@@ -68,6 +68,10 @@
             staff_cleaning: 'Cleaning', staff_crowd: 'Crowd Mgmt', staff_guest: 'Guest Services', staff_medical: 'Medical', staff_security: 'Security',
             // AI
             ai_recommendation: 'AI Recommendation',
+            // Zones
+            zone_a: 'North Stand', zone_b: 'East Stand', zone_c: 'South Stand', zone_d: 'West Stand',
+            level_low: 'low', level_moderate: 'moderate', level_high: 'high', level_critical: 'critical', level_overflow: 'overflow',
+            svg_a: 'ZONE A \u2014 NORTH', svg_b: 'ZONE B \u2014 EAST', svg_c: 'ZONE C \u2014 SOUTH', svg_d: 'ZONE D \u2014 WEST',
         },
         es: {
             loader_sub: 'Inicializando sistemas de IA',
@@ -114,6 +118,9 @@
             alert_5: 'Tiempo m\u00e9dico: 2.1 min promedio', alert_5_time: 'hace 15 min',
             staff_cleaning: 'Limpieza', staff_crowd: 'Gesti\u00f3n Multitud', staff_guest: 'Servicios al Cliente', staff_medical: 'M\u00e9dico', staff_security: 'Seguridad',
             ai_recommendation: 'Recomendaci\u00f3n IA',
+            zone_a: 'Tribuna Norte', zone_b: 'Tribuna Este', zone_c: 'Tribuna Sur', zone_d: 'Tribuna Oeste',
+            level_low: 'bajo', level_moderate: 'moderado', level_high: 'alto', level_critical: 'cr\u00edtico', level_overflow: 'desbordado',
+            svg_a: 'ZONA A \u2014 NORTE', svg_b: 'ZONA B \u2014 ESTE', svg_c: 'ZONA C \u2014 SUR', svg_d: 'ZONA D \u2014 OESTE',
         },
         fr: {
             loader_sub: 'Initialisation des syst\u00e8mes IA',
@@ -160,6 +167,9 @@
             alert_5: 'Temps m\u00e9dical: 2.1 min en moyenne', alert_5_time: 'il y a 15 min',
             staff_cleaning: 'Nettoyage', staff_crowd: 'Gestion Foule', staff_guest: 'Services Client', staff_medical: 'M\u00e9dical', staff_security: 'S\u00e9curit\u00e9',
             ai_recommendation: 'Recommandation IA',
+            zone_a: 'Tribune Nord', zone_b: 'Tribune Est', zone_c: 'Tribune Sud', zone_d: 'Tribune Ouest',
+            level_low: 'faible', level_moderate: 'mod\u00e9r\u00e9', level_high: '\u00e9lev\u00e9', level_critical: 'critique', level_overflow: 'd\u00e9bordement',
+            svg_a: 'TRIBUNE A \u2014 NORD', svg_b: 'TRIBUNE B \u2014 EST', svg_c: 'TRIBUNE C \u2014 SUD', svg_d: 'TRIBUNE D \u2014 OUEST',
         },
         de: {
             loader_sub: 'KI-Systeme werden initialisiert',
@@ -206,6 +216,9 @@
             alert_5: 'Med. Reaktionszeit: 2.1 Min', alert_5_time: 'vor 15 Min',
             staff_cleaning: 'Reinigung', staff_crowd: 'Mengenverwaltung', staff_guest: 'G\u00e4steservice', staff_medical: 'Medizin', staff_security: 'Sicherheit',
             ai_recommendation: 'KI-Empfehlung',
+            zone_a: 'Nordtribüne', zone_b: 'Osttribüne', zone_c: 'Südtribüne', zone_d: 'Westtribüne',
+            level_low: 'niedrig', level_moderate: 'mittel', level_high: 'hoch', level_critical: 'kritisch', level_overflow: 'überlauf',
+            svg_a: 'ZONE A \u2014 NORD', svg_b: 'ZONE B \u2014 OST', svg_c: 'ZONE C \u2014 S\u00dcD', svg_d: 'ZONE D \u2014 WEST',
         },
         zh: {
             loader_sub: 'AI\u7cfb\u7edf\u521d\u59cb\u5316\u4e2d',
@@ -252,6 +265,9 @@
             alert_5: '\u533b\u7597\u54cd\u5e94\u65f6\u95f4: \u5e73\u57472.1\u5206\u949f', alert_5_time: '15\u5206\u949f\u524d',
             staff_cleaning: '\u6e05\u6d01', staff_crowd: '\u4eba\u7fa4\u7ba1\u7406', staff_guest: '\u5ba2\u6237\u670d\u52a1', staff_medical: '\u533b\u7597', staff_security: '\u5b89\u4fdd',
             ai_recommendation: 'AI\u5efa\u8bae',
+            zone_a: '\u5317\u770b\u53f0', zone_b: '\u4e1c\u770b\u53f0', zone_c: '\u5357\u770b\u53f0', zone_d: '\u897f\u770b\u53f0',
+            level_low: '\u4f4e', level_moderate: '\u4e2d', level_high: '\u9ad8', level_critical: '\u4e25\u91cd', level_overflow: '\u6ea2\u51fa',
+            svg_a: '\u533a\u57df A \u2014 \u5317', svg_b: '\u533a\u57df B \u2014 \u4e1c', svg_c: '\u533a\u57df C \u2014 \u5357', svg_d: '\u533a\u57df D \u2014 \u897f',
         },
         ja: {
             loader_sub: 'AI\u30b7\u30b9\u30c6\u30e0\u521d\u59cb\u5316\u4e2d',
@@ -298,6 +314,9 @@
             alert_5: '\u533b\u7642\u5bfe\u5fdc\u6642\u9593: \u5e73\u57472.1\u5206', alert_5_time: '15\u5206\u524d',
             staff_cleaning: '\u6e05\u6b4a', staff_crowd: '\u4eba\u6ce2\u7ba1\u7406', staff_guest: '\u30ac\u30b9\u30c8\u30b5\u30fc\u30d3\u30b9', staff_medical: '\u533b\u7642', staff_security: '\u5b89\u5168',
             ai_recommendation: 'AI\u304a\u3059\u3059\u3081',
+            zone_a: '\u5317\u30b9\u30bf\u30f3\u30c9', zone_b: '\u6771\u30b9\u30bf\u30f3\u30c9', zone_c: '\u5357\u30b9\u30bf\u30f3\u30c9', zone_d: '\u897f\u30b9\u30bf\u30f3\u30c9',
+            level_low: '\u4f4e', level_moderate: '\u4e2d', level_high: '\u9ad8', level_critical: '\u5371\u967a', level_overflow: '\u30aa\u30fc\u30d0\u30fc\u30d5\u30ed\u30fc',
+            svg_a: '\u30b8\u30e7\u30f3 A \u2014 \u5317', svg_b: '\u30b8\u30e7\u30f3 B \u2014 \u6771', svg_c: '\u30b8\u30e7\u30f3 C \u2014 \u5357', svg_d: '\u30b8\u30e7\u30f3 D \u2014 \u897f',
         },
         ko: {
             loader_sub: 'AI 시스템 초기화',
@@ -344,6 +363,9 @@
             alert_5: '의료 대응시간: 평균 2.1분', alert_5_time: '15분 전',
             staff_cleaning: '청소', staff_crowd: '인파 관리', staff_guest: '고객 서비스', staff_medical: '의료', staff_security: '보안',
             ai_recommendation: 'AI 추천',
+            zone_a: '북쪽 스탠드', zone_b: '동쪽 스탠드', zone_c: '남쪽 스탠드', zone_d: '서쪽 스탠드',
+            level_low: '낮음', level_moderate: '보통', level_high: '높음', level_critical: '위험', level_overflow: '초과',
+            svg_a: '존 A \u2014 북쪽', svg_b: '존 B \u2014 동쪽', svg_c: '존 C \u2014 남쪽', svg_d: '존 D \u2014 서쪽',
         },
         pt: {
             loader_sub: 'Inicializando sistemas de IA',
@@ -390,6 +412,9 @@
             alert_5: 'Tempo médico: 2.1 min média', alert_5_time: 'há 15 min',
             staff_cleaning: 'Limpeza', staff_crowd: 'Gestão de Multidão', staff_guest: 'Serviços ao Cliente', staff_medical: 'Médico', staff_security: 'Segurança',
             ai_recommendation: 'Recomendação IA',
+            zone_a: 'Arquibancada Norte', zone_b: 'Arquibancada Leste', zone_c: 'Arquibancada Sul', zone_d: 'Arquibancada Oeste',
+            level_low: 'baixo', level_moderate: 'moderado', level_high: 'alto', level_critical: 'crítico', level_overflow: 'transbordamento',
+            svg_a: 'ZONA A \u2014 NORTE', svg_b: 'ZONA B \u2014 LESTE', svg_c: 'ZONA C \u2014 SUL', svg_d: 'ZONA D \u2014 OESTE',
         },
         hi: {
             loader_sub: 'AI \u0938\u093f\u0938\u094d\u091f\u092e \u0915\u094b \u0907\u0928\u093f\u0936\u0932\u093f\u091f \u0939\u094b \u0930\u0939\u093e \u0939\u0948',
@@ -436,6 +461,9 @@
             alert_5: '\u092e\u0947\u0921\u093f\u0915\u0932 \u092a\u094d\u0930\u0924\u093f\u0915\u094d\u0930\u093f\u092f\u093e: \u0914\u0938\u0924 \u0920 2.1', alert_5_time: '15 \u092e\u093f\u0928 \u092a\u0939\u0932\u0947',
             staff_cleaning: '\u0938\u092b\u093c\u093e\u0908', staff_crowd: '\u092d\u0940\u0921\u093c \u092a\u094d\u0930\u092c\u0902\u0927\u0928', staff_guest: '\u0917\u0948\u0938\u094d\u091f \u0938\u0947\u0935\u093e', staff_medical: '\u092e\u0947\u0921\u093f\u0915\u0932', staff_security: '\u0938\u0941\u0930\u0915\u094d\u0937\u093e',
             ai_recommendation: 'AI \u0938\u0941\u091a\u0928\u093e',
+            zone_a: '\u0909\u0924\u094d\u0924\u0930 \u0938\u094d\u091f\u0948\u0902\u0921', zone_b: '\u092a\u0942\u0930\u094d\u0925 \u0938\u094d\u091f\u0948\u0902\u0921', zone_c: '\u0926\u0915\u094d\u0937\u093f\u0928 \u0938\u094d\u091f\u0948\u0902\u0921', zone_d: '\u092a\u0936\u094d\u091a\u093f\u092e \u0938\u094d\u091f\u0948\u0902\u0921',
+            level_low: '\u0915\u092e', level_moderate: '\u092e\u0927\u094d\u092f\u092e', level_high: '\u0909\u091a\u094d\u091a', level_critical: '\u0917\u0902\u092D\u0940\u0930', level_overflow: '\u0905\u0924\u093f\u0930\u093f\u0915\u094d\u0924',
+            svg_a: '\u091c\u094b\u0928 A \u2014 \u0909\u0924\u094d\u0924\u0930', svg_b: '\u091c\u094b\u0928 B \u2014 \u092a\u0942\u0930\u094d\u0925', svg_c: '\u091c\u094b\u0928 C \u2014 \u0926\u0915\u094d\u0937\u093f\u0928', svg_d: '\u091c\u094b\u0928 D \u2014 \u092a\u0936\u094d\u091a\u093f\u092e',
         },
     };
 
@@ -581,6 +609,11 @@
             if (t[key]) el.placeholder = t[key];
         });
         document.documentElement.lang = lang;
+        var svgMap = { 'svg-zone-a': 'svg_a', 'svg-zone-b': 'svg_b', 'svg-zone-c': 'svg_c', 'svg-zone-d': 'svg_d' };
+        Object.keys(svgMap).forEach(function (id) {
+            var el = document.getElementById(id);
+            if (el && t[svgMap[id]]) el.textContent = t[svgMap[id]];
+        });
     }
 
     // ─── Toast Notifications ─────────────────────────────────
@@ -757,18 +790,24 @@
         var zones = overview.zones || {};
         var container = document.getElementById('zone-cards');
         if (!container) return;
+        var t = I18N[currentLang] || I18N.en;
+        var e = I18N.en;
+        function tr(key) { return t[key] || e[key]; }
+        var zoneMap = { A: tr('zone_a'), B: tr('zone_b'), C: tr('zone_c'), D: tr('zone_d') };
         var html = '';
 
         Object.keys(zones).forEach(function (zid) {
             var z = zones[zid];
             var pct = z.percentage || 0;
             var level = z.level || 'low';
+            var zoneName = zoneMap[zid] || (z.name || 'Zone ' + zid);
+            var levelLabel = tr('level_' + level);
 
             html +=
                 '<div class="zone-card" data-level="' + level + '">' +
                     '<div class="zone-top">' +
-                        '<span class="zone-name">' + (z.name || 'Zone ' + zid) + '</span>' +
-                        '<span class="zone-badge ' + level + '">' + level + '</span>' +
+                        '<span class="zone-name">' + zoneName + '</span>' +
+                        '<span class="zone-badge ' + level + '">' + levelLabel + '</span>' +
                     '</div>' +
                     '<div class="zone-bar"><div class="zone-fill ' + level + '" style="width:' + pct + '%"></div></div>' +
                     '<div class="zone-stats">' +
