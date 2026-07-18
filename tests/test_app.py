@@ -289,3 +289,143 @@ class TestDashboard:
         d = json.loads(r.data)
         assert "kpis" in d["data"]
         assert "alerts" in d["data"]
+
+
+# ═══ Fan Journey Tests ════════════════════════════════════════
+class TestFanJourney:
+    def test_start_journey(self, client):
+        r = client.post("/api/journey/start",
+            data=json.dumps({"fan_id": "test-fan-1", "preferences": {"language": "en"}}),
+            content_type="application/json")
+        d = json.loads(r.data)
+        assert d["status"] == "success"
+        assert d["data"]["current_stage"]["id"] == "pre_arrival"
+
+    def test_advance_journey(self, client):
+        client.post("/api/journey/start",
+            data=json.dumps({"fan_id": "test-fan-2"}),
+            content_type="application/json")
+        r = client.post("/api/journey/advance",
+            data=json.dumps({"fan_id": "test-fan-2"}),
+            content_type="application/json")
+        d = json.loads(r.data)
+        assert d["status"] == "success"
+
+    def test_journey_status(self, client):
+        client.post("/api/journey/start",
+            data=json.dumps({"fan_id": "test-fan-3"}),
+            content_type="application/json")
+        r = client.get("/api/journey/status/test-fan-3")
+        d = json.loads(r.data)
+        assert "progress_percent" in d["data"]
+        assert "personalized_tips" in d["data"]
+
+    def test_journey_recommendations(self, client):
+        client.post("/api/journey/start",
+            data=json.dumps({"fan_id": "test-fan-4"}),
+            content_type="application/json")
+        r = client.get("/api/journey/recommendations/test-fan-4")
+        d = json.loads(r.data)
+        assert isinstance(d["data"], list)
+
+    def test_journey_action(self, client):
+        client.post("/api/journey/start",
+            data=json.dumps({"fan_id": "test-fan-5"}),
+            content_type="application/json")
+        r = client.post("/api/journey/action",
+            data=json.dumps({"fan_id": "test-fan-5", "action": "entered_gate", "rating": 9}),
+            content_type="application/json")
+        d = json.loads(r.data)
+        assert d["data"]["status"] == "recorded"
+
+    def test_journey_analytics(self, client):
+        r = client.get("/api/journey/analytics")
+        d = json.loads(r.data)
+        assert "total_fans_tracked" in d["data"]
+
+
+# ═══ Match Simulator Tests ════════════════════════════════════
+class TestMatchSimulator:
+    def test_start_match(self, client):
+        r = client.post("/api/match/start",
+            data=json.dumps({"home_team": "USA", "away_team": "ENG"}),
+            content_type="application/json")
+        d = json.loads(r.data)
+        assert d["status"] == "success"
+        assert d["data"]["home"] == "USA"
+        assert d["data"]["away"] == "ENG"
+
+    def test_full_match_simulation(self, client):
+        r = client.post("/api/match/simulate",
+            data=json.dumps({"home_team": "BRA", "away_team": "GER"}),
+            content_type="application/json")
+        d = json.loads(r.data)
+        assert d["data"]["status"] == "finished"
+        assert d["data"]["minute"] >= 90
+
+    def test_match_status(self, client):
+        client.post("/api/match/start",
+            data=json.dumps({"home_team": "USA", "away_team": "ENG"}),
+            content_type="application/json")
+        r = client.get("/api/match/status")
+        d = json.loads(r.data)
+        assert "home_score" in d["data"]
+
+    def test_match_events(self, client):
+        client.post("/api/match/simulate",
+            data=json.dumps({"home_team": "USA", "away_team": "ENG"}),
+            content_type="application/json")
+        r = client.get("/api/match/events?count=5")
+        d = json.loads(r.data)
+        assert isinstance(d["data"], list)
+
+    def test_match_prediction(self, client):
+        client.post("/api/match/start",
+            data=json.dumps({"home_team": "USA", "away_team": "ENG"}),
+            content_type="application/json")
+        r = client.get("/api/match/prediction")
+        d = json.loads(r.data)
+        assert "home_win_probability" in d["data"]
+        assert "confidence" in d["data"]
+
+    def test_match_energy(self, client):
+        client.post("/api/match/simulate",
+            data=json.dumps({"home_team": "USA", "away_team": "ENG"}),
+            content_type="application/json")
+        r = client.get("/api/match/energy")
+        d = json.loads(r.data)
+        assert "energy_level" in d["data"]
+
+    def test_match_teams(self, client):
+        r = client.get("/api/match/teams")
+        d = json.loads(r.data)
+        assert "USA" in d["data"]
+        assert "BRA" in d["data"]
+
+
+# ═══ Satisfaction Tests ═══════════════════════════════════════
+class TestSatisfaction:
+    def test_record_score(self, client):
+        r = client.post("/api/satisfaction/score",
+            data=json.dumps({"touchpoint": "food_quality", "score": 8}),
+            content_type="application/json")
+        d = json.loads(r.data)
+        assert d["data"]["score"] == 8
+
+    def test_record_nps(self, client):
+        r = client.post("/api/satisfaction/nps",
+            data=json.dumps({"score": 9}),
+            content_type="application/json")
+        d = json.loads(r.data)
+        assert "nps" in d["data"]
+
+    def test_satisfaction_dashboard(self, client):
+        r = client.get("/api/satisfaction/dashboard")
+        d = json.loads(r.data)
+        assert "overall_score" in d["data"]
+        assert "nps" in d["data"]
+
+    def test_weakest_areas(self, client):
+        r = client.get("/api/satisfaction/weakest?count=3")
+        d = json.loads(r.data)
+        assert isinstance(d["data"], list)

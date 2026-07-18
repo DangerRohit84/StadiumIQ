@@ -6,7 +6,7 @@ from config.settings import Config
 
 
 class GenAIEngine:
-    """Production-grade GenAI engine with intelligent routing and fallback."""
+    """Production-grade GenAI engine with intelligent routing, multi-turn context, and fallback."""
 
     SYSTEM_PROMPT = """You are StadiumIQ Brain — a state-of-the-art AI assistant for FIFA World Cup 2026 at MetLife Stadium.
 
@@ -19,6 +19,8 @@ CAPABILITIES:
 6. Sentiment analysis of fan feedback
 7. Operational intelligence for venue staff
 8. Transportation optimization and parking guidance
+9. Live match simulation and predictions
+10. Personalized fan journey assistance
 
 PERSONALITY:
 - Concise, professional, and friendly
@@ -26,6 +28,7 @@ PERSONALITY:
 - Format responses with markdown: **bold**, bullet points, numbered steps
 - Include confidence levels when making predictions
 - Always provide alternative options
+- Remember context from earlier in the conversation
 
 CONTEXT AWARENESS:
 - You have access to real-time crowd density data
@@ -45,6 +48,7 @@ RESPONSE RULES:
         self._client = None
         self._last_init = 0
         self._init_interval = 300
+        self._conversation_history = {}  # fan_id -> list of messages
 
     @property
     def client(self) -> OpenAI | None:
@@ -67,11 +71,18 @@ RESPONSE RULES:
         language: str = "en",
         user_type: str = "fan",
         urgency: str = "normal",
+        fan_id: str | None = None,
     ) -> dict:
-        """Generate AI response with full context awareness."""
+        """Generate AI response with full context awareness and multi-turn memory."""
         start = time.time()
 
         messages = [{"role": "system", "content": self._build_system_prompt(user_type)}]
+
+        # Add conversation history for multi-turn context
+        if fan_id and fan_id in self._conversation_history:
+            history = self._conversation_history[fan_id][-6:]  # Last 3 exchanges
+            for msg in history:
+                messages.append({"role": msg["role"], "content": msg["content"]})
 
         if context:
             messages.append({
@@ -94,6 +105,15 @@ RESPONSE RULES:
                 latency = round((time.time() - start) * 1000)
                 tokens_used = response.usage.total_tokens if response.usage else 0
 
+                # Save to conversation history for multi-turn context
+                if fan_id:
+                    if fan_id not in self._conversation_history:
+                        self._conversation_history[fan_id] = []
+                    self._conversation_history[fan_id].append({"role": "user", "content": message})
+                    self._conversation_history[fan_id].append({"role": "assistant", "content": ai_text})
+                    if len(self._conversation_history[fan_id]) > 20:
+                        self._conversation_history[fan_id] = self._conversation_history[fan_id][-20:]
+
                 return {
                     "response": ai_text,
                     "source": "genai",
@@ -108,6 +128,16 @@ RESPONSE RULES:
 
         result = self._fallback_response(message, context, user_type)
         result["latency_ms"] = round((time.time() - start) * 1000)
+
+        # Save to conversation history even for fallback
+        if fan_id:
+            if fan_id not in self._conversation_history:
+                self._conversation_history[fan_id] = []
+            self._conversation_history[fan_id].append({"role": "user", "content": message})
+            self._conversation_history[fan_id].append({"role": "assistant", "content": result["response"]})
+            if len(self._conversation_history[fan_id]) > 20:
+                self._conversation_history[fan_id] = self._conversation_history[fan_id][-20:]
+
         return result
 
     def analyze_sentiment(self, text: str) -> dict:

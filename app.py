@@ -13,6 +13,9 @@ from core.sentiment.sentiment_engine import sentiment_analyzer
 from core.predictive.predictive_engine import predictive_analytics
 from core.navigation.nav_engine import navigation_engine
 from core.analytics.dashboard_engine import analytics_dashboard
+from core.fan import fan_journey
+from core.match import match_simulator
+from core.satisfaction import satisfaction_tracker
 
 
 def create_app(config_name: str = "development") -> Flask:
@@ -40,6 +43,7 @@ def create_app(config_name: str = "development") -> Flask:
 
         user_type = data.get("user_type", "fan")
         language = data.get("language", "en")
+        fan_id = data.get("fan_id", "anonymous")
         urgency = "high" if any(w in data["message"].lower() for w in ["emergency", "fire", "help", "danger"]) else "normal"
 
         context = {
@@ -48,7 +52,7 @@ def create_app(config_name: str = "development") -> Flask:
             "safety": emergency_system.get_safety_status(),
         }
 
-        result = engine.generate(data["message"], context, language, user_type, urgency)
+        result = engine.generate(data["message"], context, language, user_type, urgency, fan_id)
 
         sentiment = sentiment_analyzer.analyze(data["message"], source="chat")
         result["sentiment"] = sentiment
@@ -226,6 +230,115 @@ def create_app(config_name: str = "development") -> Flask:
     def api_dashboard_command():
         data = analytics_dashboard.get_command_center_summary()
         return jsonify({"status": "success", "data": data})
+
+    # ─── Fan Journey ──────────────────────────────────────────
+    @app.route("/api/journey/start", methods=["POST"])
+    def api_journey_start():
+        data = request.get_json() or {}
+        fan_id = data.get("fan_id", f"fan-{int(time.time())}")
+        result = fan_journey.start_journey(fan_id, data.get("preferences"))
+        return jsonify({"status": "success", "data": result})
+
+    @app.route("/api/journey/advance", methods=["POST"])
+    def api_journey_advance():
+        data = request.get_json() or {}
+        fan_id = data.get("fan_id")
+        if not fan_id:
+            return jsonify({"status": "error", "message": "fan_id required"}), 400
+        result = fan_journey.advance_stage(fan_id, data.get("stage"))
+        return jsonify({"status": "success", "data": result})
+
+    @app.route("/api/journey/status/<fan_id>", methods=["GET"])
+    def api_journey_status(fan_id):
+        result = fan_journey.get_journey_status(fan_id)
+        return jsonify({"status": "success", "data": result})
+
+    @app.route("/api/journey/recommendations/<fan_id>", methods=["GET"])
+    def api_journey_recommendations(fan_id):
+        result = fan_journey.get_personalized_recommendations(fan_id)
+        return jsonify({"status": "success", "data": result})
+
+    @app.route("/api/journey/action", methods=["POST"])
+    def api_journey_action():
+        data = request.get_json() or {}
+        result = fan_journey.complete_action(data.get("fan_id"), data.get("action", ""), data.get("rating"))
+        return jsonify({"status": "success", "data": result})
+
+    @app.route("/api/journey/analytics", methods=["GET"])
+    def api_journey_analytics():
+        return jsonify({"status": "success", "data": fan_journey.get_analytics()})
+
+    # ─── Match Simulator ──────────────────────────────────────
+    @app.route("/api/match/start", methods=["POST"])
+    def api_match_start():
+        data = request.get_json() or {}
+        home = data.get("home_team", "USA")
+        away = data.get("away_team", "ENG")
+        result = match_simulator.start_match(home, away)
+        return jsonify({"status": "success", "data": result})
+
+    @app.route("/api/match/simulate", methods=["POST"])
+    def api_match_simulate():
+        data = request.get_json() or {}
+        home = data.get("home_team", "USA")
+        away = data.get("away_team", "ENG")
+        result = match_simulator.simulate_full_match(home, away)
+        return jsonify({"status": "success", "data": result})
+
+    @app.route("/api/match/minute", methods=["POST"])
+    def api_match_minute():
+        result = match_simulator.simulate_minute()
+        return jsonify({"status": "success", "data": result})
+
+    @app.route("/api/match/status", methods=["GET"])
+    def api_match_status():
+        return jsonify({"status": "success", "data": match_simulator.get_match_status()})
+
+    @app.route("/api/match/events", methods=["GET"])
+    def api_match_events():
+        count = request.args.get("count", 5, type=int)
+        return jsonify({"status": "success", "data": match_simulator.get_recent_events(count)})
+
+    @app.route("/api/match/prediction", methods=["GET"])
+    def api_match_prediction():
+        return jsonify({"status": "success", "data": match_simulator.get_prediction()})
+
+    @app.route("/api/match/energy", methods=["GET"])
+    def api_match_energy():
+        return jsonify({"status": "success", "data": match_simulator.get_crowd_energy()})
+
+    @app.route("/api/match/teams", methods=["GET"])
+    def api_match_teams():
+        return jsonify({"status": "success", "data": match_simulator.TEAMS})
+
+    # ─── Satisfaction ─────────────────────────────────────────
+    @app.route("/api/satisfaction/score", methods=["POST"])
+    def api_satisfaction_score():
+        data = request.get_json() or {}
+        tp = data.get("touchpoint")
+        score = data.get("score")
+        if not tp or score is None:
+            return jsonify({"status": "error", "message": "touchpoint and score required"}), 400
+        result = satisfaction_tracker.record_score(tp, score, data.get("fan_id"))
+        return jsonify({"status": "success", "data": result})
+
+    @app.route("/api/satisfaction/nps", methods=["POST"])
+    def api_satisfaction_nps():
+        data = request.get_json() or {}
+        score = data.get("score")
+        if score is None:
+            return jsonify({"status": "error", "message": "score required"}), 400
+        result = satisfaction_tracker.record_nps(score, data.get("fan_id"))
+        return jsonify({"status": "success", "data": result})
+
+    @app.route("/api/satisfaction/dashboard", methods=["GET"])
+    def api_satisfaction_dashboard():
+        return jsonify({"status": "success", "data": satisfaction_tracker.get_dashboard_data()})
+
+    @app.route("/api/satisfaction/weakest", methods=["GET"])
+    def api_satisfaction_weakest():
+        count = request.args.get("count", 3, type=int)
+        return jsonify({"status": "success", "data": satisfaction_tracker.get_weakest_areas(count)})
 
     # ─── WebSocket Events ─────────────────────────────────────
     @socketio.on("connect")
