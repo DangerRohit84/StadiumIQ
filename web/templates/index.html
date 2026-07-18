@@ -5,54 +5,62 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>StadiumIQ — AI Command Center | FIFA World Cup 2026</title>
     <link rel="stylesheet" href="/static/css/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
+    <!-- Loading Screen -->
     <div class="app-loader" id="app-loader">
+        <div class="loader-bg"></div>
         <div class="loader-content">
-            <div class="loader-logo">
-                <i class="fas fa-futbol fa-spin"></i>
+            <div class="loader-ring">
+                <div class="ring-segment"></div>
+                <div class="ring-segment"></div>
+                <div class="ring-segment"></div>
+                <div class="loader-icon"><i class="fas fa-futbol"></i></div>
             </div>
-            <h1>StadiumIQ</h1>
-            <p>Initializing AI Systems...</p>
+            <h1 class="loader-title">Stadium<span>IQ</span></h1>
+            <p class="loader-sub">Initializing AI Systems</p>
             <div class="loader-bar"><div class="loader-fill"></div></div>
+            <div class="loader-dots"><span></span><span></span><span></span></div>
         </div>
     </div>
 
+    <!-- Floating Particles -->
+    <canvas id="particles-canvas"></canvas>
+
+    <!-- Header -->
     <header class="header">
         <div class="header-left">
             <div class="logo">
-                <i class="fas fa-futbol"></i>
-                <span class="logo-text">Stadium<span class="accent">IQ</span></span>
-                <span class="version-badge">v2.0</span>
+                <div class="logo-icon"><i class="fas fa-futbol"></i></div>
+                <div class="logo-text">Stadium<span>IQ</span></div>
+                <div class="logo-badge">LIVE</div>
             </div>
-            <nav class="nav-tabs">
-                <button class="nav-btn active" data-view="fan" onclick="switchView('fan')">
-                    <i class="fas fa-user"></i> Fan View
+            <nav class="nav-pills">
+                <button class="nav-pill active" data-view="fan" onclick="switchView('fan')">
+                    <i class="fas fa-user-astronaut"></i><span>Fan Experience</span>
                 </button>
-                <button class="nav-btn" data-view="command" onclick="switchView('command')">
-                    <i class="fas fa-terminal"></i> Command Center
+                <button class="nav-pill" data-view="command" onclick="switchView('command')">
+                    <i class="fas fa-terminal"></i><span>Command Center</span>
                 </button>
             </nav>
         </div>
         <div class="header-right">
-            <div class="live-indicator">
-                <span class="pulse"></span> LIVE
-            </div>
+            <div class="status-pill"><span class="status-dot"></span>Systems Online</div>
             <select id="lang-select" class="lang-select" aria-label="Language">
-                <option value="en">English</option>
-                <option value="es">Español</option>
-                <option value="fr">Français</option>
-                <option value="de">Deutsch</option>
-                <option value="ar">العربية</option>
-                <option value="zh">中文</option>
-                <option value="ja">日本語</option>
-                <option value="ko">한국어</option>
-                <option value="pt">Português</option>
-                <option value="hi">हिन्दी</option>
+                <option value="en">EN</option>
+                <option value="es">ES</option>
+                <option value="fr">FR</option>
+                <option value="de">DE</option>
+                <option value="ar">AR</option>
+                <option value="zh">ZH</option>
+                <option value="ja">JA</option>
+                <option value="ko">KO</option>
+                <option value="pt">PT</option>
+                <option value="hi">HI</option>
             </select>
-            <button class="icon-btn" id="a11y-btn" onclick="toggleAccessibility()" title="Accessibility">
+            <button class="a11y-btn" id="a11y-btn" onclick="toggleAccessibility()" title="Accessibility">
                 <i class="fas fa-universal-access"></i>
             </button>
         </div>
@@ -60,110 +68,179 @@
 
     <!-- ═══ FAN VIEW ═══ -->
     <div id="view-fan" class="view active">
-        <div class="fan-layout">
-            <div class="chat-section">
-                <div class="chat-header">
-                    <div class="chat-title">
-                        <i class="fas fa-robot"></i>
-                        <span>AI Assistant</span>
+        <!-- Hero Banner -->
+        <div class="hero-banner">
+            <div class="hero-content">
+                <div class="hero-badge"><i class="fas fa-trophy"></i> FIFA World Cup 2026</div>
+                <h1 class="hero-title">Your Personal <span class="gradient-text">AI Stadium</span> Assistant</h1>
+                <p class="hero-sub">Navigate smarter. Experience better. powered by Google Gemini 2.5 Flash.</p>
+                <div class="hero-stats">
+                    <div class="hero-stat">
+                        <div class="stat-value" data-count="82500">0</div>
+                        <div class="stat-label">Capacity</div>
                     </div>
-                    <div class="chat-status online">Online</div>
+                    <div class="hero-stat">
+                        <div class="stat-value" data-count="45">0</div>
+                        <div class="stat-label">API Endpoints</div>
+                    </div>
+                    <div class="hero-stat">
+                        <div class="stat-value" data-count="10">0</div>
+                        <div class="stat-label">Languages</div>
+                    </div>
+                    <div class="hero-stat">
+                        <div class="stat-value" data-count="61">0</div>
+                        <div class="stat-label">Tests Passing</div>
+                    </div>
                 </div>
+            </div>
+            <div class="hero-visual">
+                <div class="orbit-system">
+                    <div class="orbit orbit-1"><div class="orbit-dot"><i class="fas fa-users"></i></div></div>
+                    <div class="orbit orbit-2"><div class="orbit-dot"><i class="fas fa-shield-alt"></i></div></div>
+                    <div class="orbit orbit-3"><div class="orbit-dot"><i class="fas fa-utensils"></i></div></div>
+                    <div class="orbit-center"><i class="fas fa-futbol"></i></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Layout -->
+        <div class="main-layout">
+            <!-- Chat Panel -->
+            <div class="panel chat-panel">
+                <div class="panel-header">
+                    <div class="panel-title">
+                        <div class="title-icon"><i class="fas fa-robot"></i></div>
+                        <div>
+                            <h2>AI Assistant</h2>
+                            <span class="title-sub">Powered by Gemini 2.5 Flash</span>
+                        </div>
+                    </div>
+                    <div class="panel-status"><span class="status-dot"></span>Active</div>
+                </div>
+
                 <div id="chat-messages" class="chat-messages" role="log">
                     <div class="msg bot">
                         <div class="msg-avatar"><i class="fas fa-robot"></i></div>
                         <div class="msg-body">
-                            <div class="msg-content">
-                                <p>Welcome to <strong>StadiumIQ</strong> — your AI-powered assistant for FIFA World Cup 2026!</p>
-                                <p>Ask me about navigation, crowds, food, parking, accessibility, or sustainability.</p>
+                            <div class="msg-bubble">
+                                <div class="msg-greeting">
+                                    <h3>Welcome to StadiumIQ! <span class="wave">&#128075;</span></h3>
+                                    <p>I'm your AI-powered assistant for <strong>FIFA World Cup 2026</strong> at MetLife Stadium.</p>
+                                    <div class="greeting-features">
+                                        <div class="gf-item"><i class="fas fa-map-marker-alt"></i> Navigation</div>
+                                        <div class="gf-item"><i class="fas fa-chart-line"></i> Live Crowds</div>
+                                        <div class="gf-item"><i class="fas fa-wheelchair"></i> Accessibility</div>
+                                        <div class="gf-item"><i class="fas fa-leaf"></i> Sustainability</div>
+                                        <div class="gf-item"><i class="fas fa-futbol"></i> Match Info</div>
+                                        <div class="gf-item"><i class="fas fa-car"></i> Transport</div>
+                                    </div>
+                                </div>
                             </div>
-                            <span class="msg-time">Now</span>
+                            <span class="msg-time">Just now</span>
                         </div>
                     </div>
                 </div>
-                <div class="quick-replies">
-                    <button onclick="sendQuick('Where is the nearest restroom?')"><i class="fas fa-restroom"></i> Restrooms</button>
-                    <button onclick="sendQuick('What food options are available?')"><i class="fas fa-utensils"></i> Food</button>
-                    <button onclick="sendQuick('How busy is the stadium?')"><i class="fas fa-chart-bar"></i> Crowds</button>
-                    <button onclick="sendQuick('Where can I park?')"><i class="fas fa-parking"></i> Parking</button>
-                    <button onclick="sendQuick('I need wheelchair accessibility')"><i class="fas fa-wheelchair"></i> Accessible</button>
-                    <button onclick="sendQuick('Where are recycling stations?')"><i class="fas fa-recycle"></i> Eco</button>
-                    <button onclick="sendQuick('What matches are today?')"><i class="fas fa-calendar"></i> Schedule</button>
+
+                <div class="quick-bar">
+                    <div class="quick-scroll">
+                        <button class="quick-chip" onclick="sendQuick('Where is the nearest restroom?')"><i class="fas fa-restroom"></i> Restrooms</button>
+                        <button class="quick-chip" onclick="sendQuick('What food options are available?')"><i class="fas fa-utensils"></i> Food</button>
+                        <button class="quick-chip" onclick="sendQuick('How busy is the stadium?')"><i class="fas fa-chart-bar"></i> Crowds</button>
+                        <button class="quick-chip" onclick="sendQuick('Where can I park?')"><i class="fas fa-parking"></i> Parking</button>
+                        <button class="quick-chip" onclick="sendQuick('I need wheelchair accessibility')"><i class="fas fa-wheelchair"></i> Accessible</button>
+                        <button class="quick-chip" onclick="sendQuick('Where are recycling stations?')"><i class="fas fa-recycle"></i> Eco</button>
+                        <button class="quick-chip" onclick="sendQuick('What matches are today?')"><i class="fas fa-calendar-alt"></i> Schedule</button>
+                        <button class="quick-chip" onclick="sendQuick('Where is the first aid?')"><i class="fas fa-medkit"></i> Medical</button>
+                    </div>
                 </div>
-                <form id="chat-form" class="chat-input">
-                    <input type="text" id="chat-input" placeholder="Ask me anything..." autocomplete="off">
-                    <button type="submit"><i class="fas fa-paper-plane"></i></button>
+
+                <form id="chat-form" class="chat-input-area">
+                    <div class="input-wrapper">
+                        <i class="fas fa-comment-dots input-icon"></i>
+                        <input type="text" id="chat-input" placeholder="Ask me anything about the stadium..." autocomplete="off">
+                        <button type="submit" class="send-btn" aria-label="Send">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
                 </form>
             </div>
 
-            <div class="info-section">
-                <div class="info-tabs">
-                    <button class="info-tab active" data-tab="crowd"><i class="fas fa-users"></i> Crowd</button>
-                    <button class="info-tab" data-tab="map"><i class="fas fa-map"></i> Map</button>
-                    <button class="info-tab" data-tab="transport"><i class="fas fa-bus"></i> Transport</button>
-                    <button class="info-tab" data-tab="eco"><i class="fas fa-leaf"></i> Eco</button>
+            <!-- Info Panel -->
+            <div class="panel info-panel">
+                <div class="panel-tabs">
+                    <button class="panel-tab active" data-tab="crowd" onclick="switchInfoTab('crowd')">
+                        <i class="fas fa-users"></i><span>Crowd</span>
+                    </button>
+                    <button class="panel-tab" data-tab="map" onclick="switchInfoTab('map')">
+                        <i class="fas fa-map-marked-alt"></i><span>Map</span>
+                    </button>
+                    <button class="panel-tab" data-tab="transport" onclick="switchInfoTab('transport')">
+                        <i class="fas fa-shuttle-van"></i><span>Transport</span>
+                    </button>
+                    <button class="panel-tab" data-tab="eco" onclick="switchInfoTab('eco')">
+                        <i class="fas fa-leaf"></i><span>Eco</span>
+                    </button>
                 </div>
 
-                <div id="info-crowd" class="info-panel active">
-                    <div class="panel-title">Real-Time Crowd Density</div>
-                    <div class="stadium-visual" id="stadium-visual">
-                        <svg viewBox="0 0 500 350" class="stadium-svg">
+                <!-- Crowd Tab -->
+                <div id="tab-crowd" class="tab-content active">
+                    <div class="tab-header">
+                        <h3>Real-Time Crowd Density</h3>
+                        <div class="live-badge"><span class="live-dot"></span>Live</div>
+                    </div>
+                    <div class="stadium-map-wrap">
+                        <svg viewBox="0 0 500 350" class="stadium-svg" id="stadium-svg">
                             <defs>
-                                <linearGradient id="grad-green" x1="0%" y1="0%" x2="100%" y2="0%">
-                                    <stop offset="0%" style="stop-color:#10b981;stop-opacity:1" />
-                                    <stop offset="100%" style="stop-color:#059669;stop-opacity:1" />
+                                <filter id="glow"><feGaussianBlur stdDeviation="3" result="coloredBlur"/><feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+                                <linearGradient id="pitchGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#059669;stop-opacity:0.3"/>
+                                    <stop offset="100%" style="stop-color:#10b981;stop-opacity:0.1"/>
                                 </linearGradient>
-                                <linearGradient id="grad-yellow" x1="0%" y1="0%" x2="100%" y2="0%">
-                                    <stop offset="0%" style="stop-color:#f59e0b;stop-opacity:1" />
-                                    <stop offset="100%" style="stop-color:#d97706;stop-opacity:1" />
-                                </linearGradient>
-                                <linearGradient id="grad-orange" x1="0%" y1="0%" x2="100%" y2="0%">
-                                    <stop offset="0%" style="stop-color:#f97316;stop-opacity:1" />
-                                    <stop offset="100%" style="stop-color:#ea580c;stop-opacity:1" />
-                                </linearGradient>
-                                <linearGradient id="grad-red" x1="0%" y1="0%" x2="100%" y2="0%">
-                                    <stop offset="0%" style="stop-color:#ef4444;stop-opacity:1" />
-                                    <stop offset="100%" style="stop-color:#dc2626;stop-opacity:1" />
-                                </linearGradient>
-                                <filter id="glow">
-                                    <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
-                                    <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
-                                </filter>
                             </defs>
-                            <text x="250" y="18" text-anchor="middle" fill="#64748b" font-size="11" font-weight="700" letter-spacing="2">METLIFE STADIUM — 82,500 CAPACITY</text>
-                            <rect x="80" y="30" width="340" height="290" rx="30" fill="none" stroke="#334155" stroke-width="2" stroke-dasharray="5,5"/>
-                            <rect id="zone-a-svg" x="130" y="45" width="240" height="55" rx="10" class="zone-block" data-zone="A" filter="url(#glow)"/>
-                            <text x="250" y="78" text-anchor="middle" fill="white" font-size="13" font-weight="700">A — NORTH</text>
-                            <rect id="zone-b-svg" x="355" y="105" width="55" height="140" rx="10" class="zone-block" data-zone="B" filter="url(#glow)"/>
-                            <text x="382" y="178" text-anchor="middle" fill="white" font-size="12" font-weight="700" transform="rotate(90 382 178)">B — EAST</text>
-                            <rect id="zone-c-svg" x="130" y="250" width="240" height="55" rx="10" class="zone-block" data-zone="C" filter="url(#glow)"/>
-                            <text x="250" y="283" text-anchor="middle" fill="white" font-size="13" font-weight="700">C — SOUTH</text>
-                            <rect id="zone-d-svg" x="90" y="105" width="55" height="140" rx="10" class="zone-block" data-zone="D" filter="url(#glow)"/>
-                            <text x="118" y="178" text-anchor="middle" fill="white" font-size="12" font-weight="700" transform="rotate(-90 118 178)">D — WEST</text>
-                            <rect x="155" y="110" width="190" height="130" rx="6" fill="#16a34a" opacity="0.15" stroke="#16a34a" stroke-width="1"/>
-                            <text x="250" y="178" text-anchor="middle" fill="#22c55e" font-size="12" font-weight="600">PITCH</text>
-                            <circle cx="100" cy="45" r="7" fill="#f59e0b" class="gate-marker"/><text x="100" y="35" text-anchor="middle" fill="#f59e0b" font-size="8" font-weight="600">E1</text>
-                            <circle cx="400" cy="45" r="7" fill="#f59e0b" class="gate-marker"/><text x="400" y="35" text-anchor="middle" fill="#f59e0b" font-size="8" font-weight="600">E2</text>
-                            <circle cx="400" cy="295" r="7" fill="#f59e0b" class="gate-marker"/><text x="400" y="310" text-anchor="middle" fill="#f59e0b" font-size="8" font-weight="600">E3</text>
-                            <circle cx="100" cy="295" r="7" fill="#f59e0b" class="gate-marker"/><text x="100" y="310" text-anchor="middle" fill="#f59e0b" font-size="8" font-weight="600">E4</text>
-                            <circle cx="250" cy="175" r="5" fill="#ef4444"/><text x="250" y="190" text-anchor="middle" fill="#ef4444" font-size="7">MED</text>
+                            <text x="250" y="18" text-anchor="middle" fill="#475569" font-size="10" font-weight="700" letter-spacing="3" font-family="Space Grotesk">METLIFE STADIUM</text>
+                            <rect x="70" y="28" width="360" height="295" rx="35" fill="none" stroke="#1e293b" stroke-width="1.5" stroke-dasharray="4,4"/>
+                            <rect id="zone-a-svg" x="130" y="42" width="240" height="55" rx="12" class="zone-block" data-zone="A" filter="url(#glow)"/>
+                            <text x="250" y="75" text-anchor="middle" fill="white" font-size="12" font-weight="700" font-family="Space Grotesk">ZONE A — NORTH</text>
+                            <rect id="zone-b-svg" x="360" y="102" width="55" height="145" rx="12" class="zone-block" data-zone="B" filter="url(#glow)"/>
+                            <text x="388" y="180" text-anchor="middle" fill="white" font-size="10" font-weight="700" font-family="Space Grotesk" transform="rotate(90 388 180)">ZONE B — EAST</text>
+                            <rect id="zone-c-svg" x="130" y="252" width="240" height="55" rx="12" class="zone-block" data-zone="C" filter="url(#glow)"/>
+                            <text x="250" y="285" text-anchor="middle" fill="white" font-size="12" font-weight="700" font-family="Space Grotesk">ZONE C — SOUTH</text>
+                            <rect id="zone-d-svg" x="85" y="102" width="55" height="145" rx="12" class="zone-block" data-zone="D" filter="url(#glow)"/>
+                            <text x="113" y="180" text-anchor="middle" fill="white" font-size="10" font-weight="700" font-family="Space Grotesk" transform="rotate(-90 113 180)">ZONE D — WEST</text>
+                            <rect x="152" y="108" width="196" height="134" rx="8" fill="url(#pitchGrad)" stroke="#059669" stroke-width="1"/>
+                            <text x="250" y="180" text-anchor="middle" fill="#10b981" font-size="11" font-weight="600" opacity="0.8">PITCH</text>
+                            <!-- Gates -->
+                            <circle cx="95" cy="42" r="8" fill="#f59e0b" class="gate-pulse"><animate attributeName="r" values="7;9;7" dur="2s" repeatCount="indefinite"/></circle>
+                            <text x="95" y="32" text-anchor="middle" fill="#f59e0b" font-size="8" font-weight="700">E1</text>
+                            <circle cx="405" cy="42" r="8" fill="#f59e0b" class="gate-pulse"><animate attributeName="r" values="7;9;7" dur="2s" repeatCount="indefinite" begin="0.5s"/></circle>
+                            <text x="405" y="32" text-anchor="middle" fill="#f59e0b" font-size="8" font-weight="700">E2</text>
+                            <circle cx="405" cy="298" r="8" fill="#f59e0b" class="gate-pulse"><animate attributeName="r" values="7;9;7" dur="2s" repeatCount="indefinite" begin="1s"/></circle>
+                            <text x="405" y="318" text-anchor="middle" fill="#f59e0b" font-size="8" font-weight="700">E3</text>
+                            <circle cx="95" cy="298" r="8" fill="#f59e0b" class="gate-pulse"><animate attributeName="r" values="7;9;7" dur="2s" repeatCount="indefinite" begin="1.5s"/></circle>
+                            <text x="95" y="318" text-anchor="middle" fill="#f59e0b" font-size="8" font-weight="700">E4</text>
+                            <!-- Medical -->
+                            <circle cx="250" cy="175" r="6" fill="#ef4444" opacity="0.8"><animate attributeName="opacity" values="0.5;1;0.5" dur="1.5s" repeatCount="indefinite"/></circle>
+                            <text x="250" y="195" text-anchor="middle" fill="#ef4444" font-size="7" font-weight="600">MED</text>
                         </svg>
                     </div>
-                    <div class="zone-cards" id="zone-cards"></div>
+                    <div class="zone-grid" id="zone-cards"></div>
                 </div>
 
-                <div id="info-map" class="info-panel">
-                    <div class="panel-title">Interactive Facility Map</div>
+                <!-- Map Tab -->
+                <div id="tab-map" class="tab-content">
+                    <div class="tab-header"><h3>Interactive Facility Map</h3></div>
                     <div class="facility-list" id="facility-list"></div>
                 </div>
 
-                <div id="info-transport" class="info-panel">
-                    <div class="panel-title">Transportation Hub</div>
+                <!-- Transport Tab -->
+                <div id="tab-transport" class="tab-content">
+                    <div class="tab-header"><h3>Transportation Hub</h3></div>
                     <div id="transport-list"></div>
                 </div>
 
-                <div id="info-eco" class="info-panel">
-                    <div class="panel-title">Sustainability Dashboard</div>
+                <!-- Eco Tab -->
+                <div id="tab-eco" class="tab-content">
+                    <div class="tab-header"><h3>Sustainability Dashboard</h3></div>
                     <div id="eco-list"></div>
                 </div>
             </div>
@@ -172,45 +249,51 @@
 
     <!-- ═══ COMMAND CENTER VIEW ═══ -->
     <div id="view-command" class="view">
+        <div class="command-hero">
+            <h2><i class="fas fa-terminal"></i> Operations Command Center</h2>
+            <p>Real-time stadium intelligence and operational analytics</p>
+        </div>
         <div class="command-layout">
-            <div class="command-top">
-                <div class="kpi-grid" id="kpi-grid"></div>
-            </div>
-            <div class="command-mid">
-                <div class="command-card">
-                    <div class="card-header"><i class="fas fa-chart-area"></i> Crowd Flow Analytics</div>
-                    <canvas id="chart-crowd" height="200"></canvas>
+            <div class="kpi-row" id="kpi-grid"></div>
+            <div class="command-grid">
+                <div class="cmd-card">
+                    <div class="cmd-card-header"><i class="fas fa-chart-area"></i> Crowd Flow</div>
+                    <canvas id="chart-crowd" height="180"></canvas>
                 </div>
-                <div class="command-card">
-                    <div class="card-header"><i class="fas fa-smile"></i> Fan Sentiment</div>
-                    <canvas id="chart-sentiment" height="200"></canvas>
+                <div class="cmd-card">
+                    <div class="cmd-card-header"><i class="fas fa-smile-beam"></i> Fan Sentiment</div>
+                    <canvas id="chart-sentiment" height="180"></canvas>
                 </div>
-                <div class="command-card">
-                    <div class="card-header"><i class="fas fa-exclamation-triangle"></i> Risk Assessment</div>
+                <div class="cmd-card">
+                    <div class="cmd-card-header"><i class="fas fa-exclamation-triangle"></i> Risk Assessment</div>
                     <div id="risk-grid" class="risk-grid"></div>
                 </div>
             </div>
-            <div class="command-bottom">
-                <div class="command-card">
-                    <div class="card-header"><i class="fas fa-bell"></i> Live Alerts</div>
+            <div class="command-grid">
+                <div class="cmd-card">
+                    <div class="cmd-card-header"><i class="fas fa-bell"></i> Live Alerts</div>
                     <div id="alerts-feed" class="alerts-feed"></div>
                 </div>
-                <div class="command-card">
-                    <div class="card-header"><i class="fas fa-users-cog"></i> Staff Deployment</div>
+                <div class="cmd-card">
+                    <div class="cmd-card-header"><i class="fas fa-users-cog"></i> Staff Deployment</div>
                     <div id="staff-grid" class="staff-grid"></div>
                 </div>
-                <div class="command-card">
-                    <div class="card-header"><i class="fas fa-brain"></i> AI Insights</div>
+                <div class="cmd-card">
+                    <div class="cmd-card-header"><i class="fas fa-brain"></i> AI Insights</div>
                     <div id="ai-insights" class="ai-insights"></div>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Footer -->
     <footer class="footer">
-        <span>StadiumIQ v2.0 — Powered by GenAI</span>
+        <span>StadiumIQ v3.0 — Powered by Google Gemini 2.5 Flash</span>
         <span>FIFA World Cup 2026 — MetLife Stadium</span>
     </footer>
+
+    <!-- Toast Container -->
+    <div id="toast-container"></div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
     <script src="/static/js/app.js"></script>

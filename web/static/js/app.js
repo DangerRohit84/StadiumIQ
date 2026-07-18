@@ -5,15 +5,17 @@
 (function () {
     'use strict';
 
-    const API = '';
-    let currentLang = 'en';
-    let a11yMode = false;
-    let crowdChart = null;
-    let sentimentChart = null;
+    var API = '';
+    var currentLang = 'en';
+    var a11yMode = false;
+    var crowdChart = null;
+    var sentimentChart = null;
 
     // ─── Init ────────────────────────────────────────────────
     document.addEventListener('DOMContentLoaded', function () {
-        createParticles();
+        initParticles();
+        animateCounters();
+
         setTimeout(function () {
             document.getElementById('app-loader').classList.add('hidden');
             showToast('StadiumIQ is ready! Ask me anything.', 'success');
@@ -34,40 +36,117 @@
         setInterval(refreshCrowdData, 6000);
     });
 
-    // ─── Particle System ─────────────────────────────────────
-    function createParticles() {
-        var container = document.createElement('div');
-        container.className = 'particles';
-        document.body.appendChild(container);
+    // ─── Canvas Particle System ──────────────────────────────
+    function initParticles() {
+        var canvas = document.getElementById('particles-canvas');
+        if (!canvas) return;
+        var ctx = canvas.getContext('2d');
+        var particles = [];
+        var particleCount = 60;
+        var colors = ['#3b82f6', '#8b5cf6', '#06b6d4', '#10b981', '#f59e0b', '#ec4899'];
 
-        for (var i = 0; i < 50; i++) {
-            var p = document.createElement('div');
-            p.className = 'particle';
-            p.style.left = Math.random() * 100 + '%';
-            p.style.animationDuration = (Math.random() * 15 + 10) + 's';
-            p.style.animationDelay = (Math.random() * 10) + 's';
-            p.style.width = p.style.height = (Math.random() * 3 + 1) + 'px';
-            var colors = ['#3b82f6', '#8b5cf6', '#10b981', '#f59e0b', '#ec4899'];
-            p.style.background = colors[Math.floor(Math.random() * colors.length)];
-            container.appendChild(p);
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
         }
+        resize();
+        window.addEventListener('resize', resize);
+
+        function Particle() {
+            this.x = Math.random() * canvas.width;
+            this.y = Math.random() * canvas.height;
+            this.vx = (Math.random() - 0.5) * 0.3;
+            this.vy = (Math.random() - 0.5) * 0.3;
+            this.radius = Math.random() * 2 + 0.5;
+            this.color = colors[Math.floor(Math.random() * colors.length)];
+            this.alpha = Math.random() * 0.4 + 0.1;
+            this.pulse = Math.random() * Math.PI * 2;
+        }
+
+        for (var i = 0; i < particleCount; i++) {
+            particles.push(new Particle());
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            for (var i = 0; i < particles.length; i++) {
+                var p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.pulse += 0.02;
+
+                if (p.x < 0) p.x = canvas.width;
+                if (p.x > canvas.width) p.x = 0;
+                if (p.y < 0) p.y = canvas.height;
+                if (p.y > canvas.height) p.y = 0;
+
+                var currentAlpha = p.alpha + Math.sin(p.pulse) * 0.15;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                ctx.fillStyle = p.color;
+                ctx.globalAlpha = Math.max(0.05, currentAlpha);
+                ctx.fill();
+
+                for (var j = i + 1; j < particles.length; j++) {
+                    var p2 = particles[j];
+                    var dx = p.x - p2.x;
+                    var dy = p.y - p2.y;
+                    var dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < 150) {
+                        ctx.beginPath();
+                        ctx.moveTo(p.x, p.y);
+                        ctx.lineTo(p2.x, p2.y);
+                        ctx.strokeStyle = p.color;
+                        ctx.globalAlpha = (1 - dist / 150) * 0.08;
+                        ctx.lineWidth = 0.5;
+                        ctx.stroke();
+                    }
+                }
+            }
+            ctx.globalAlpha = 1;
+            requestAnimationFrame(draw);
+        }
+        draw();
+    }
+
+    // ─── Animated Counters ──────────────────────────────────
+    function animateCounters() {
+        var counters = document.querySelectorAll('.stat-value[data-count]');
+        counters.forEach(function (el) {
+            var target = parseInt(el.getAttribute('data-count'), 10);
+            var duration = 2000;
+            var startTime = null;
+
+            function step(timestamp) {
+                if (!startTime) startTime = timestamp;
+                var progress = Math.min((timestamp - startTime) / duration, 1);
+                var eased = 1 - Math.pow(1 - progress, 3);
+                var current = Math.floor(eased * target);
+                el.textContent = current.toLocaleString();
+                if (progress < 1) requestAnimationFrame(step);
+            }
+            setTimeout(function () { requestAnimationFrame(step); }, 800);
+        });
     }
 
     // ─── Toast Notifications ─────────────────────────────────
     window.showToast = function (message, type) {
         type = type || 'info';
-        var existing = document.querySelector('.toast');
-        if (existing) existing.remove();
+        var container = document.getElementById('toast-container');
+        if (!container) return;
 
         var toast = document.createElement('div');
         toast.className = 'toast ' + type;
 
         var icons = { success: 'fa-check-circle', warning: 'fa-exclamation-triangle', error: 'fa-times-circle', info: 'fa-info-circle' };
-        toast.innerHTML = '<i class="fas ' + (icons[type] || icons.info) + '"></i><span>' + message + '</span>';
-        document.body.appendChild(toast);
+        toast.innerHTML = '<i class="fas ' + (icons[type] || icons.info) + ' toast-icon"></i><span>' + message + '</span>';
+        container.appendChild(toast);
 
         setTimeout(function () {
-            toast.style.animation = 'toastOut 0.3s ease forwards';
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateX(20px)';
+            toast.style.transition = 'all 0.3s ease';
             setTimeout(function () { toast.remove(); }, 300);
         }, 3500);
     };
@@ -75,8 +154,9 @@
     // ─── View Switching ──────────────────────────────────────
     window.switchView = function (view) {
         document.querySelectorAll('.view').forEach(function (v) { v.classList.remove('active'); });
-        document.getElementById('view-' + view).classList.add('active');
-        document.querySelectorAll('.nav-btn').forEach(function (b) {
+        var target = document.getElementById('view-' + view);
+        if (target) target.classList.add('active');
+        document.querySelectorAll('.nav-pill').forEach(function (b) {
             b.classList.toggle('active', b.dataset.view === view);
         });
         if (view === 'command') loadCommandCenter();
@@ -84,7 +164,7 @@
 
     // ─── Tab Switching ───────────────────────────────────────
     function setupTabs() {
-        document.querySelectorAll('.info-tab').forEach(function (tab) {
+        document.querySelectorAll('.panel-tab').forEach(function (tab) {
             tab.addEventListener('click', function () {
                 var name = this.dataset.tab;
                 switchInfoTab(name);
@@ -93,11 +173,11 @@
     }
 
     window.switchInfoTab = function (name) {
-        document.querySelectorAll('.info-tab').forEach(function (t) {
+        document.querySelectorAll('.panel-tab').forEach(function (t) {
             t.classList.toggle('active', t.dataset.tab === name);
         });
-        document.querySelectorAll('.info-panel').forEach(function (p) { p.classList.remove('active'); });
-        var panel = document.getElementById('info-' + name);
+        document.querySelectorAll('.tab-content').forEach(function (p) { p.classList.remove('active'); });
+        var panel = document.getElementById('tab-' + name);
         if (panel) panel.classList.add('active');
     };
 
@@ -155,12 +235,12 @@
         var icon = type === 'bot' ? 'fa-robot' : 'fa-user';
         var time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         var footer = '<span class="msg-time">' + time;
-        if (latency) footer += ' · ' + source + ' · ' + latency + 'ms';
+        if (latency) footer += ' \u00b7 ' + source + ' \u00b7 ' + latency + 'ms';
         footer += '</span>';
 
         div.innerHTML =
             '<div class="msg-avatar"><i class="fas ' + icon + '"></i></div>' +
-            '<div class="msg-body"><div class="msg-content">' + formatMd(content) + '</div>' + footer + '</div>';
+            '<div class="msg-body"><div class="msg-bubble">' + formatMd(content) + '</div>' + footer + '</div>';
 
         container.appendChild(div);
         container.scrollTop = container.scrollHeight;
@@ -173,7 +253,7 @@
         div.id = 'typing-indicator';
         div.innerHTML =
             '<div class="msg-avatar"><i class="fas fa-robot"></i></div>' +
-            '<div class="msg-body"><div class="msg-content">' +
+            '<div class="msg-body"><div class="msg-bubble">' +
             '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>' +
             '</div></div>';
         container.appendChild(div);
@@ -192,7 +272,7 @@
                 var cells = match.split('|').filter(function (c) { return c.trim(); });
                 if (cells.length >= 2) {
                     return '<div style="display:grid;grid-template-columns:repeat(' + cells.length + ',1fr);gap:2px;margin:3px 0;font-size:0.72rem">' +
-                        cells.map(function (c) { return '<span style="padding:3px 5px;background:rgba(30,41,59,0.5);border-radius:4px;border:1px solid var(--glass-border)">' + c.trim() + '</span>'; }).join('') + '</div>';
+                        cells.map(function (c) { return '<span style="padding:3px 5px;background:rgba(255,255,255,0.04);border-radius:4px;border:1px solid rgba(255,255,255,0.06)">' + c.trim() + '</span>'; }).join('') + '</div>';
                 }
                 return match;
             })
@@ -223,6 +303,7 @@
     function renderCrowd(overview) {
         var zones = overview.zones || {};
         var container = document.getElementById('zone-cards');
+        if (!container) return;
         var html = '';
 
         Object.keys(zones).forEach(function (zid) {
@@ -231,33 +312,27 @@
             var level = z.level || 'low';
 
             html +=
-                '<div class="zone-card">' +
-                    '<div class="zone-card-top">' +
-                        '<span class="zone-card-name">' + (z.name || 'Zone ' + zid) + '</span>' +
+                '<div class="zone-card" data-level="' + level + '">' +
+                    '<div class="zone-top">' +
+                        '<span class="zone-name">' + (z.name || 'Zone ' + zid) + '</span>' +
                         '<span class="zone-badge ' + level + '">' + level + '</span>' +
                     '</div>' +
-                    '<div class="zone-bar"><div class="zone-bar-fill ' + level + '" style="width:' + pct + '%"></div></div>' +
-                    '<div class="zone-card-stats">' +
+                    '<div class="zone-bar"><div class="zone-fill ' + level + '" style="width:' + pct + '%"></div></div>' +
+                    '<div class="zone-stats">' +
                         '<span>' + (z.occupancy || 0).toLocaleString() + ' / ' + (z.capacity || 0).toLocaleString() + '</span>' +
                         '<span>' + pct + '%</span>' +
-                    '</div>' +
-                    '<div class="zone-card-stats" style="margin-top:0.3rem;font-size:0.62rem">' +
-                        '<span>↗ +' + (z.inflow || 0) + ' in</span>' +
-                        '<span>↙ -' + (z.outflow || 0) + ' out</span>' +
-                        '<span>' + (z.trend || 'stable') + '</span>' +
                     '</div>' +
                 '</div>';
         });
 
         container.innerHTML = html;
 
-        // Update SVG zones
         Object.keys(zones).forEach(function (zid) {
             var z = zones[zid];
             var el = document.getElementById('zone-' + zid.toLowerCase() + '-svg');
             if (el) {
-                var colors = { low: '#10b981', moderate: '#f59e0b', high: '#f97316', critical: '#ef4444', overflow: '#dc2626' };
-                el.setAttribute('fill', colors[z.level] || '#3b82f6');
+                var fillColors = { low: '#10b981', moderate: '#f59e0b', high: '#f97316', critical: '#ef4444', overflow: '#dc2626' };
+                el.setAttribute('fill', fillColors[z.level] || '#3b82f6');
                 el.style.opacity = 0.3 + (z.percentage / 100) * 0.7;
             }
         });
@@ -265,42 +340,46 @@
 
     // ─── Transport ───────────────────────────────────────────
     function loadTransportData() {
-        document.getElementById('transport-list').innerHTML =
-            '<div class="transport-card"><h4><i class="fas fa-parking"></i> Parking</h4>' +
-            '<div class="transport-row"><span>Lot A (North)</span><span>$40</span><span class="badge badge-success">EV Charging</span></div>' +
-            '<div class="transport-row"><span>Lot B (East)</span><span>$35</span><span class="badge badge-danger">No EV</span></div>' +
-            '<div class="transport-row"><span>Lot C (South)</span><span>$38</span><span class="badge badge-success">EV Charging</span></div>' +
+        var el = document.getElementById('transport-list');
+        if (!el) return;
+        el.innerHTML =
+            '<div class="info-card"><h4><i class="fas fa-parking"></i> Parking</h4>' +
+            '<div class="info-row"><span>Lot A (North)</span><span>$40</span><span class="badge badge-green">EV Charging</span></div>' +
+            '<div class="info-row"><span>Lot B (East)</span><span>$35</span><span class="badge badge-red">No EV</span></div>' +
+            '<div class="info-row"><span>Lot C (South)</span><span>$38</span><span class="badge badge-green">EV Charging</span></div>' +
             '</div>' +
-            '<div class="transport-card"><h4><i class="fas fa-train"></i> Public Transit</h4>' +
-            '<div class="transport-row"><span>MetLife Station</span><span>0.5 km</span><span>Every 10 min</span></div>' +
-            '<div class="transport-row"><span>Bus Terminal</span><span>1.2 km</span><span>Every 15 min</span></div>' +
+            '<div class="info-card"><h4><i class="fas fa-train"></i> Public Transit</h4>' +
+            '<div class="info-row"><span>MetLife Station</span><span>0.5 km</span><span>Every 10 min</span></div>' +
+            '<div class="info-row"><span>Bus Terminal</span><span>1.2 km</span><span>Every 15 min</span></div>' +
             '</div>' +
-            '<div class="transport-card"><h4><i class="fas fa-car"></i> Rideshare</h4>' +
-            '<div class="transport-row"><span>Pickup</span><span>West Zone</span></div>' +
-            '<div class="transport-row"><span>Drop-off</span><span>North Zone</span></div>' +
+            '<div class="info-card"><h4><i class="fas fa-car"></i> Rideshare</h4>' +
+            '<div class="info-row"><span>Pickup Zone</span><span>West Zone</span></div>' +
+            '<div class="info-row"><span>Drop-off</span><span>North Zone</span></div>' +
             '</div>';
     }
 
     // ─── Eco ─────────────────────────────────────────────────
     function loadEcoData() {
-        document.getElementById('eco-list').innerHTML =
-            '<div class="eco-card"><div><h4>Eco Station North</h4><p style="font-size:0.72rem;color:var(--text-muted)">Plastic, Paper, Glass</p></div><span class="eco-points">+50 pts</span></div>' +
-            '<div class="eco-card"><div><h4>Eco Station East</h4><p style="font-size:0.72rem;color:var(--text-muted)">Plastic, Paper</p></div><span class="eco-points">+30 pts</span></div>' +
-            '<div class="eco-card"><div><h4>Eco Station South</h4><p style="font-size:0.72rem;color:var(--text-muted)">All + Food Waste</p></div><span class="eco-points">+75 pts</span></div>' +
-            '<div class="transport-card" style="margin-top:0.75rem"><h4><i class="fas fa-leaf"></i> Green Tips</h4>' +
-            '<div class="transport-row"><span>Bike to stadium</span><span class="badge badge-success">+200 pts</span></div>' +
-            '<div class="transport-row"><span>Public transit</span><span class="badge badge-success">+100 pts</span></div>' +
-            '<div class="transport-row"><span>Reusable container</span><span class="badge badge-success">+75 pts</span></div>' +
+        var el = document.getElementById('eco-list');
+        if (!el) return;
+        el.innerHTML =
+            '<div class="eco-highlight"><div><h4>Eco Station North</h4><p style="font-size:.7rem;color:var(--text-3)">Plastic, Paper, Glass</p></div><span class="eco-pts">+50 pts</span></div>' +
+            '<div class="eco-highlight"><div><h4>Eco Station East</h4><p style="font-size:.7rem;color:var(--text-3)">Plastic, Paper</p></div><span class="eco-pts">+30 pts</span></div>' +
+            '<div class="eco-highlight"><div><h4>Eco Station South</h4><p style="font-size:.7rem;color:var(--text-3)">All + Food Waste</p></div><span class="eco-pts">+75 pts</span></div>' +
+            '<div class="info-card"><h4><i class="fas fa-leaf"></i> Green Tips</h4>' +
+            '<div class="info-row"><span>Bike to stadium</span><span class="badge badge-green">+200 pts</span></div>' +
+            '<div class="info-row"><span>Public transit</span><span class="badge badge-green">+100 pts</span></div>' +
+            '<div class="info-row"><span>Reusable container</span><span class="badge badge-green">+75 pts</span></div>' +
             '</div>';
     }
 
     // ─── Facility Map ────────────────────────────────────────
     function loadFacilityMap() {
         var facilities = [
-            { icon: 'fa-door-open', name: 'Gate E1 — Main North', accessible: true },
-            { icon: 'fa-door-open', name: 'Gate E2 — East', accessible: true },
-            { icon: 'fa-door-open', name: 'Gate E3 — South', accessible: true },
-            { icon: 'fa-door-open', name: 'Gate E4 — VIP', accessible: true },
+            { icon: 'fa-door-open', name: 'Gate E1 \u2014 Main North', accessible: true },
+            { icon: 'fa-door-open', name: 'Gate E2 \u2014 East', accessible: true },
+            { icon: 'fa-door-open', name: 'Gate E3 \u2014 South', accessible: true },
+            { icon: 'fa-door-open', name: 'Gate E4 \u2014 VIP', accessible: true },
             { icon: 'fa-restroom', name: 'Restroom North', accessible: true },
             { icon: 'fa-restroom', name: 'Restroom East', accessible: true },
             { icon: 'fa-utensils', name: 'Food Court North', extra: 'American, Mexican' },
@@ -310,21 +389,23 @@
             { icon: 'fa-medkit', name: 'Medical Station North' },
             { icon: 'fa-medkit', name: 'Medical Station South' },
             { icon: 'fa-recycle', name: 'Eco Station North' },
-            { icon: 'fa-recycle', name: 'Eco Station South' },
+            { icon: 'fa-recycle', name: 'Eco Station South' }
         ];
 
+        var el = document.getElementById('facility-list');
+        if (!el) return;
         var html = '';
         facilities.forEach(function (f) {
-            var badge = f.accessible ? '<span class="badge badge-success">Accessible</span>' : '';
-            var extra = f.extra ? '<div style="font-size:0.65rem;color:var(--text-dim)">' + f.extra + '</div>' : '';
+            var badge = f.accessible ? '<span class="badge badge-green">Accessible</span>' : '';
+            var extra = f.extra ? '<div class="facility-sub">' + f.extra + '</div>' : '';
             html +=
-                '<div class="transport-card" style="display:flex;gap:0.6rem;align-items:center">' +
-                    '<i class="fas ' + f.icon + '" style="color:var(--primary);font-size:1rem;width:20px;text-align:center"></i>' +
-                    '<div style="flex:1"><div style="font-size:0.8rem;font-weight:600">' + f.name + '</div>' + extra + '</div>' +
+                '<div class="facility-item">' +
+                    '<div class="facility-icon"><i class="fas ' + f.icon + '"></i></div>' +
+                    '<div class="facility-info"><div class="facility-name">' + f.name + '</div>' + extra + '</div>' +
                     badge +
                 '</div>';
         });
-        document.getElementById('facility-list').innerHTML = html;
+        el.innerHTML = html;
     }
 
     // ─── Command Center ──────────────────────────────────────
@@ -343,18 +424,21 @@
             .then(function (data) {
                 if (data.status !== 'success') return;
                 var container = document.getElementById('kpi-grid');
+                if (!container) return;
                 var kpis = data.data;
                 var icons = ['fa-users', 'fa-door-open', 'fa-clock', 'fa-shield-alt', 'fa-leaf', 'fa-exclamation-circle'];
                 var html = '';
-                Object.keys(kpis).forEach(function (key, i) {
+                var i = 0;
+                Object.keys(kpis).forEach(function (key) {
                     var kpi = kpis[key];
                     var label = key.replace(/_/g, ' ').replace(/\b\w/g, function (c) { return c.toUpperCase(); });
                     html +=
-                        '<div class="kpi-card">' +
+                        '<div class="kpi">' +
                             '<div class="kpi-label"><i class="fas ' + (icons[i] || 'fa-chart-line') + '"></i> ' + label + '</div>' +
-                            '<div class="kpi-value">' + kpi.value + '<span style="font-size:0.6rem;color:var(--text-dim)">' + kpi.unit + '</span></div>' +
-                            '<div class="kpi-sub">Target: ' + kpi.target + kpi.unit + ' · ' + kpi.trend + '</div>' +
+                            '<div class="kpi-val" style="color:var(--text)">' + kpi.value + '<span style="font-size:.6rem;color:var(--text-3)">' + kpi.unit + '</span></div>' +
+                            '<div class="kpi-sub">Target: ' + kpi.target + kpi.unit + ' \u00b7 ' + kpi.trend + '</div>' +
                         '</div>';
+                    i++;
                 });
                 container.innerHTML = html;
             });
@@ -368,12 +452,12 @@
                 var html = '';
                 Object.keys(data.data).forEach(function (zid) {
                     var r = data.data[zid];
-                    var color = r.risk_level === 'critical' ? 'var(--danger)' : r.risk_level === 'high' ? 'var(--warning)' : r.risk_level === 'moderate' ? 'var(--accent)' : 'var(--success)';
+                    var color = r.risk_level === 'critical' ? 'var(--red)' : r.risk_level === 'high' ? 'var(--amber)' : r.risk_level === 'moderate' ? 'var(--blue)' : 'var(--green)';
                     html +=
-                        '<div class="risk-item">' +
+                        '<div class="risk-box">' +
                             '<div class="risk-zone">Zone ' + zid + '</div>' +
-                            '<div class="risk-score" style="color:' + color + '">' + r.risk_score + '%</div>' +
-                            '<div class="risk-level" style="color:' + color + '">' + r.risk_level + '</div>' +
+                            '<div class="risk-val" style="color:' + color + '">' + r.risk_score + '%</div>' +
+                            '<div class="risk-lbl" style="color:' + color + '">' + r.risk_level + '</div>' +
                         '</div>';
                 });
                 document.getElementById('risk-grid').innerHTML = html;
@@ -386,12 +470,12 @@
             { type: 'success', icon: 'fa-check-circle', text: 'Halftime rush managed successfully', time: '5 min ago' },
             { type: 'info', icon: 'fa-info-circle', text: 'New eco station activated in Zone D', time: '8 min ago' },
             { type: 'danger', icon: 'fa-bell', text: 'High noise levels detected in Zone A', time: '12 min ago' },
-            { type: 'success', icon: 'fa-check-circle', text: 'Medical response time: 2.1 min average', time: '15 min ago' },
+            { type: 'success', icon: 'fa-check-circle', text: 'Medical response time: 2.1 min average', time: '15 min ago' }
         ];
         var html = '';
         alerts.forEach(function (a) {
             html +=
-                '<div class="alert-item ' + a.type + '">' +
+                '<div class="alert-row ' + a.type + '">' +
                     '<i class="fas ' + a.icon + ' alert-icon"></i>' +
                     '<div><div class="alert-text">' + a.text + '</div><div class="alert-time">' + a.time + '</div></div>' +
                 '</div>';
@@ -413,8 +497,8 @@
                     html +=
                         '<div class="staff-row">' +
                             '<span class="staff-dept">' + label + '</span>' +
-                            '<div class="staff-bar"><div class="staff-bar-fill" style="width:' + pct + '%"></div></div>' +
-                            '<span class="staff-count">' + d.deployed + '/' + d.total + '</span>' +
+                            '<div class="staff-bar"><div class="staff-fill" style="width:' + pct + '%"></div></div>' +
+                            '<span class="staff-ct">' + d.deployed + '/' + d.total + '</span>' +
                         '</div>';
                 });
                 document.getElementById('staff-grid').innerHTML = html;
@@ -430,9 +514,9 @@
                 var html = '';
                 suggestions.forEach(function (s) {
                     html +=
-                        '<div class="insight-item">' +
-                            '<div class="insight-type"><i class="fas fa-brain"></i> AI Recommendation</div>' +
-                            '<div class="insight-text">' + s + '</div>' +
+                        '<div class="ai-item">' +
+                            '<div class="ai-type"><i class="fas fa-brain"></i> AI Recommendation</div>' +
+                            '<div class="ai-text">' + s + '</div>' +
                         '</div>';
                 });
                 document.getElementById('ai-insights').innerHTML = html;
@@ -454,14 +538,14 @@
                 });
 
                 var labels = Object.keys(zones['A'] || {}).map(function (_, i) { return 'S' + (i + 1); });
-                var colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444'];
+                var chartColors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444'];
                 var datasets = Object.keys(zones).map(function (z, i) {
                     return {
                         label: 'Zone ' + z,
                         data: zones[z],
-                        borderColor: colors[i],
-                        backgroundColor: colors[i] + '20',
-                        fill: true, tension: 0.4, borderWidth: 2,
+                        borderColor: chartColors[i],
+                        backgroundColor: chartColors[i] + '20',
+                        fill: true, tension: 0.4, borderWidth: 2
                     };
                 });
 
@@ -471,12 +555,12 @@
                     data: { labels: labels, datasets: datasets },
                     options: {
                         responsive: true,
-                        plugins: { legend: { labels: { color: '#94a3b8', font: { size: 10 } } } },
+                        plugins: { legend: { labels: { color: '#94a3c8', font: { size: 10 } } } },
                         scales: {
-                            x: { ticks: { color: '#64748b', font: { size: 9 } }, grid: { color: '#1e293b' } },
-                            y: { ticks: { color: '#64748b', font: { size: 9 } }, grid: { color: '#1e293b' }, min: 0, max: 100 },
-                        },
-                    },
+                            x: { ticks: { color: '#64748b', font: { size: 9 } }, grid: { color: 'rgba(255,255,255,0.04)' } },
+                            y: { ticks: { color: '#64748b', font: { size: 9 } }, grid: { color: 'rgba(255,255,255,0.04)' }, min: 0, max: 100 }
+                        }
+                    }
                 });
             });
 
@@ -500,17 +584,17 @@
                             backgroundColor: scores.map(function (s) {
                                 return s >= 7 ? '#10b981' : s >= 5 ? '#f59e0b' : '#ef4444';
                             }),
-                            borderRadius: 6,
-                        }],
+                            borderRadius: 6
+                        }]
                     },
                     options: {
                         responsive: true,
                         plugins: { legend: { display: false } },
                         scales: {
                             x: { ticks: { color: '#64748b', font: { size: 9 } }, grid: { display: false } },
-                            y: { ticks: { color: '#64748b', font: { size: 9 } }, grid: { color: '#1e293b' }, min: 0, max: 10 },
-                        },
-                    },
+                            y: { ticks: { color: '#64748b', font: { size: 9 } }, grid: { color: 'rgba(255,255,255,0.04)' }, min: 0, max: 10 }
+                        }
+                    }
                 });
             });
     }
