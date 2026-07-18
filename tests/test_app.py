@@ -6,7 +6,7 @@ from app import create_app
 
 @pytest.fixture
 def client():
-    app = create_app("development")
+    app, _ = create_app("development")
     app.config["TESTING"] = True
     with app.test_client() as c:
         yield c

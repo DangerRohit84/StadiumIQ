@@ -76,7 +76,7 @@ def test_app_creation():
     print("\n2. Testing app creation...")
     try:
         from app import create_app
-        app = create_app("development")
+        app, _ = create_app("development")
         print("   App created OK")
         return app
     except Exception as e:

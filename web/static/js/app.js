@@ -474,7 +474,10 @@
         translateUI(currentLang);
 
         setTimeout(function () {
-            document.getElementById('app-loader').classList.add('hidden');
+            var loader = document.getElementById('app-loader');
+            loader.classList.add('hidden');
+            loader.setAttribute('aria-busy', 'false');
+            loader.setAttribute('aria-live', 'off');
             var t = I18N[currentLang] || I18N.en;
             showToast(t.toast_ready, 'success');
         }, 2200);
@@ -639,11 +642,19 @@
 
     // ─── View Switching ──────────────────────────────────────
     window.switchView = function (view) {
-        document.querySelectorAll('.view').forEach(function (v) { v.classList.remove('active'); });
+        document.querySelectorAll('.view').forEach(function (v) {
+            v.classList.remove('active');
+            v.setAttribute('aria-hidden', 'true');
+        });
         var target = document.getElementById('view-' + view);
-        if (target) target.classList.add('active');
+        if (target) {
+            target.classList.add('active');
+            target.removeAttribute('aria-hidden');
+        }
         document.querySelectorAll('.nav-pill').forEach(function (b) {
-            b.classList.toggle('active', b.dataset.view === view);
+            var isActive = b.dataset.view === view;
+            b.classList.toggle('active', isActive);
+            b.setAttribute('aria-pressed', isActive ? 'true' : 'false');
         });
         if (view === 'command') loadCommandCenter();
     };
@@ -660,18 +671,28 @@
 
     window.switchInfoTab = function (name) {
         document.querySelectorAll('.panel-tab').forEach(function (t) {
-            t.classList.toggle('active', t.dataset.tab === name);
+            var isActive = t.dataset.tab === name;
+            t.classList.toggle('active', isActive);
+            t.setAttribute('aria-selected', isActive ? 'true' : 'false');
         });
-        document.querySelectorAll('.tab-content').forEach(function (p) { p.classList.remove('active'); });
+        document.querySelectorAll('.tab-content').forEach(function (p) {
+            p.classList.remove('active');
+            p.setAttribute('aria-hidden', 'true');
+        });
         var panel = document.getElementById('tab-' + name);
-        if (panel) panel.classList.add('active');
+        if (panel) {
+            panel.classList.add('active');
+            panel.removeAttribute('aria-hidden');
+        }
     };
 
     // ─── Accessibility Toggle ────────────────────────────────
     window.toggleAccessibility = function () {
         a11yMode = !a11yMode;
         document.body.classList.toggle('a11y', a11yMode);
-        document.getElementById('a11y-btn').classList.toggle('active', a11yMode);
+        var btn = document.getElementById('a11y-btn');
+        btn.classList.toggle('active', a11yMode);
+        btn.setAttribute('aria-expanded', a11yMode ? 'true' : 'false');
         showToast(a11yMode ? 'Accessibility mode enabled' : 'Accessibility mode disabled', 'info');
     };
 

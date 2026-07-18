@@ -1,6 +1,7 @@
 flask==3.0.3
 flask-cors==4.0.1
 flask-socketio==5.3.7
+flask-limiter==3.5.1
 eventlet==0.36.1
 google-generativeai==0.8.3
 python-dotenv==1.0.1

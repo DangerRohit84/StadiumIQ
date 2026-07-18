@@ -7,7 +7,7 @@
     --glass-border: rgba(255,255,255,0.06);
     --text: #f0f4ff;
     --text-2: #94a3c8;
-    --text-3: #5a6a8a;
+    --text-3: #8494ab;
     --blue: #3b82f6;
     --blue-g: rgba(59,130,246,0.35);
     --purple: #8b5cf6;
@@ -343,4 +343,21 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
 body.a11y .msg-bubble,body.a11y .quick-chip{font-size:1rem}
 body.a11y .nav-pill,body.a11y .panel-tab{padding:.7rem 1rem;font-size:.85rem}
 *:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
-@media(prefers-reduced-motion:reduce){*{animation:none!important;transition-duration:.01ms!important}}
+*:focus:not(:focus-visible){outline:none}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition-duration:0s!important;scroll-behavior:auto!important}}
+
+/* ═══ Skip Link ═══ */
+.skip-link{position:absolute;top:-100%;left:0;background:var(--blue);color:#fff;padding:.75rem 1.5rem;z-index:10000;font-weight:600;text-decoration:none;border-radius:0 0 8px 0}
+.skip-link:focus{top:0}
+
+/* ═══ Screen Reader Only ═══ */
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+/* ═══ High Contrast ═══ */
+@media(forced-colors:active){.zone-block,.gate-pulse,.status-dot,.live-dot{forced-color-adjust:none}}
+@media(prefers-contrast:more){:root{--text-3:#a0b0c8;--glass-border:rgba(255,255,255,0.2)}}
+
+/* ═══ Scrollbar Visibility ═══ */
+.chat-messages::-webkit-scrollbar-thumb,.alerts-feed::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.15);border-radius:2px}
+.quick-scroll::-webkit-scrollbar{height:4px}
+.quick-scroll::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.15);border-radius:2px}

@@ -1,8 +1,12 @@
 """StadiumIQ - GenAI Smart Stadium Assistant for FIFA World Cup 2026."""
+import logging
 import time
-import json
+import uuid
+from functools import wraps
 from flask import Flask, render_template, request, jsonify
 from flask_cors import CORS
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 from flask_socketio import SocketIO, emit
 from config.settings import config_by_name
 from core.ai.genai_engine import engine
@@ -17,13 +21,92 @@ from core.fan import fan_journey
 from core.match import match_simulator
 from core.satisfaction import satisfaction_tracker
 
+logger = logging.getLogger("stadiumiq.security")
+
+VALID_ZONES = {"A", "B", "C", "D"}
+VALID_MODES = {"standard", "crowd_aware", "accessible", "fastest"}
+VALID_STAGES = {"arrival", "entry", "seating", "concession", "halftime", "second_half", "post_match", "departure"}
+VALID_INCIDENT_TYPES = {"medical", "fire", "security", "structural", "weather", "crowd_surge", "lost_person", "equipment_failure"}
+VALID_FACILITY_TYPES = {"restrooms", "food", "medical", "merchandise", "water_fountain", "atm", "info_desk"}
+MAX_CHAT_LENGTH = 2000
+MAX_DETAILS_LENGTH = 500
+MAX_PAGE_SIZE = 100
+
+
+def _validate_json(*required_fields):
+    """Validate that request has JSON body with required fields."""
+    def decorator(f):
+        @wraps(f)
+        def decorated(*args, **kwargs):
+            data = request.get_json(silent=True)
+            if data is None:
+                return jsonify({"status": "error", "message": "Invalid JSON"}), 400
+            for field in required_fields:
+                if field not in data:
+                    return jsonify({"status": "error", "message": f"Missing field: {field}"}), 400
+            return f(*args, **kwargs)
+        return decorated
+    return decorator
+
+
+def _sanitize_string(value: str, max_len: int = 500) -> str:
+    """Sanitize and truncate string input."""
+    if not isinstance(value, str):
+        return ""
+    return value.strip()[:max_len]
+
 
 def create_app(config_name: str = "development") -> Flask:
-    """Application factory with full feature integration."""
+    """Application factory with security hardening."""
     app = Flask(__name__, template_folder="web/templates", static_folder="web/static")
     app.config.from_object(config_by_name[config_name])
-    CORS(app)
+
+    CORS(app, origins=["*"], methods=["GET", "POST", "OPTIONS"], allow_headers=["Content-Type", "Authorization"])
+    limiter = Limiter(get_remote_address, app=app, default_limits=["200 per hour"])
     socketio = SocketIO(app, cors_allowed_origins="*", async_mode="threading")
+
+    # ─── Security Headers ──────────────────────────────────────
+    @app.after_request
+    def set_security_headers(response):
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["X-Frame-Options"] = "DENY"
+        response.headers["X-XSS-Protection"] = "0"
+        response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+        response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()"
+        response.headers["Content-Security-Policy"] = (
+            "default-src 'self'; "
+            "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; "
+            "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; "
+            "font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com; "
+            "img-src 'self' data:; "
+            "connect-src 'self' ws: wss:; "
+            "frame-ancestors 'none'"
+        )
+        if not app.config.get("DEBUG"):
+            response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+        return response
+
+    # ─── Error Handlers ────────────────────────────────────────
+    @app.errorhandler(400)
+    def bad_request(e):
+        return jsonify({"status": "error", "message": "Bad request"}), 400
+
+    @app.errorhandler(404)
+    def not_found(e):
+        return jsonify({"status": "error", "message": "Not found"}), 404
+
+    @app.errorhandler(405)
+    def method_not_allowed(e):
+        return jsonify({"status": "error", "message": "Method not allowed"}), 405
+
+    @app.errorhandler(429)
+    def rate_limited(e):
+        return jsonify({"status": "error", "message": "Rate limit exceeded"}), 429
+
+    @app.errorhandler(500)
+    def server_error(e):
+        logger.error("Internal server error: %s", e)
+        return jsonify({"status": "error", "message": "Internal server error"}), 500
 
     # ─── Pages ────────────────────────────────────────────────
     @app.route("/")
@@ -36,15 +119,20 @@ def create_app(config_name: str = "development") -> Flask:
 
     # ─── AI Chat ──────────────────────────────────────────────
     @app.route("/api/chat", methods=["POST"])
+    @limiter.limit("30 per minute")
     def api_chat():
-        data = request.get_json()
+        data = request.get_json(silent=True)
         if not data or "message" not in data:
             return jsonify({"status": "error", "message": "No message"}), 400
+
+        message = _sanitize_string(data["message"], MAX_CHAT_LENGTH)
+        if not message:
+            return jsonify({"status": "error", "message": "Empty message"}), 400
 
         user_type = data.get("user_type", "fan")
         language = data.get("language", "en")
         fan_id = data.get("fan_id", "anonymous")
-        urgency = "high" if any(w in data["message"].lower() for w in ["emergency", "fire", "help", "danger"]) else "normal"
+        urgency = "high" if any(w in message.lower() for w in ["emergency", "fire", "help", "danger"]) else "normal"
 
         context = {
             "stadium": "MetLife Stadium",
@@ -52,13 +140,12 @@ def create_app(config_name: str = "development") -> Flask:
             "safety": emergency_system.get_safety_status(),
         }
 
-        result = engine.generate(data["message"], context, language, user_type, urgency, fan_id)
-
-        sentiment = sentiment_analyzer.analyze(data["message"], source="chat")
+        result = engine.generate(message, context, language, user_type, urgency, fan_id)
+        sentiment = sentiment_analyzer.analyze(message, source="chat")
         result["sentiment"] = sentiment
 
         socketio.emit("new_message", {
-            "user_message": data["message"],
+            "user_message": message,
             "ai_response": result["response"],
             "sentiment": sentiment["sentiment"],
             "timestamp": time.time(),
@@ -85,6 +172,7 @@ def create_app(config_name: str = "development") -> Flask:
     @app.route("/api/crowd/predict", methods=["GET"])
     def api_crowd_predict():
         minutes = request.args.get("minutes", 30, type=int)
+        minutes = max(1, min(minutes, 180))
         data = crowd_manager.predict_flow(minutes)
         return jsonify({"status": "success", "data": data})
 
@@ -106,18 +194,28 @@ def create_app(config_name: str = "development") -> Flask:
 
     # ─── Emergency ────────────────────────────────────────────
     @app.route("/api/emergency/raise", methods=["POST"])
+    @limiter.limit("10 per minute")
+    @_validate_json("type")
     def api_emergency_raise():
         data = request.get_json()
-        if not data or "type" not in data:
-            return jsonify({"status": "error", "message": "Incident type required"}), 400
-        result = emergency_system.raise_incident(data["type"], data.get("location", {}), data.get("details", ""))
+        inc_type = _sanitize_string(data["type"], 50)
+        if inc_type.lower() not in VALID_INCIDENT_TYPES:
+            return jsonify({"status": "error", "message": f"Invalid incident type. Valid: {VALID_INCIDENT_TYPES}"}), 400
+        details = _sanitize_string(data.get("details", ""), MAX_DETAILS_LENGTH)
+        result = emergency_system.raise_incident(inc_type, data.get("location", {}), details)
+        logger.warning("Emergency raised: %s by %s", inc_type, request.remote_addr)
         socketio.emit("emergency_alert", result)
         return jsonify({"status": "success", "data": result})
 
     @app.route("/api/emergency/resolve", methods=["POST"])
+    @limiter.limit("10 per minute")
+    @_validate_json("id")
     def api_emergency_resolve():
         data = request.get_json()
-        result = emergency_system.resolve_incident(data.get("id", ""), data.get("notes", ""))
+        inc_id = _sanitize_string(data["id"], 50)
+        notes = _sanitize_string(data.get("notes", ""), MAX_DETAILS_LENGTH)
+        result = emergency_system.resolve_incident(inc_id, notes)
+        logger.warning("Emergency resolved: %s by %s", inc_id, request.remote_addr)
         return jsonify({"status": "success", "data": result})
 
     @app.route("/api/emergency/status", methods=["GET"])
@@ -125,21 +223,28 @@ def create_app(config_name: str = "development") -> Flask:
         return jsonify({"status": "success", "data": emergency_system.get_safety_status()})
 
     @app.route("/api/emergency/evacuation", methods=["POST"])
+    @limiter.limit("5 per minute")
     def api_emergency_evacuation():
-        data = request.get_json()
+        data = request.get_json(silent=True) or {}
         zones = data.get("zones", ["A"])
+        if not isinstance(zones, list):
+            zones = ["A"]
+        zones = [z for z in zones if z in VALID_ZONES] or ["A"]
         plan = emergency_system.get_evacuation_plan(zones)
+        logger.warning("Evacuation plan requested for zones: %s", zones)
         return jsonify({"status": "success", "data": plan})
 
     # ─── Navigation ───────────────────────────────────────────
     @app.route("/api/navigation", methods=["POST"])
+    @limiter.limit("60 per minute")
+    @_validate_json("origin", "destination")
     def api_navigation():
         data = request.get_json()
-        origin = data.get("origin")
-        dest = data.get("destination")
-        mode = data.get("mode", "standard")
-        if not origin or not dest:
-            return jsonify({"status": "error", "message": "Origin and destination required"}), 400
+        origin = _sanitize_string(data["origin"], 100)
+        dest = _sanitize_string(data["destination"], 100)
+        mode = _sanitize_string(data.get("mode", "standard"), 20)
+        if mode not in VALID_MODES:
+            mode = "standard"
 
         if mode == "crowd_aware":
             zones = crowd_manager.get_all_zones()
@@ -149,17 +254,28 @@ def create_app(config_name: str = "development") -> Flask:
         return jsonify({"status": "success", "data": route})
 
     @app.route("/api/navigation/nearby", methods=["POST"])
+    @limiter.limit("60 per minute")
     def api_navigation_nearby():
-        data = request.get_json()
+        data = request.get_json(silent=True) or {}
         lat = data.get("lat", 40.8128)
         lon = data.get("lon", -74.0745)
-        ftype = data.get("type", "restrooms")
+        if not isinstance(lat, (int, float)) or not (-90 <= lat <= 90):
+            lat = 40.8128
+        if not isinstance(lon, (int, float)) or not (-180 <= lon <= 180):
+            lon = -74.0745
+        ftype = _sanitize_string(data.get("type", "restrooms"), 30)
+        if ftype not in VALID_FACILITY_TYPES:
+            ftype = "restrooms"
         count = data.get("count", 3)
+        if not isinstance(count, int) or count < 1:
+            count = 3
+        count = min(count, MAX_PAGE_SIZE)
         results = navigation_engine.get_nearby_options(lat, lon, ftype, count)
         return jsonify({"status": "success", "data": results})
 
     @app.route("/api/navigation/accessibility/<profile>", methods=["GET"])
     def api_navigation_accessibility(profile):
+        profile = _sanitize_string(profile, 30)
         data = navigation_engine.get_accessibility_info(profile)
         return jsonify({"status": "success", "data": data})
 
@@ -167,7 +283,10 @@ def create_app(config_name: str = "development") -> Flask:
     @app.route("/api/analytics/predict", methods=["GET"])
     def api_analytics_predict():
         zone = request.args.get("zone", "A")
+        if zone not in VALID_ZONES:
+            zone = "A"
         minutes = request.args.get("minutes", 60, type=int)
+        minutes = max(1, min(minutes, 180))
         data = predictive_analytics.predict_demand(zone, minutes)
         return jsonify({"status": "success", "data": data})
 
@@ -189,9 +308,14 @@ def create_app(config_name: str = "development") -> Flask:
 
     # ─── Sentiment ────────────────────────────────────────────
     @app.route("/api/sentiment/analyze", methods=["POST"])
+    @limiter.limit("60 per minute")
     def api_sentiment_analyze():
-        data = request.get_json()
-        text = data.get("text", "")
+        data = request.get_json(silent=True)
+        if not data:
+            return jsonify({"status": "error", "message": "Invalid JSON"}), 400
+        text = _sanitize_string(data.get("text", ""), MAX_CHAT_LENGTH)
+        if not text:
+            return jsonify({"status": "error", "message": "No text provided"}), 400
         result = sentiment_analyzer.analyze(text, data.get("source", "chat"))
         return jsonify({"status": "success", "data": result})
 
@@ -233,35 +357,45 @@ def create_app(config_name: str = "development") -> Flask:
 
     # ─── Fan Journey ──────────────────────────────────────────
     @app.route("/api/journey/start", methods=["POST"])
+    @limiter.limit("30 per minute")
     def api_journey_start():
-        data = request.get_json() or {}
-        fan_id = data.get("fan_id", f"fan-{int(time.time())}")
+        data = request.get_json(silent=True) or {}
+        fan_id = data.get("fan_id", f"fan-{uuid.uuid4().hex[:12]}")
         result = fan_journey.start_journey(fan_id, data.get("preferences"))
         return jsonify({"status": "success", "data": result})
 
     @app.route("/api/journey/advance", methods=["POST"])
+    @limiter.limit("30 per minute")
+    @_validate_json("fan_id")
     def api_journey_advance():
-        data = request.get_json() or {}
-        fan_id = data.get("fan_id")
-        if not fan_id:
-            return jsonify({"status": "error", "message": "fan_id required"}), 400
-        result = fan_journey.advance_stage(fan_id, data.get("stage"))
+        data = request.get_json()
+        fan_id = _sanitize_string(data["fan_id"], 50)
+        stage = _sanitize_string(data.get("stage", ""), 30)
+        if stage and stage not in VALID_STAGES:
+            return jsonify({"status": "error", "message": f"Invalid stage. Valid: {VALID_STAGES}"}), 400
+        result = fan_journey.advance_stage(fan_id, stage)
         return jsonify({"status": "success", "data": result})
 
     @app.route("/api/journey/status/<fan_id>", methods=["GET"])
     def api_journey_status(fan_id):
+        fan_id = _sanitize_string(fan_id, 50)
         result = fan_journey.get_journey_status(fan_id)
         return jsonify({"status": "success", "data": result})
 
     @app.route("/api/journey/recommendations/<fan_id>", methods=["GET"])
     def api_journey_recommendations(fan_id):
+        fan_id = _sanitize_string(fan_id, 50)
         result = fan_journey.get_personalized_recommendations(fan_id)
         return jsonify({"status": "success", "data": result})
 
     @app.route("/api/journey/action", methods=["POST"])
+    @limiter.limit("30 per minute")
+    @_validate_json("fan_id", "action")
     def api_journey_action():
-        data = request.get_json() or {}
-        result = fan_journey.complete_action(data.get("fan_id"), data.get("action", ""), data.get("rating"))
+        data = request.get_json()
+        fan_id = _sanitize_string(data["fan_id"], 50)
+        action = _sanitize_string(data["action"], 50)
+        result = fan_journey.complete_action(fan_id, action, data.get("rating"))
         return jsonify({"status": "success", "data": result})
 
     @app.route("/api/journey/analytics", methods=["GET"])
@@ -270,22 +404,25 @@ def create_app(config_name: str = "development") -> Flask:
 
     # ─── Match Simulator ──────────────────────────────────────
     @app.route("/api/match/start", methods=["POST"])
+    @limiter.limit("10 per minute")
     def api_match_start():
-        data = request.get_json() or {}
-        home = data.get("home_team", "USA")
-        away = data.get("away_team", "ENG")
+        data = request.get_json(silent=True) or {}
+        home = _sanitize_string(data.get("home_team", "USA"), 30)
+        away = _sanitize_string(data.get("away_team", "ENG"), 30)
         result = match_simulator.start_match(home, away)
         return jsonify({"status": "success", "data": result})
 
     @app.route("/api/match/simulate", methods=["POST"])
+    @limiter.limit("10 per minute")
     def api_match_simulate():
-        data = request.get_json() or {}
-        home = data.get("home_team", "USA")
-        away = data.get("away_team", "ENG")
+        data = request.get_json(silent=True) or {}
+        home = _sanitize_string(data.get("home_team", "USA"), 30)
+        away = _sanitize_string(data.get("away_team", "ENG"), 30)
         result = match_simulator.simulate_full_match(home, away)
         return jsonify({"status": "success", "data": result})
 
     @app.route("/api/match/minute", methods=["POST"])
+    @limiter.limit("30 per minute")
     def api_match_minute():
         result = match_simulator.simulate_minute()
         return jsonify({"status": "success", "data": result})
@@ -297,6 +434,7 @@ def create_app(config_name: str = "development") -> Flask:
     @app.route("/api/match/events", methods=["GET"])
     def api_match_events():
         count = request.args.get("count", 5, type=int)
+        count = max(1, min(count, MAX_PAGE_SIZE))
         return jsonify({"status": "success", "data": match_simulator.get_recent_events(count)})
 
     @app.route("/api/match/prediction", methods=["GET"])
@@ -313,21 +451,25 @@ def create_app(config_name: str = "development") -> Flask:
 
     # ─── Satisfaction ─────────────────────────────────────────
     @app.route("/api/satisfaction/score", methods=["POST"])
+    @limiter.limit("30 per minute")
+    @_validate_json("touchpoint", "score")
     def api_satisfaction_score():
-        data = request.get_json() or {}
-        tp = data.get("touchpoint")
+        data = request.get_json()
+        tp = _sanitize_string(data["touchpoint"], 50)
         score = data.get("score")
-        if not tp or score is None:
-            return jsonify({"status": "error", "message": "touchpoint and score required"}), 400
+        if not isinstance(score, (int, float)) or not (0 <= score <= 100):
+            return jsonify({"status": "error", "message": "Score must be a number 0-100"}), 400
         result = satisfaction_tracker.record_score(tp, score, data.get("fan_id"))
         return jsonify({"status": "success", "data": result})
 
     @app.route("/api/satisfaction/nps", methods=["POST"])
+    @limiter.limit("30 per minute")
+    @_validate_json("score")
     def api_satisfaction_nps():
-        data = request.get_json() or {}
+        data = request.get_json()
         score = data.get("score")
-        if score is None:
-            return jsonify({"status": "error", "message": "score required"}), 400
+        if not isinstance(score, (int, float)) or not (0 <= score <= 10):
+            return jsonify({"status": "error", "message": "NPS score must be 0-10"}), 400
         result = satisfaction_tracker.record_nps(score, data.get("fan_id"))
         return jsonify({"status": "success", "data": result})
 
@@ -338,6 +480,7 @@ def create_app(config_name: str = "development") -> Flask:
     @app.route("/api/satisfaction/weakest", methods=["GET"])
     def api_satisfaction_weakest():
         count = request.args.get("count", 3, type=int)
+        count = max(1, min(count, 13))
         return jsonify({"status": "success", "data": satisfaction_tracker.get_weakest_areas(count)})
 
     # ─── WebSocket Events ─────────────────────────────────────
@@ -353,19 +496,22 @@ def create_app(config_name: str = "development") -> Flask:
     def background_updates():
         while True:
             socketio.sleep(5)
-            crowd_data = crowd_manager.update()
-            socketio.emit("crowd_update", crowd_data)
-            sensor_data = sensor_network.update_readings()
-            anomalies = sensor_network.get_anomaly_readings()
-            if anomalies:
-                socketio.emit("anomaly_alert", {"anomalies": anomalies})
+            try:
+                crowd_data = crowd_manager.update()
+                socketio.emit("crowd_update", crowd_data)
+                sensor_data = sensor_network.update_readings()
+                anomalies = sensor_network.get_anomaly_readings()
+                if anomalies:
+                    socketio.emit("anomaly_alert", {"anomalies": anomalies})
+            except Exception as e:
+                logger.error("Background update error: %s", e)
 
     socketio.start_background_task(background_updates)
 
-    return app
+    return app, socketio
 
 
 if __name__ == "__main__":
-    app = create_app("development")
-    socketio = SocketIO(app, cors_allowed_origins="*", async_mode="threading")
-    socketio.run(app, debug=True, port=5000)
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(name)s] %(levelname)s: %(message)s")
+    app, socketio = create_app("development")
+    socketio.run(app, debug=app.config["DEBUG"], port=5000)
