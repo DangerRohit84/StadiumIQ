@@ -489,9 +489,47 @@
         setupChat();
         setupTabs();
 
+        // ─── AI Translation Cache ──────────────────────────────
+        var aiTranslationCache = {};
+
+        function loadAITranslations(lang) {
+            if (aiTranslationCache[lang]) {
+                I18N[lang] = aiTranslationCache[lang];
+                return Promise.resolve();
+            }
+            var en = I18N.en;
+            var texts = {};
+            Object.keys(en).forEach(function (k) { texts[k] = en[k]; });
+            return fetch(API + '/api/i18n/translate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ texts: texts, target_lang: lang })
+            })
+            .then(function (r) { return r.json(); })
+            .then(function (result) {
+                if (result.status === 'success' && result.data) {
+                    var merged = {};
+                    Object.keys(en).forEach(function (k) {
+                        merged[k] = result.data[k] || en[k];
+                    });
+                    I18N[lang] = merged;
+                    aiTranslationCache[lang] = merged;
+                }
+            })
+            .catch(function () {
+                // Fallback to hardcoded translations
+            });
+        }
+
         document.getElementById('lang-select').addEventListener('change', function () {
             currentLang = this.value;
-            translateUI(currentLang);
+            if (currentLang === 'en') {
+                translateUI(currentLang);
+            } else {
+                loadAITranslations(currentLang).then(function () {
+                    translateUI(currentLang);
+                });
+            }
             loadTransportData();
             loadEcoData();
             loadFacilityMap();

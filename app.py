@@ -345,6 +345,56 @@ def create_app(config_name: str = "development") -> Flask:
         data = analytics_dashboard.get_revenue_analytics()
         return jsonify({"status": "success", "data": data})
 
+    # ─── AI Translation ───────────────────────────────────────
+    _translation_cache: dict = {}
+
+    @app.route("/api/i18n/translate", methods=["POST"])
+    @limiter.limit("20 per minute")
+    def api_translate():
+        data = request.get_json(silent=True)
+        if not data or "texts" not in data or "target_lang" not in data:
+            return jsonify({"status": "error", "message": "texts and target_lang required"}), 400
+
+        texts = data["texts"]
+        target_lang = data["target_lang"]
+
+        if not isinstance(texts, dict) or not texts:
+            return jsonify({"status": "error", "message": "texts must be a non-empty dict"}), 400
+        if len(texts) > 100:
+            return jsonify({"status": "error", "message": "Max 100 texts per request"}), 400
+
+        cache_key = f"{target_lang}:{hash(frozenset(texts.items()))}"
+        if cache_key in _translation_cache:
+            return jsonify({"status": "success", "data": _translation_cache[cache_key], "cached": True})
+
+        lang_names = {
+            "es": "Spanish", "fr": "French", "de": "German", "ar": "Arabic",
+            "zh": "Chinese", "ja": "Japanese", "ko": "Korean", "pt": "Portuguese", "hi": "Hindi"
+        }
+        lang_name = lang_names.get(target_lang, target_lang)
+
+        prompt_parts = [f"Translate these UI strings to {lang_name}. Return ONLY a valid JSON object with the same keys and translated values. No markdown, no explanation.\n"]
+        prompt_parts.append("{")
+        for key, val in texts.items():
+            escaped_val = val.replace('"', '\\"')
+            prompt_parts.append(f'  "{key}": "{escaped_val}",')
+        prompt_parts.append("}")
+
+        full_prompt = "\n".join(prompt_parts)
+
+        try:
+            response = engine._model.generate_content(full_prompt)
+            raw = response.text.strip()
+            if raw.startswith("```"):
+                raw = raw.split("\n", 1)[1].rsplit("```", 1)[0].strip()
+            import json
+            translated = json.loads(raw)
+            _translation_cache[cache_key] = translated
+            return jsonify({"status": "success", "data": translated, "cached": False})
+        except Exception as e:
+            logger.error("Translation failed: %s", e)
+            return jsonify({"status": "error", "message": "Translation failed"}), 500
+
     @app.route("/api/dashboard/staff", methods=["GET"])
     def api_dashboard_staff():
         data = analytics_dashboard.get_staff_deployment()
