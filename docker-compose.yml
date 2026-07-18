@@ -1,0 +1,14 @@
+version: "3.8"
+
+services:
+  stadiumiq:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=development
+      - SECRET_KEY=${SECRET_KEY:-stadiumiq-docker-key}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+    volumes:
+      - .:/app
+    restart: unless-stopped
