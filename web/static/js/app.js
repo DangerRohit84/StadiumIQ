@@ -473,6 +473,15 @@
         animateCounters();
         translateUI(currentLang);
 
+        fetch(API + '/api/csrf-token')
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+                if (data.csrf_token) {
+                    document.getElementById('csrf-token').setAttribute('content', data.csrf_token);
+                }
+            })
+            .catch(function () {});
+
         setTimeout(function () {
             var loader = document.getElementById('app-loader');
             loader.classList.add('hidden');
@@ -752,9 +761,10 @@
         appendMsg('user', message);
         showTyping();
 
+        var csrfToken = document.getElementById('csrf-token').getAttribute('content') || '';
         fetch(API + '/api/chat', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken },
             body: JSON.stringify({ message: message, language: currentLang, fan_id: 'web-user' })
         })
         .then(function (r) { return r.json(); })
