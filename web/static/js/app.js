@@ -38,6 +38,26 @@
             footer_right: 'FIFA World Cup 2026 — MetLife Stadium',
             toast_ready: 'StadiumIQ is ready! Ask me anything.',
             toast_lang: 'Language changed to',
+            // Facility names
+            fac_gate1: 'Gate E1 \u2014 Main North', fac_gate2: 'Gate E2 \u2014 East', fac_gate3: 'Gate E3 \u2014 South', fac_gate4: 'Gate E4 \u2014 VIP',
+            fac_rest_n: 'Restroom North', fac_rest_e: 'Restroom East',
+            fac_food_n: 'Food Court North', fac_food_e: 'Food Court East', fac_food_s: 'Food Court South', fac_food_w: 'Food Court West',
+            fac_food_n_sub: 'American, Mexican', fac_food_e_sub: 'Asian, Italian', fac_food_s_sub: 'Halal, Vegan', fac_food_w_sub: 'Burgers, Pizza',
+            fac_med_n: 'Medical Station North', fac_med_s: 'Medical Station South',
+            fac_eco_n: 'Eco Station North', fac_eco_s: 'Eco Station South',
+            fac_accessible: 'Accessible',
+            // Transport
+            tr_parking: 'Parking', tr_lot_a: 'Lot A (North)', tr_lot_b: 'Lot B (East)', tr_lot_c: 'Lot C (South)',
+            tr_ev: 'EV Charging', tr_no_ev: 'No EV',
+            tr_transit: 'Public Transit', tr_metlife: 'MetLife Station', tr_bus: 'Bus Terminal',
+            tr_every: 'Every', tr_min: 'min',
+            tr_rideshare: 'Rideshare', tr_pickup: 'Pickup Zone', tr_dropoff: 'Drop-off',
+            tr_west: 'West Zone', tr_north: 'North Zone',
+            // Eco
+            eco_station_n: 'Eco Station North', eco_station_e: 'Eco Station East', eco_station_s: 'Eco Station South',
+            eco_materials_1: 'Plastic, Paper, Glass', eco_materials_2: 'Plastic, Paper', eco_materials_3: 'All + Food Waste',
+            eco_tips: 'Green Tips', eco_bike: 'Bike to stadium', eco_transit: 'Public transit', eco_reusable: 'Reusable container',
+            eco_pts: 'pts',
         },
         es: {
             loader_sub: 'Inicializando sistemas de IA',
@@ -64,6 +84,19 @@
             footer_right: 'Copa Mundial FIFA 2026 — MetLife Stadium',
             toast_ready: '\u00a1StadiumIQ listo! Preg\u00fabtame algo.',
             toast_lang: 'Idioma cambiado a',
+            fac_gate1: 'Puerta E1 \u2014 Norte Principal', fac_gate2: 'Puerta E2 \u2014 Este', fac_gate3: 'Puerta E3 \u2014 Sur', fac_gate4: 'Puerta E4 \u2014 VIP',
+            fac_rest_n: 'Ba\u00f1o Norte', fac_rest_e: 'Ba\u00f1o Este',
+            fac_food_n: 'Comedor Norte', fac_food_e: 'Comedor Este', fac_food_s: 'Comedor Sur', fac_food_w: 'Comedor Oeste',
+            fac_food_n_sub: 'Americano, Mexicano', fac_food_e_sub: 'Asi\u00e1tico, Italiano', fac_food_s_sub: 'Halal, Vegano', fac_food_w_sub: 'Hamburguesas, Pizza',
+            fac_med_n: 'Estaci\u00f3n M\u00e9dica Norte', fac_med_s: 'Estaci\u00f3n M\u00e9dica Sur',
+            fac_eco_n: 'Estaci\u00f3n Eco Norte', fac_eco_s: 'Estaci\u00f3n Eco Sur', fac_accessible: 'Accesible',
+            tr_parking: 'Estacionamiento', tr_lot_a: 'Lote A (Norte)', tr_lot_b: 'Lote B (Este)', tr_lot_c: 'Lote C (Sur)',
+            tr_ev: 'Carga EV', tr_no_ev: 'Sin EV', tr_transit: 'Transporte P\u00fablico', tr_metlife: 'Estaci\u00f3n MetLife', tr_bus: 'Terminal de Bus',
+            tr_every: 'Cada', tr_min: 'min', tr_rideshare: 'Viaje Compartido', tr_pickup: 'Zona de Recogida', tr_dropoff: 'Bajada',
+            tr_west: 'Zona Oeste', tr_north: 'Zona Norte',
+            eco_station_n: 'Estaci\u00f3n Eco Norte', eco_station_e: 'Estaci\u00f3n Eco Este', eco_station_s: 'Estaci\u00f3n Eco Sur',
+            eco_materials_1: 'Pl\u00e1stico, Papel, Vidrio', eco_materials_2: 'Pl\u00e1stico, Papel', eco_materials_3: 'Todo + Residuos de Comida',
+            eco_tips: 'Consejos Verdes', eco_bike: 'Ir en bici al estadio', eco_transit: 'Transporte p\u00fablico', eco_reusable: 'Contenedor reutilizable', eco_pts: 'pts',
         },
         fr: {
             loader_sub: 'Initialisation des syst\u00e8mes IA',
@@ -90,6 +123,19 @@
             footer_right: 'Coupe du Monde FIFA 2026 — MetLife Stadium',
             toast_ready: 'StadiumIQ pr\u00eat! Demandez-moi quelque chose.',
             toast_lang: 'Langue chang\u00e9e en',
+            fac_gate1: 'Porte E1 \u2014 Nord Principal', fac_gate2: 'Porte E2 \u2014 Est', fac_gate3: 'Porte E3 \u2014 Sud', fac_gate4: 'Porte E4 \u2014 VIP',
+            fac_rest_n: 'Toilettes Nord', fac_rest_e: 'Toilettes Est',
+            fac_food_n: 'Food Court Nord', fac_food_e: 'Food Court Est', fac_food_s: 'Food Court Sud', fac_food_w: 'Food Court Ouest',
+            fac_food_n_sub: 'Am\u00e9ricain, Mexicain', fac_food_e_sub: 'Asiatique, Italien', fac_food_s_sub: 'Halal, V\u00e9g\u00e9tal', fac_food_w_sub: 'Burgers, Pizza',
+            fac_med_n: 'Poste M\u00e9dical Nord', fac_med_s: 'Poste M\u00e9dical Sud',
+            fac_eco_n: 'Station \u00c9co Nord', fac_eco_s: 'Station \u00c9co Sud', fac_accessible: 'Accessible',
+            tr_parking: 'Parking', tr_lot_a: 'Zone A (Nord)', tr_lot_b: 'Zone B (Est)', tr_lot_c: 'Zone C (Sud)',
+            tr_ev: 'Recharge EV', tr_no_ev: 'Pas de EV', tr_transit: 'Transport en Commun', tr_metlife: 'Station MetLife', tr_bus: 'Gare Routi\u00e8re',
+            tr_every: 'Tous les', tr_min: 'min', tr_rideshare: 'Covoiturage', tr_pickup: 'Zone de Prise', tr_dropoff: 'D\u00e9pose',
+            tr_west: 'Zone Ouest', tr_north: 'Zone Nord',
+            eco_station_n: 'Station \u00c9co Nord', eco_station_e: 'Station \u00c9co Est', eco_station_s: 'Station \u00c9co Sud',
+            eco_materials_1: 'Plastique, Papier, Verre', eco_materials_2: 'Plastique, Papier', eco_materials_3: 'Tout + D\u00e9chets Alimentaires',
+            eco_tips: 'Conseils \u00c9co', eco_bike: 'V\u00e9lo au stade', eco_transit: 'Transport en commun', eco_reusable: 'Conteneur r\u00e9utilisable', eco_pts: 'pts',
         },
         de: {
             loader_sub: 'KI-Systeme werden initialisiert',
@@ -116,6 +162,19 @@
             footer_right: 'FIFA Weltmeisterschaft 2026 — MetLife Stadium',
             toast_ready: 'StadiumIQ bereit! Fragen Sie mich alles.',
             toast_lang: 'Sprache ge\u00e4ndert zu',
+            fac_gate1: 'Tor E1 \u2014 Haupt Nord', fac_gate2: 'Tor E2 \u2014 Ost', fac_gate3: 'Tor E3 \u2014 S\u00fcd', fac_gate4: 'Tor E4 \u2014 VIP',
+            fac_rest_n: 'Toilette Nord', fac_rest_e: 'Toilette Ost',
+            fac_food_n: 'Essenscourt Nord', fac_food_e: 'Essenscourt Ost', fac_food_s: 'Essenscourt S\u00fcd', fac_food_w: 'Essenscourt West',
+            fac_food_n_sub: 'Amerikanisch, Mexikanisch', fac_food_e_sub: 'Asiatisch, Italienisch', fac_food_s_sub: 'Halal, Vegan', fac_food_w_sub: 'Burgers, Pizza',
+            fac_med_n: 'Medizinische Station Nord', fac_med_s: 'Medizinische Station S\u00fcd',
+            fac_eco_n: '\u00d6ko-Station Nord', fac_eco_s: '\u00d6ko-Station S\u00fcd', fac_accessible: 'Barrierefrei',
+            tr_parking: 'Parkplatz', tr_lot_a: 'Lot A (Nord)', tr_lot_b: 'Lot B (Ost)', tr_lot_c: 'Lot C (S\u00fcd)',
+            tr_ev: 'EV-Laden', tr_no_ev: 'Kein EV', tr_transit: '\u00d6ffentlicher Verkehr', tr_metlife: 'MetLife Station', tr_bus: 'Busbahnhof',
+            tr_every: 'Alle', tr_min: 'Min', tr_rideshare: 'Fahrgemeinschaft', tr_pickup: 'Abholzone', tr_dropoff: 'Absprung',
+            tr_west: 'Westzone', tr_north: 'Nordzone',
+            eco_station_n: '\u00d6ko-Station Nord', eco_station_e: '\u00d6ko-Station Ost', eco_station_s: '\u00d6ko-Station S\u00fcd',
+            eco_materials_1: 'Kunststoff, Papier, Glas', eco_materials_2: 'Kunststoff, Papier', eco_materials_3: 'Alles + Lebensmittelabf\u00e4lle',
+            eco_tips: 'Umwelttipps', eco_bike: 'Mit dem Rad zum Stadion', eco_transit: '\u00d6ffentlicher Verkehr', eco_reusable: 'Wiederverwendbarer Beh\u00e4lter', eco_pts: 'Pkte',
         },
         zh: {
             loader_sub: 'AI\u7cfb\u7edf\u521d\u59cb\u5316\u4e2d',
@@ -142,6 +201,19 @@
             footer_right: '2026\u5e74FIFA\u4e16\u754c\u676f \u2014 MetLife\u4f53\u80b2\u573a',
             toast_ready: 'StadiumIQ\u5df2\u5c31\u7eea\uff01\u95ee\u6211\u4efb\u4f55\u95ee\u9898\u3002',
             toast_lang: '\u8bed\u8a00\u5df2\u66f4\u6539\u4e3a',
+            fac_gate1: 'E1\u53f7\u95e8 \u2014 \u5317\u4fa7\u4e3b\u5165\u53e3', fac_gate2: 'E2\u53f7\u95e8 \u2014 \u4e1c\u4fa7', fac_gate3: 'E3\u53f7\u95e8 \u2014 \u5357\u4fa7', fac_gate4: 'E4\u53f7\u95e8 \u2014 VIP',
+            fac_rest_n: '\u5317\u4fa7\u6d17\u624b\u95f4', fac_rest_e: '\u4e1c\u4fa7\u6d17\u624b\u95f4',
+            fac_food_n: '\u5317\u4fa7\u7f8e\u98df\u5e02\u573a', fac_food_e: '\u4e1c\u4fa7\u7f8e\u98df\u5e02\u573a', fac_food_s: '\u5357\u4fa7\u7f8e\u98df\u5e02\u573a', fac_food_w: '\u897f\u4fa7\u7f8e\u98df\u5e02\u573a',
+            fac_food_n_sub: '\u7f8e\u56fd\u3001\u58a8\u897f\u54e5', fac_food_e_sub: '\u4e9a\u6d32\u3001\u610f\u5927\u5229', fac_food_s_sub: '\u6e05\u771f\u3001\u7d20\u98df', fac_food_w_sub: '\u6c49\u5821\u3001\u62b9\u8336',
+            fac_med_n: '\u5317\u4fa7\u533b\u7597\u7ad9', fac_med_s: '\u5357\u4fa7\u533b\u7597\u7ad9',
+            fac_eco_n: '\u5317\u4fa7\u73af\u4fdd\u7ad9', fac_eco_s: '\u5357\u4fa7\u73af\u4fdd\u7ad9', fac_accessible: '\u65e0\u969c\u788d',
+            tr_parking: '\u505c\u8f66\u573a', tr_lot_a: 'A\u533a\uff08\u5317\uff09', tr_lot_b: 'B\u533a\uff08\u4e1c\uff09', tr_lot_c: 'C\u533a\uff08\u5357\uff09',
+            tr_ev: '\u7535\u52a8\u5145\u7535', tr_no_ev: '\u65e0\u5145\u7535', tr_transit: '\u516c\u5171\u4ea4\u901a', tr_metlife: 'MetLife\u7ad9', tr_bus: '\u516c\u4ea4\u7ad9',
+            tr_every: '\u6bcf', tr_min: '\u5206\u949f', tr_rideshare: '\u62ff\u62ff\u8f66', tr_pickup: '\u4e0a\u8f66\u70b9', tr_dropoff: '\u4e0b\u8f66\u70b9',
+            tr_west: '\u897f\u533a', tr_north: '\u5317\u533a',
+            eco_station_n: '\u5317\u4fa7\u73af\u4fdd\u7ad9', eco_station_e: '\u4e1c\u4fa7\u73af\u4fdd\u7ad9', eco_station_s: '\u5357\u4fa7\u73af\u4fdd\u7ad9',
+            eco_materials_1: '\u5851\u6599\u3001\u7eb8\u5f20\u3001\u73bb\u7483', eco_materials_2: '\u5851\u6599\u3001\u7eb8\u5f20', eco_materials_3: '\u5168\u90e8 + \u996e\u98df\u5783\u573e',
+            eco_tips: '\u7eff\u8272\u5c0f\u8d34\u58eb', eco_bike: '\u9a91\u8f66\u5230\u4f53\u80b2\u573a', eco_transit: '\u516c\u5171\u4ea4\u901a', eco_reusable: '\u53ef\u91cd\u590d\u4f7f\u7528\u5bb9\u5668', eco_pts: '\u5206',
         },
         ja: {
             loader_sub: 'AI\u30b7\u30b9\u30c6\u30e0\u521d\u59cb\u5316\u4e2d',
@@ -168,32 +240,58 @@
             footer_right: 'FIFA\u30ef\u30fc\u30eb\u30c9\u30ab\u30c3\u30d72026 \u2014 MetLife\u30b9\u30bf\u30b8\u30a2',
             toast_ready: 'StadiumIQ\u6e96\u5099\u5b8c\u4e86\uff01\u4f55\u3067\u3082\u304a\u554f\u3044\u5408\u308f\u305b\u304f\u3060\u3055\u3044\u3002',
             toast_lang: '\u8a00\u8a9e\u3092\u5909\u66f4\u3057\u307e\u3057\u305f',
+            fac_gate1: '\u30b8\u30fc\u30c8E1 \u2014 \u5317\u5074\u30e1\u30a4\u30f3', fac_gate2: '\u30b8\u30fc\u30c8E2 \u2014 \u6771\u5074', fac_gate3: '\u30b8\u30fc\u30c8E3 \u2014 \u5357\u5074', fac_gate4: '\u30b8\u30fc\u30c8E4 \u2014 VIP',
+            fac_rest_n: '\u5317\u5074\u30c8\u30a4\u30ec', fac_rest_e: '\u6771\u5074\u30c8\u30a4\u30ec',
+            fac_food_n: '\u5317\u5074\u30d5\u30fc\u30c9\u30b3\u30fc\u30c8', fac_food_e: '\u6771\u5074\u30d5\u30fc\u30c9\u30b3\u30fc\u30c8', fac_food_s: '\u5357\u5074\u30d5\u30fc\u30c9\u30b3\u30fc\u30c8', fac_food_w: '\u897f\u5074\u30d5\u30fc\u30c9\u30b3\u30fc\u30c8',
+            fac_food_n_sub: '\u30a2\u30e1\u30ea\u30ab\u3001\u30e1\u30ad\u30b7\u30b3', fac_food_e_sub: '\u30a2\u30b8\u30a2\u3001\u30a4\u30bf\u30ea\u30a2\u30f3', fac_food_s_sub: '\u30cf\u30e9\u30fc\u3001\u30d9\u30b8\u30bf\u30eb', fac_food_w_sub: '\u30d0\u30fc\u30ac\u30fc\u3001\u30d4\u30b6',
+            fac_med_n: '\u5317\u5074\u533b\u7642\u30b9\u30c6\u30fc\u30b7\u30e7\u30f3', fac_med_s: '\u5357\u5074\u533b\u7642\u30b9\u30c6\u30fc\u30b7\u30e7\u30f3',
+            fac_eco_n: '\u5317\u5074\u30a8\u30b3\u30b9\u30c6\u30fc\u30b7\u30e7\u30f3', fac_eco_s: '\u5357\u5074\u30a8\u30b3\u30b9\u30c6\u30fc\u30b7\u30e7\u30f3', fac_accessible: '\u30a2\u30af\u30bb\u30b7\u30d3\u30eb',
+            tr_parking: '\u99d0\u8eeb\u5834', tr_lot_a: '\u30ed\u30c3\u30c8A\uff08\u5317\uff09', tr_lot_b: '\u30ed\u30c3\u30c8B\uff08\u6771\uff09', tr_lot_c: '\u30ed\u30c3\u30c8C\uff08\u5357\uff09',
+            tr_ev: 'EV\u5145\u96fb', tr_no_ev: 'EV\u306a\u3057', tr_transit: '\u516c\u5171\u4ea4\u901a', tr_metlife: 'MetLife\u99c5', tr_bus: '\u30d0\u30b9\u30bf\u30fc\u30df\u30ca\u30eb',
+            tr_every: '\u6bcf', tr_min: '\u5206', tr_rideshare: '\u30e9\u30a4\u30c9\u30b7\u30a7\u30a2', tr_pickup: '\u4e58\u308a\u5834', tr_dropoff: '\u964d\u8fbc\u307f',
+            tr_west: '\u897f\u5074', tr_north: '\u5317\u5074',
+            eco_station_n: '\u5317\u5074\u30a8\u30b3\u30b9\u30c6\u30fc\u30b7\u30e7\u30f3', eco_station_e: '\u6771\u5074\u30a8\u30b3\u30b9\u30c6\u30fc\u30b7\u30e7\u30f3', eco_station_s: '\u5357\u5074\u30a8\u30b3\u30b9\u30c6\u30fc\u30b7\u30e7\u30f3',
+            eco_materials_1: '\u30d7\u30e9\u30b9\u30c1\u30c3\u30af\u3001\u7d19\u3001\u30ac\u30e9\u30b9', eco_materials_2: '\u30d7\u30e9\u30b9\u30c1\u30c3\u30af\u3001\u7d19', eco_materials_3: '\u5168\u3066 + \u98df\u3079\u7269\u5ecf\u5831',
+            eco_tips: '\u30a8\u30b3\u30c1\u30c3\u30d7', eco_bike: '\u30d0\u30a4\u30af\u3067\u30b9\u30bf\u30b8\u30a2\u3078', eco_transit: '\u516c\u5171\u4ea4\u901a', eco_reusable: '\u518d\u5229\u7528\u5bb9\u5668', eco_pts: '\u30dd\u30a4\u30f3\u30c8',
         },
         ko: {
-            loader_sub: 'AI \uc2dc\uc2a4\ud15c \ucd08\uc2dc\ud655',
-            nav_fan: '\ud32c \ucee8\ud14c\uc2a4', nav_cmd: '\ucee4\ub2e4\uc778\uc5d0\ub4dc',
-            systems_online: '\uc2dc\uc2a4\ud15c \uc624\ub77c\uc778',
-            hero_badge: 'FIFA \uc6d4\ub4dc\ucee8\ud504 2026',
-            hero_title_1: '\ub2f9\uc2e0\uc758', hero_title_2: 'AI \uc2a4\ud0c0\uc778', hero_title_3: '\ub3c4\uc6c0',
-            hero_sub: '\ub354 \uba87\ubc88 \ub113\uac8c \ub124\uc774\ubc84\ud558\uc138\uc694. Google Gemini 2.5 Flash\uc5d0 \ub77c\uc6b0\ub294.',
-            stat_capacity: '\uc6a9\ub7c8', stat_endpoints: 'API \uc5d4\ud305\ud2b8', stat_languages: '\uc5b8\uc5b4', stat_tests: '\ud14c\uc2a4\ud2b8',
-            ai_assistant: 'AI \uc2dc\uc2a4\ud15c', ai_sub: 'Gemini 2.5 Flash \uae30\uc220', active: '\ud65c\uc601',
-            greeting_title: 'StadiumIQ\uc5d0 \uc624\uc2e0 \uac83\uc744 \ud658\uc601\ud569\ub2c8\ub2e4!',
-            greeting_sub: '<strong>FIFA \uc6d4\ub4dc\ucee8\ud504 2026</strong> \uc2dc\uc2a4\ud15c \uc2dc\uc2a4\ud15c \uc2dc\uc2a4\ud15c \ub3c4\uc6c0\uc785\ub2c8\ub2e4.',
-            feat_nav: '\ub124\uc774\ubc84\uc774\uc158', feat_crowds: '\uc778\ud0a4', feat_a11y: '\ubb34\uc5e7\ud558\uc9c0 \uc5c6\uc774', feat_eco: '\uc9c0\uc18d\uc131', feat_match: '\uacbd\uae30', feat_transport: '\uac70\ud1b5',
-            just_now: '\uc790\uae30',
-            q_restroom: '\uc708\ub300\uc2dc\uacfc', q_food: '\uc2f8\ubc00', q_crowds: '\uc778\ud0a4', q_parking: '\uc8fc\ucc28', q_accessible: '\ubb34\uc5e7\ud558\uc9c0 \uc5c6\uc774', q_eco: '\uc5d0\ucf54', q_schedule: '\uc77c\uc815', q_medical: '\uc758\ub8cc',
-            chat_placeholder: '\uc2a4\ud0c0\uc778\uc5d0 \uad00\ud55c \ubb3c\uc5b4\ub4e0 \ubb3c\uc5b4\ubcf4\uc138\uc694...',
-            tab_crowd: '\uc778\ud0a4', tab_map: '\ub514\uc9c0\ud130', tab_transport: '\uac70\ud1b5', tab_eco: '\uc5d0\ucf54',
-            crowd_title: '\uc2e4\uc2dc\uac04 \uc778\ud0a4 \ubc00\ub3c4', live: '\uc2e4\uc2dc\uac04',
-            map_title: '\uc2dc\uc124 \ub9f5\ud504', transport_title: '\uac70\ud1b5 \ud5e9', eco_title: '\uc9c0\uc18d\uc131 \ub300\uc2dc\ubc84\ub4dc',
-            cmd_title: '\uc6b4\uc601 \ucee4\ub2e4\uc778\uc5d0\ub4dc', cmd_sub: '\uc2e4\uc2dc\uac04 \uc2a4\ud0c0\uc778 \uc815\ubcf8\ubd84\uc11d',
-            cmd_crowd: '\uc778\ud0a4 \ud751\ub4dd', cmd_sentiment: '\ud32c \uac10\uc815', cmd_risk: '\uc6d0\ud558 \ud3c9\uac00',
-            cmd_alerts: '\uc2e4\uc2dc\uac04 \uacfc\ud558', cmd_staff: '\uc7a5\uad7c \ubd84\uc0b0', cmd_insights: 'AI \ub9cc\ub828',
-            footer_left: 'StadiumIQ v3.0 \u2014 Google Gemini 2.5 Flash \uc5d0 \ub77c\uc6b0\ub294',
-            footer_right: 'FIFA \uc6d4\ub4dc\ucee8\ud504 2026 \u2014 MetLife \uc2a4\ud0c0\uc778',
-            toast_ready: 'StadiumIQ \uc900\ube44 \uc644\ub8cc! \ubb3c\uc5b4\ub4e0 \ubb3c\uc5b4\ubcf4\uc138\uc694.',
-            toast_lang: '\uc5b8\uc5b4\uac00 \ubcc0\uacbd\ub418\uc5c8\uc2b5\ub2c8\ub2e4',
+            loader_sub: 'AI 시스템 초기화',
+            nav_fan: '팬 경험', nav_cmd: '지휘 센터',
+            systems_online: '시스템 온라인',
+            hero_badge: 'FIFA 월드컵 2026',
+            hero_title_1: '나만의', hero_title_2: 'AI 경기장', hero_title_3: '어시스턴트',
+            hero_sub: '더 똑똑하게 내비게이션하세요. Google Gemini 2.5 Flash로 구동됩니다.',
+            stat_capacity: '수용량', stat_endpoints: 'API 엔드포인트', stat_languages: '언어', stat_tests: '테스트',
+            ai_assistant: 'AI 어시스턴트', ai_sub: 'Gemini 2.5 Flash 기술', active: '활성',
+            greeting_title: 'StadiumIQ에 오신 것을 환영합니다!',
+            greeting_sub: '<strong>FIFA 월드컵 2026</strong> MetLife 경기장의 AI 어시스턴트입니다.',
+            feat_nav: '내비게이션', feat_crowds: '혼잡도', feat_a11y: '접근성', feat_eco: '지속가능성', feat_match: '경기 정보', feat_transport: '교통',
+            just_now: '방금',
+            q_restroom: '화장실', q_food: '음식', q_crowds: '혼잡도', q_parking: '주차', q_accessible: '접근성', q_eco: '에코', q_schedule: '일정', q_medical: '의료',
+            chat_placeholder: '경기장에 대해 무엇이든 물어보세요...',
+            tab_crowd: '혼잡도', tab_map: '지도', tab_transport: '교통', tab_eco: '에코',
+            crowd_title: '실시간 혼잡도', live: '실시간',
+            map_title: '시설 안내도', transport_title: '교통 허브', eco_title: '지속가능성 대시보드',
+            cmd_title: '운영 지휘 센터', cmd_sub: '실시간 경기장 인텔리전스 및 운영 분석',
+            cmd_crowd: '인파 흐름', cmd_sentiment: '팬 감정', cmd_risk: '위험 평가',
+            cmd_alerts: '실시간 알림', cmd_staff: '인력 배치', cmd_insights: 'AI 인사이트',
+            footer_left: 'StadiumIQ v3.0 — Google Gemini 2.5 Flash로 구동',
+            footer_right: 'FIFA 월드컵 2026 — MetLife 경기장',
+            toast_ready: 'StadiumIQ 준비 완료! 무엇이든 물어보세요.',
+            toast_lang: '언어가 변경되었습니다',
+            fac_gate1: 'E1번 게이트 — 북쪽 메인', fac_gate2: 'E2번 게이트 — 동쪽', fac_gate3: 'E3번 게이트 — 남쪽', fac_gate4: 'E4번 게이트 — VIP',
+            fac_rest_n: '북쪽 화장실', fac_rest_e: '동쪽 화장실',
+            fac_food_n: '북쪽 푸드코트', fac_food_e: '동쪽 푸드코트', fac_food_s: '남쪽 푸드코트', fac_food_w: '서쪽 푸드코트',
+            fac_food_n_sub: '미국식, 멕시코식', fac_food_e_sub: '아시안, 이탈리안', fac_food_s_sub: '할랄, 비건', fac_food_w_sub: '버거, 피자',
+            fac_med_n: '북쪽 의료소', fac_med_s: '남쪽 의료소',
+            fac_eco_n: '북쪽 에코스테이션', fac_eco_s: '남쪽 에코스테이션', fac_accessible: '접근성 지원',
+            tr_parking: '주차장', tr_lot_a: 'A구역 (북쪽)', tr_lot_b: 'B구역 (동쪽)', tr_lot_c: 'C구역 (남쪽)',
+            tr_ev: '전기차 충전', tr_no_ev: '충전 없음', tr_transit: '대중교통', tr_metlife: 'MetLife역', tr_bus: '버스 터미널',
+            tr_every: '매', tr_min: '분', tr_rideshare: '카풀', tr_pickup: '승차장', tr_dropoff: '하차장',
+            tr_west: '서쪽 구역', tr_north: '북쪽 구역',
+            eco_station_n: '북쪽 에코스테이션', eco_station_e: '동쪽 에코스테이션', eco_station_s: '남쪽 에코스테이션',
+            eco_materials_1: '플라스틱, 종이, 유리', eco_materials_2: '플라스틱, 종이', eco_materials_3: '전체 + 음식쓰레기',
+            eco_tips: '그린 팁', eco_bike: '자전거로 경기장 가기', eco_transit: '대중교통 이용', eco_reusable: '재사용 용기', eco_pts: '점',
         },
         pt: {
             loader_sub: 'Inicializando sistemas de IA',
@@ -220,6 +318,19 @@
             footer_right: 'Copa do Mundo FIFA 2026 \u2014 MetLife Stadium',
             toast_ready: 'StadiumIQ pronto! Pergunte qualquer coisa.',
             toast_lang: 'Idioma alterado para',
+            fac_gate1: 'Port\u00e3o E1 \u2014 Norte Principal', fac_gate2: 'Port\u00e3o E2 \u2014 Leste', fac_gate3: 'Port\u00e3o E3 \u2014 Sul', fac_gate4: 'Port\u00e3o E4 \u2014 VIP',
+            fac_rest_n: 'Banheiro Norte', fac_rest_e: 'Banheiro Leste',
+            fac_food_n: 'Praça de Alimentação Norte', fac_food_e: 'Praça de Alimentação Leste', fac_food_s: 'Praça de Alimentação Sul', fac_food_w: 'Praça de Alimentação Oeste',
+            fac_food_n_sub: 'Americano, Mexicano', fac_food_e_sub: 'Asiático, Italiano', fac_food_s_sub: 'Halal, Vegano', fac_food_w_sub: 'Hambúrgueres, Pizza',
+            fac_med_n: 'Posto Médico Norte', fac_med_s: 'Posto Médico Sul',
+            fac_eco_n: 'Posto Ecológico Norte', fac_eco_s: 'Posto Ecológico Sul', fac_accessible: 'Acessível',
+            tr_parking: 'Estacionamento', tr_lot_a: 'Lote A (Norte)', tr_lot_b: 'Lote B (Leste)', tr_lot_c: 'Lote C (Sul)',
+            tr_ev: 'Carregamento EV', tr_no_ev: 'Sem EV', tr_transit: 'Transporte Público', tr_metlife: 'Estação MetLife', tr_bus: 'Terminal de Ônibus',
+            tr_every: 'A cada', tr_min: 'min', tr_rideshare: 'Boleia', tr_pickup: 'Zona de Embarque', tr_dropoff: 'Desembarque',
+            tr_west: 'Zona Oeste', tr_north: 'Zona Norte',
+            eco_station_n: 'Posto Ecológico Norte', eco_station_e: 'Posto Ecológico Leste', eco_station_s: 'Posto Ecológico Sul',
+            eco_materials_1: 'Plástico, Papel, Vidro', eco_materials_2: 'Plástico, Papel', eco_materials_3: 'Tudo + Resíduos Alimentares',
+            eco_tips: 'Dicas Verdes', eco_bike: 'Ir de bike ao estádio', eco_transit: 'Transporte público', eco_reusable: 'Recipiente reutilizável', eco_pts: 'pts',
         },
         hi: {
             loader_sub: 'AI \u0938\u093f\u0938\u094d\u091f\u092e \u0915\u094b \u0907\u0928\u093f\u0936\u0932\u093f\u091f \u0939\u094b \u0930\u0939\u093e \u0939\u0948',
@@ -246,6 +357,19 @@
             footer_right: 'FIFA \u0935\u0930\u094d\u0932\u094d\u0921 \u0915\u092a 2026 \u2014 MetLife \u0938\u094d\u091f\u0947\u0921\u093f\u092f\u092e',
             toast_ready: 'StadiumIQ \u0924\u0948\u092f\u093e\u0930 \u0939\u0948! \u0915\u0941\u0924\u0940 \u092d\u0940 \u092a\u0942\u091b\u0947\u0902\u0964',
             toast_lang: '\u092d\u093e\u0937\u093e \u092c\u0926\u0932 \u0915\u0930 \u0926\u093f\u092f\u093e',
+            fac_gate1: '\u0917\u0947\u091f E1 \u2014 \u092e\u0941\u0916\u094d\u092f \u0909\u0924\u094d\u0924\u0930', fac_gate2: '\u0917\u0947\u091f E2 \u2014 \u092a\u0942\u0930\u094d\u0935', fac_gate3: '\u0917\u0947\u091f E3 \u2014 \u0926\u0915\u094d\u0937\u093f\u0923', fac_gate4: '\u0917\u0947\u091f E4 \u2014 VIP',
+            fac_rest_n: '\u0909\u0924\u094d\u0924\u0930 \u0936\u094c\u091a\u093e\u0918\u0930', fac_rest_e: '\u092a\u0942\u0930\u094d\u0935 \u0936\u094c\u091a\u093e\u0918\u0930',
+            fac_food_n: '\u0909\u0924\u094d\u0924\u0930 \u092b\u0942\u0921 \u0915\u0949\u0930\u094d\u091f', fac_food_e: '\u092a\u0942\u0930\u094d\u0935 \u092b\u0942\u0921 \u0915\u0949\u0930\u094d\u091f', fac_food_s: '\u0926\u0915\u094d\u0937\u093f\u0923 \u092b\u0942\u0921 \u0915\u0949\u0930\u094d\u091f', fac_food_w: '\u092a\u0936\u094d\u091a\u093f\u092e \u092b\u0942\u0921 \u0915\u0949\u0930\u094d\u091f',
+            fac_food_n_sub: '\u0905\u092e\u0947\u0930\u093f\u0915\u0940, \u092e\u0947\u0915\u094d\u0938\u093f\u0915\u0928', fac_food_e_sub: '\u090f\u0936\u093f\u092f\u093e\u0908, \u0907\u091f\u0932\u0940\u092f\u093e\u0908', fac_food_s_sub: '\u0939\u0932\u093e\u0932, \u0935\u0947\u0917\u0928', fac_food_w_sub: '\u092c\u0930\u094d\u0917\u0930, \u092a\u093f\u091c\u093c\u093e',
+            fac_med_n: '\u0909\u0924\u094d\u0924\u0930 \u092e\u0947\u0921\u093f\u0915\u0932 \u0938\u094d\u091f\u0947\u0936\u0928', fac_med_s: '\u0926\u0915\u094d\u0937\u093f\u0923 \u092e\u0947\u0921\u093f\u0915\u0932 \u0938\u094d\u091f\u0947\u0936\u0928',
+            fac_eco_n: '\u0909\u0924\u094d\u0924\u0930 \u091f\u093f\u0915\u093e \u0938\u094d\u091f\u0947\u0936\u0928', fac_eco_s: '\u0926\u0915\u094d\u0937\u093f\u0923 \u091f\u093f\u0915\u093e \u0938\u094d\u091f\u0947\u0936\u0928', fac_accessible: '\u0938\u0941\u0932\u092d',
+            tr_parking: '\u092a\u093e\u0930\u094d\u0915\u093f\u0902\u0917', tr_lot_a: '\u0932\u0949\u091f A (\u0909\u0924\u094d\u0924\u0930)', tr_lot_b: '\u0932\u0949\u091f B (\u092a\u0942\u0930\u094d\u0935)', tr_lot_c: '\u0932\u0949\u091f C (\u0926\u0915\u094d\u0937\u093f\u0923)',
+            tr_ev: 'EV \u091a\u093e\u0930\u094d\u091c', tr_no_ev: 'EV \u0928\u0939\u0940\u0902', tr_transit: '\u0938\u093e\u0930\u094d\u0935\u0939\u093f\u0915 \u092a\u0930\u093f\u0935\u0939\u093e\u0928', tr_metlife: 'MetLife \u0938\u094d\u091f\u0947\u0936\u0928', tr_bus: '\u092c\u0938 \u091f\u0930\u094d\u092e\u093f\u0928\u0932',
+            tr_every: '\u0939\u0930', tr_min: '\u092e\u093f\u0928\u091f', tr_rideshare: '\u0915\u093e\u0930\u092a\u0942\u0932', tr_pickup: '\u0938\u094d\u0935\u0940\u0915\u093e\u0930\u0923 \u0915\u094d\u0937\u0947\u0924\u094d\u0930', tr_dropoff: '\u0909\u0924\u093e\u0930\u0923\u093e',
+            tr_west: '\u092a\u0936\u094d\u091a\u093f\u092e \u0915\u094d\u0937\u0947\u0924\u094d\u0930', tr_north: '\u0909\u0924\u094d\u0924\u0930 \u0915\u094d\u0937\u0947\u0924\u094d\u0930',
+            eco_station_n: '\u0909\u0924\u094d\u0924\u0930 \u091f\u093f\u0915\u093e \u0938\u094d\u091f\u0947\u0936\u0928', eco_station_e: '\u092a\u0942\u0930\u094d\u0935 \u091f\u093f\u0915\u093e \u0938\u094d\u091f\u0947\u0936\u0928', eco_station_s: '\u0926\u0915\u094d\u0937\u093f\u0923 \u091f\u093f\u0915\u093e \u0938\u094d\u091f\u0947\u0936\u0928',
+            eco_materials_1: '\u092a\u094d\u0932\u093e\u0938\u094d\u091f\u093f\u0915, \u0915\u093e\u0917\u093c\u093e\u091c, \u0915\u093e\u0901\u091b', eco_materials_2: '\u092a\u094d\u0932\u093e\u0938\u094d\u091f\u093f\u0915, \u0915\u093e\u0917\u093c\u093e\u091c', eco_materials_3: '\u0938\u092c \u0915\u0941\u0937 \u0906\u0939\u093e\u0930 \u0938\u093e\u092e\u0917\u094d\u0930\u0940',
+            eco_tips: '\u0939\u0930\u093e \u091f\u093f\u092a\u094d\u0938', eco_bike: '\u092c\u093e\u0907\u0915 \u0938\u0947 \u0938\u094d\u091f\u0947\u0921\u093f\u092f\u092e', eco_transit: '\u0938\u093e\u0930\u094d\u0935\u0939\u093f\u0915 \u092a\u0930\u093f\u0935\u0939\u093e\u0928', eco_reusable: '\u092a\u0941\u0928\u0930\u094d\u092f\u094b\u091c\u093f\u0924 \u0915\u0902\u091f\u0947\u0928\u0930', eco_pts: '\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0',
         },
     };
 
@@ -271,6 +395,9 @@
         document.getElementById('lang-select').addEventListener('change', function () {
             currentLang = this.value;
             translateUI(currentLang);
+            loadTransportData();
+            loadEcoData();
+            loadFacilityMap();
             showToast((I18N[currentLang] || I18N.en).toast_lang + ' ' + this.options[this.selectedIndex].text, 'info');
         });
 
@@ -597,19 +724,22 @@
     function loadTransportData() {
         var el = document.getElementById('transport-list');
         if (!el) return;
+        var t = I18N[currentLang] || I18N.en;
+        var e = I18N.en;
+        function tr(key) { return t[key] || e[key]; }
         el.innerHTML =
-            '<div class="info-card"><h4><i class="fas fa-parking"></i> Parking</h4>' +
-            '<div class="info-row"><span>Lot A (North)</span><span>$40</span><span class="badge badge-green">EV Charging</span></div>' +
-            '<div class="info-row"><span>Lot B (East)</span><span>$35</span><span class="badge badge-red">No EV</span></div>' +
-            '<div class="info-row"><span>Lot C (South)</span><span>$38</span><span class="badge badge-green">EV Charging</span></div>' +
+            '<div class="info-card"><h4><i class="fas fa-parking"></i> ' + tr('tr_parking') + '</h4>' +
+            '<div class="info-row"><span>' + tr('tr_lot_a') + '</span><span>$40</span><span class="badge badge-green">' + tr('tr_ev') + '</span></div>' +
+            '<div class="info-row"><span>' + tr('tr_lot_b') + '</span><span>$35</span><span class="badge badge-red">' + tr('tr_no_ev') + '</span></div>' +
+            '<div class="info-row"><span>' + tr('tr_lot_c') + '</span><span>$38</span><span class="badge badge-green">' + tr('tr_ev') + '</span></div>' +
             '</div>' +
-            '<div class="info-card"><h4><i class="fas fa-train"></i> Public Transit</h4>' +
-            '<div class="info-row"><span>MetLife Station</span><span>0.5 km</span><span>Every 10 min</span></div>' +
-            '<div class="info-row"><span>Bus Terminal</span><span>1.2 km</span><span>Every 15 min</span></div>' +
+            '<div class="info-card"><h4><i class="fas fa-train"></i> ' + tr('tr_transit') + '</h4>' +
+            '<div class="info-row"><span>' + tr('tr_metlife') + '</span><span>0.5 km</span><span>' + tr('tr_every') + ' 10 ' + tr('tr_min') + '</span></div>' +
+            '<div class="info-row"><span>' + tr('tr_bus') + '</span><span>1.2 km</span><span>' + tr('tr_every') + ' 15 ' + tr('tr_min') + '</span></div>' +
             '</div>' +
-            '<div class="info-card"><h4><i class="fas fa-car"></i> Rideshare</h4>' +
-            '<div class="info-row"><span>Pickup Zone</span><span>West Zone</span></div>' +
-            '<div class="info-row"><span>Drop-off</span><span>North Zone</span></div>' +
+            '<div class="info-card"><h4><i class="fas fa-car"></i> ' + tr('tr_rideshare') + '</h4>' +
+            '<div class="info-row"><span>' + tr('tr_pickup') + '</span><span>' + tr('tr_west') + '</span></div>' +
+            '<div class="info-row"><span>' + tr('tr_dropoff') + '</span><span>' + tr('tr_north') + '</span></div>' +
             '</div>';
     }
 
@@ -617,41 +747,47 @@
     function loadEcoData() {
         var el = document.getElementById('eco-list');
         if (!el) return;
+        var t = I18N[currentLang] || I18N.en;
+        var e = I18N.en;
+        function tr(key) { return t[key] || e[key]; }
         el.innerHTML =
-            '<div class="eco-highlight"><div><h4>Eco Station North</h4><p style="font-size:.7rem;color:var(--text-3)">Plastic, Paper, Glass</p></div><span class="eco-pts">+50 pts</span></div>' +
-            '<div class="eco-highlight"><div><h4>Eco Station East</h4><p style="font-size:.7rem;color:var(--text-3)">Plastic, Paper</p></div><span class="eco-pts">+30 pts</span></div>' +
-            '<div class="eco-highlight"><div><h4>Eco Station South</h4><p style="font-size:.7rem;color:var(--text-3)">All + Food Waste</p></div><span class="eco-pts">+75 pts</span></div>' +
-            '<div class="info-card"><h4><i class="fas fa-leaf"></i> Green Tips</h4>' +
-            '<div class="info-row"><span>Bike to stadium</span><span class="badge badge-green">+200 pts</span></div>' +
-            '<div class="info-row"><span>Public transit</span><span class="badge badge-green">+100 pts</span></div>' +
-            '<div class="info-row"><span>Reusable container</span><span class="badge badge-green">+75 pts</span></div>' +
+            '<div class="eco-highlight"><div><h4>' + tr('eco_station_n') + '</h4><p style="font-size:.7rem;color:var(--text-3)">' + tr('eco_materials_1') + '</p></div><span class="eco-pts">+50 ' + tr('eco_pts') + '</span></div>' +
+            '<div class="eco-highlight"><div><h4>' + tr('eco_station_e') + '</h4><p style="font-size:.7rem;color:var(--text-3)">' + tr('eco_materials_2') + '</p></div><span class="eco-pts">+30 ' + tr('eco_pts') + '</span></div>' +
+            '<div class="eco-highlight"><div><h4>' + tr('eco_station_s') + '</h4><p style="font-size:.7rem;color:var(--text-3)">' + tr('eco_materials_3') + '</p></div><span class="eco-pts">+75 ' + tr('eco_pts') + '</span></div>' +
+            '<div class="info-card"><h4><i class="fas fa-leaf"></i> ' + tr('eco_tips') + '</h4>' +
+            '<div class="info-row"><span>' + tr('eco_bike') + '</span><span class="badge badge-green">+200 ' + tr('eco_pts') + '</span></div>' +
+            '<div class="info-row"><span>' + tr('eco_transit') + '</span><span class="badge badge-green">+100 ' + tr('eco_pts') + '</span></div>' +
+            '<div class="info-row"><span>' + tr('eco_reusable') + '</span><span class="badge badge-green">+75 ' + tr('eco_pts') + '</span></div>' +
             '</div>';
     }
 
     // ─── Facility Map ────────────────────────────────────────
     function loadFacilityMap() {
+        var t = I18N[currentLang] || I18N.en;
+        var e = I18N.en;
+        function tr(key) { return t[key] || e[key]; }
         var facilities = [
-            { icon: 'fa-door-open', name: 'Gate E1 \u2014 Main North', accessible: true },
-            { icon: 'fa-door-open', name: 'Gate E2 \u2014 East', accessible: true },
-            { icon: 'fa-door-open', name: 'Gate E3 \u2014 South', accessible: true },
-            { icon: 'fa-door-open', name: 'Gate E4 \u2014 VIP', accessible: true },
-            { icon: 'fa-restroom', name: 'Restroom North', accessible: true },
-            { icon: 'fa-restroom', name: 'Restroom East', accessible: true },
-            { icon: 'fa-utensils', name: 'Food Court North', extra: 'American, Mexican' },
-            { icon: 'fa-utensils', name: 'Food Court East', extra: 'Asian, Italian' },
-            { icon: 'fa-utensils', name: 'Food Court South', extra: 'Halal, Vegan' },
-            { icon: 'fa-utensils', name: 'Food Court West', extra: 'Burgers, Pizza' },
-            { icon: 'fa-medkit', name: 'Medical Station North' },
-            { icon: 'fa-medkit', name: 'Medical Station South' },
-            { icon: 'fa-recycle', name: 'Eco Station North' },
-            { icon: 'fa-recycle', name: 'Eco Station South' }
+            { icon: 'fa-door-open', name: tr('fac_gate1'), accessible: true },
+            { icon: 'fa-door-open', name: tr('fac_gate2'), accessible: true },
+            { icon: 'fa-door-open', name: tr('fac_gate3'), accessible: true },
+            { icon: 'fa-door-open', name: tr('fac_gate4'), accessible: true },
+            { icon: 'fa-restroom', name: tr('fac_rest_n'), accessible: true },
+            { icon: 'fa-restroom', name: tr('fac_rest_e'), accessible: true },
+            { icon: 'fa-utensils', name: tr('fac_food_n'), extra: tr('fac_food_n_sub') },
+            { icon: 'fa-utensils', name: tr('fac_food_e'), extra: tr('fac_food_e_sub') },
+            { icon: 'fa-utensils', name: tr('fac_food_s'), extra: tr('fac_food_s_sub') },
+            { icon: 'fa-utensils', name: tr('fac_food_w'), extra: tr('fac_food_w_sub') },
+            { icon: 'fa-medkit', name: tr('fac_med_n') },
+            { icon: 'fa-medkit', name: tr('fac_med_s') },
+            { icon: 'fa-recycle', name: tr('fac_eco_n') },
+            { icon: 'fa-recycle', name: tr('fac_eco_s') }
         ];
 
         var el = document.getElementById('facility-list');
         if (!el) return;
         var html = '';
         facilities.forEach(function (f) {
-            var badge = f.accessible ? '<span class="badge badge-green">Accessible</span>' : '';
+            var badge = f.accessible ? '<span class="badge badge-green">' + tr('fac_accessible') + '</span>' : '';
             var extra = f.extra ? '<div class="facility-sub">' + f.extra + '</div>' : '';
             html +=
                 '<div class="facility-item">' +
