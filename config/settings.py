@@ -6,10 +6,9 @@ load_dotenv()
 
 class Config:
     SECRET_KEY = os.getenv("SECRET_KEY", "stadiumiq-dev-key-2026")
-    OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
-    OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
+    GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY", "")
+    GOOGLE_MODEL = os.getenv("GOOGLE_MODEL", "gemini-2.5-flash")
     FLASK_ENV = os.getenv("FLASK_ENV", "development")
-    REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
     DEBUG = FLASK_ENV == "development"
 
 
