@@ -58,6 +58,16 @@
             eco_materials_1: 'Plastic, Paper, Glass', eco_materials_2: 'Plastic, Paper', eco_materials_3: 'All + Food Waste',
             eco_tips: 'Green Tips', eco_bike: 'Bike to stadium', eco_transit: 'Public transit', eco_reusable: 'Reusable container',
             eco_pts: 'pts',
+            // Alerts
+            alert_1: 'Zone C approaching 80% capacity', alert_1_time: '2 min ago',
+            alert_2: 'Halftime rush managed successfully', alert_2_time: '5 min ago',
+            alert_3: 'New eco station activated in Zone D', alert_3_time: '8 min ago',
+            alert_4: 'High noise levels detected in Zone A', alert_4_time: '12 min ago',
+            alert_5: 'Medical response time: 2.1 min average', alert_5_time: '15 min ago',
+            // Staff
+            staff_cleaning: 'Cleaning', staff_crowd: 'Crowd Mgmt', staff_guest: 'Guest Services', staff_medical: 'Medical', staff_security: 'Security',
+            // AI
+            ai_recommendation: 'AI Recommendation',
         },
         es: {
             loader_sub: 'Inicializando sistemas de IA',
@@ -97,6 +107,13 @@
             eco_station_n: 'Estaci\u00f3n Eco Norte', eco_station_e: 'Estaci\u00f3n Eco Este', eco_station_s: 'Estaci\u00f3n Eco Sur',
             eco_materials_1: 'Pl\u00e1stico, Papel, Vidrio', eco_materials_2: 'Pl\u00e1stico, Papel', eco_materials_3: 'Todo + Residuos de Comida',
             eco_tips: 'Consejos Verdes', eco_bike: 'Ir en bici al estadio', eco_transit: 'Transporte p\u00fablico', eco_reusable: 'Contenedor reutilizable', eco_pts: 'pts',
+            alert_1: 'Zona C al 80% de capacidad', alert_1_time: 'hace 2 min',
+            alert_2: 'Rush de medio tiempo gestionado', alert_2_time: 'hace 5 min',
+            alert_3: 'Nueva estaci\u00f3n eco activada en Zona D', alert_3_time: 'hace 8 min',
+            alert_4: 'Altos niveles de ruido en Zona A', alert_4_time: 'hace 12 min',
+            alert_5: 'Tiempo m\u00e9dico: 2.1 min promedio', alert_5_time: 'hace 15 min',
+            staff_cleaning: 'Limpieza', staff_crowd: 'Gesti\u00f3n Multitud', staff_guest: 'Servicios al Cliente', staff_medical: 'M\u00e9dico', staff_security: 'Seguridad',
+            ai_recommendation: 'Recomendaci\u00f3n IA',
         },
         fr: {
             loader_sub: 'Initialisation des syst\u00e8mes IA',
@@ -136,6 +153,13 @@
             eco_station_n: 'Station \u00c9co Nord', eco_station_e: 'Station \u00c9co Est', eco_station_s: 'Station \u00c9co Sud',
             eco_materials_1: 'Plastique, Papier, Verre', eco_materials_2: 'Plastique, Papier', eco_materials_3: 'Tout + D\u00e9chets Alimentaires',
             eco_tips: 'Conseils \u00c9co', eco_bike: 'V\u00e9lo au stade', eco_transit: 'Transport en commun', eco_reusable: 'Conteneur r\u00e9utilisable', eco_pts: 'pts',
+            alert_1: 'Zone C \u00e0 80% de capacit\u00e9', alert_1_time: 'il y a 2 min',
+            alert_2: 'Rush de la mi-temps g\u00e9r\u00e9', alert_2_time: 'il y a 5 min',
+            alert_3: 'Nouvelle station \u00c9co activ\u00e9e Zone D', alert_3_time: 'il y a 8 min',
+            alert_4: 'Niveaux de bruit \u00e9lev\u00e9s Zone A', alert_4_time: 'il y a 12 min',
+            alert_5: 'Temps m\u00e9dical: 2.1 min en moyenne', alert_5_time: 'il y a 15 min',
+            staff_cleaning: 'Nettoyage', staff_crowd: 'Gestion Foule', staff_guest: 'Services Client', staff_medical: 'M\u00e9dical', staff_security: 'S\u00e9curit\u00e9',
+            ai_recommendation: 'Recommandation IA',
         },
         de: {
             loader_sub: 'KI-Systeme werden initialisiert',
@@ -175,6 +199,13 @@
             eco_station_n: '\u00d6ko-Station Nord', eco_station_e: '\u00d6ko-Station Ost', eco_station_s: '\u00d6ko-Station S\u00fcd',
             eco_materials_1: 'Kunststoff, Papier, Glas', eco_materials_2: 'Kunststoff, Papier', eco_materials_3: 'Alles + Lebensmittelabf\u00e4lle',
             eco_tips: 'Umwelttipps', eco_bike: 'Mit dem Rad zum Stadion', eco_transit: '\u00d6ffentlicher Verkehr', eco_reusable: 'Wiederverwendbarer Beh\u00e4lter', eco_pts: 'Pkte',
+            alert_1: 'Zone C n\u00e4hert sich 80% Kapazit\u00e4t', alert_1_time: 'vor 2 Min',
+            alert_2: 'Halftime-Rush erfolgreich', alert_2_time: 'vor 5 Min',
+            alert_3: 'Neue \u00d6ko-Station in Zone D', alert_3_time: 'vor 8 Min',
+            alert_4: 'Hohe Ger\u00e4uschpegel in Zone A', alert_4_time: 'vor 12 Min',
+            alert_5: 'Med. Reaktionszeit: 2.1 Min', alert_5_time: 'vor 15 Min',
+            staff_cleaning: 'Reinigung', staff_crowd: 'Mengenverwaltung', staff_guest: 'G\u00e4steservice', staff_medical: 'Medizin', staff_security: 'Sicherheit',
+            ai_recommendation: 'KI-Empfehlung',
         },
         zh: {
             loader_sub: 'AI\u7cfb\u7edf\u521d\u59cb\u5316\u4e2d',
@@ -214,6 +245,13 @@
             eco_station_n: '\u5317\u4fa7\u73af\u4fdd\u7ad9', eco_station_e: '\u4e1c\u4fa7\u73af\u4fdd\u7ad9', eco_station_s: '\u5357\u4fa7\u73af\u4fdd\u7ad9',
             eco_materials_1: '\u5851\u6599\u3001\u7eb8\u5f20\u3001\u73bb\u7483', eco_materials_2: '\u5851\u6599\u3001\u7eb8\u5f20', eco_materials_3: '\u5168\u90e8 + \u996e\u98df\u5783\u573e',
             eco_tips: '\u7eff\u8272\u5c0f\u8d34\u58eb', eco_bike: '\u9a91\u8f66\u5230\u4f53\u80b2\u573a', eco_transit: '\u516c\u5171\u4ea4\u901a', eco_reusable: '\u53ef\u91cd\u590d\u4f7f\u7528\u5bb9\u5668', eco_pts: '\u5206',
+            alert_1: 'C\u533a\u63a5\u8fd180%\u5bb9\u91cf', alert_1_time: '2\u5206\u949f\u524d',
+            alert_2: '\u4e2d\u573a\u4f11\u606f\u9ad8\u5cf0\u5df2\u5904\u7406', alert_2_time: '5\u5206\u949f\u524d',
+            alert_3: '\u65b0\u73af\u4fdd\u7ad9\u5df2\u5728D\u533a\u542f\u7528', alert_3_time: '8\u5206\u949f\u524d',
+            alert_4: 'A\u533a\u68c0\u6d4b\u5230\u9ad8\u566a\u97f3', alert_4_time: '12\u5206\u949f\u524d',
+            alert_5: '\u533b\u7597\u54cd\u5e94\u65f6\u95f4: \u5e73\u57472.1\u5206\u949f', alert_5_time: '15\u5206\u949f\u524d',
+            staff_cleaning: '\u6e05\u6d01', staff_crowd: '\u4eba\u7fa4\u7ba1\u7406', staff_guest: '\u5ba2\u6237\u670d\u52a1', staff_medical: '\u533b\u7597', staff_security: '\u5b89\u4fdd',
+            ai_recommendation: 'AI\u5efa\u8bae',
         },
         ja: {
             loader_sub: 'AI\u30b7\u30b9\u30c6\u30e0\u521d\u59cb\u5316\u4e2d',
@@ -253,6 +291,13 @@
             eco_station_n: '\u5317\u5074\u30a8\u30b3\u30b9\u30c6\u30fc\u30b7\u30e7\u30f3', eco_station_e: '\u6771\u5074\u30a8\u30b3\u30b9\u30c6\u30fc\u30b7\u30e7\u30f3', eco_station_s: '\u5357\u5074\u30a8\u30b3\u30b9\u30c6\u30fc\u30b7\u30e7\u30f3',
             eco_materials_1: '\u30d7\u30e9\u30b9\u30c1\u30c3\u30af\u3001\u7d19\u3001\u30ac\u30e9\u30b9', eco_materials_2: '\u30d7\u30e9\u30b9\u30c1\u30c3\u30af\u3001\u7d19', eco_materials_3: '\u5168\u3066 + \u98df\u3079\u7269\u5ecf\u5831',
             eco_tips: '\u30a8\u30b3\u30c1\u30c3\u30d7', eco_bike: '\u30d0\u30a4\u30af\u3067\u30b9\u30bf\u30b8\u30a2\u3078', eco_transit: '\u516c\u5171\u4ea4\u901a', eco_reusable: '\u518d\u5229\u7528\u5bb9\u5668', eco_pts: '\u30dd\u30a4\u30f3\u30c8',
+            alert_1: 'C\u30be\u30fc\u30f380%\u5bb9\u91cf\u8efd\u8d85', alert_1_time: '2\u5206\u524d',
+            alert_2: '\u30cf\u30fc\u30bf\u30a4\u30e0\u30e9\u30b7\u30e5\u7ba1\u7406\u6e08\u307f', alert_2_time: '5\u5206\u524d',
+            alert_3: '\u65b0\u30a8\u30b3\u30b9\u30c6\u30fc\u30b7\u30e7\u30f3D\u30be\u30fc\u30f3', alert_3_time: '8\u5206\u524d',
+            alert_4: 'A\u30be\u30fc\u30f3\u9ad8\u97f3\u99f3\u691c\u51fa', alert_4_time: '12\u5206\u524d',
+            alert_5: '\u533b\u7642\u5bfe\u5fdc\u6642\u9593: \u5e73\u57472.1\u5206', alert_5_time: '15\u5206\u524d',
+            staff_cleaning: '\u6e05\u6b4a', staff_crowd: '\u4eba\u6ce2\u7ba1\u7406', staff_guest: '\u30ac\u30b9\u30c8\u30b5\u30fc\u30d3\u30b9', staff_medical: '\u533b\u7642', staff_security: '\u5b89\u5168',
+            ai_recommendation: 'AI\u304a\u3059\u3059\u3081',
         },
         ko: {
             loader_sub: 'AI 시스템 초기화',
@@ -292,6 +337,13 @@
             eco_station_n: '북쪽 에코스테이션', eco_station_e: '동쪽 에코스테이션', eco_station_s: '남쪽 에코스테이션',
             eco_materials_1: '플라스틱, 종이, 유리', eco_materials_2: '플라스틱, 종이', eco_materials_3: '전체 + 음식쓰레기',
             eco_tips: '그린 팁', eco_bike: '자전거로 경기장 가기', eco_transit: '대중교통 이용', eco_reusable: '재사용 용기', eco_pts: '점',
+            alert_1: 'C구역 80% 수용량 접근', alert_1_time: '2분 전',
+            alert_2: '하프타임 대응 성공', alert_2_time: '5분 전',
+            alert_3: 'D구역 신규 에코스테이션 활성화', alert_3_time: '8분 전',
+            alert_4: 'A구역 높은 소음 감지', alert_4_time: '12분 전',
+            alert_5: '의료 대응시간: 평균 2.1분', alert_5_time: '15분 전',
+            staff_cleaning: '청소', staff_crowd: '인파 관리', staff_guest: '고객 서비스', staff_medical: '의료', staff_security: '보안',
+            ai_recommendation: 'AI 추천',
         },
         pt: {
             loader_sub: 'Inicializando sistemas de IA',
@@ -331,6 +383,13 @@
             eco_station_n: 'Posto Ecológico Norte', eco_station_e: 'Posto Ecológico Leste', eco_station_s: 'Posto Ecológico Sul',
             eco_materials_1: 'Plástico, Papel, Vidro', eco_materials_2: 'Plástico, Papel', eco_materials_3: 'Tudo + Resíduos Alimentares',
             eco_tips: 'Dicas Verdes', eco_bike: 'Ir de bike ao estádio', eco_transit: 'Transporte público', eco_reusable: 'Recipiente reutilizável', eco_pts: 'pts',
+            alert_1: 'Zona C a 80% da capacidade', alert_1_time: 'há 2 min',
+            alert_2: 'Rush do intervalo gerenciado', alert_2_time: 'há 5 min',
+            alert_3: 'Nova ecológica ativada na Zona D', alert_3_time: 'há 8 min',
+            alert_4: 'Altos níveis de ruído na Zona A', alert_4_time: 'há 12 min',
+            alert_5: 'Tempo médico: 2.1 min média', alert_5_time: 'há 15 min',
+            staff_cleaning: 'Limpeza', staff_crowd: 'Gestão de Multidão', staff_guest: 'Serviços ao Cliente', staff_medical: 'Médico', staff_security: 'Segurança',
+            ai_recommendation: 'Recomendação IA',
         },
         hi: {
             loader_sub: 'AI \u0938\u093f\u0938\u094d\u091f\u092e \u0915\u094b \u0907\u0928\u093f\u0936\u0932\u093f\u091f \u0939\u094b \u0930\u0939\u093e \u0939\u0948',
@@ -369,7 +428,14 @@
             tr_west: '\u092a\u0936\u094d\u091a\u093f\u092e \u0915\u094d\u0937\u0947\u0924\u094d\u0930', tr_north: '\u0909\u0924\u094d\u0924\u0930 \u0915\u094d\u0937\u0947\u0924\u094d\u0930',
             eco_station_n: '\u0909\u0924\u094d\u0924\u0930 \u091f\u093f\u0915\u093e \u0938\u094d\u091f\u0947\u0936\u0928', eco_station_e: '\u092a\u0942\u0930\u094d\u0935 \u091f\u093f\u0915\u093e \u0938\u094d\u091f\u0947\u0936\u0928', eco_station_s: '\u0926\u0915\u094d\u0937\u093f\u0923 \u091f\u093f\u0915\u093e \u0938\u094d\u091f\u0947\u0936\u0928',
             eco_materials_1: '\u092a\u094d\u0932\u093e\u0938\u094d\u091f\u093f\u0915, \u0915\u093e\u0917\u093c\u093e\u091c, \u0915\u093e\u0901\u091b', eco_materials_2: '\u092a\u094d\u0932\u093e\u0938\u094d\u091f\u093f\u0915, \u0915\u093e\u0917\u093c\u093e\u091c', eco_materials_3: '\u0938\u092c \u0915\u0941\u0937 \u0906\u0939\u093e\u0930 \u0938\u093e\u092e\u0917\u094d\u0930\u0940',
-            eco_tips: '\u0939\u0930\u093e \u091f\u093f\u092a\u094d\u0938', eco_bike: '\u092c\u093e\u0907\u0915 \u0938\u0947 \u0938\u094d\u091f\u0947\u0921\u093f\u092f\u092e', eco_transit: '\u0938\u093e\u0930\u094d\u0935\u0939\u093f\u0915 \u092a\u0930\u093f\u0935\u0939\u093e\u0928', eco_reusable: '\u092a\u0941\u0928\u0930\u094d\u092f\u094b\u091c\u093f\u0924 \u0915\u0902\u091f\u0947\u0928\u0930', eco_pts: '\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0',
+            eco_tips: '\u0939\u0930\u093e \u091f\u093f\u092a\u094d\u0938', eco_bike: '\u092c\u093e\u0907\u0915 \u0938\u0947 \u0938\u094d\u091f\u0947\u0921\u093f\u092f\u092e', eco_transit: '\u0938\u093e\u0930\u094d\u0935\u0939\u093f\u0915 \u092a\u0930\u093f\u0935\u0939\u093e\u0928', eco_reusable: '\u092a\u0941\u0928\u0930\u094d\u092f\u094b\u091c\u093f\u0924 \u0915\u0902\u091f\u0947\u0928\u0930', eco_pts: 'pts',
+            alert_1: '\u091c\u094b\u0928 \u0938\u0940 80% \u0915\u094d\u0937\u092e\u0924\u093e \u0915\u0947 \u0915\u0930\u0940\u092c', alert_1_time: '2 \u092e\u093f\u0928 \u092a\u0939\u0932\u0947',
+            alert_2: '\u0939\u093e\u092b\u091f\u093e\u0907\u092e \u0930\u0947\u0936 \u0938\u092b\u0932\u0924\u093e\u092a\u0942\u0930\u094d\u0935\u0915', alert_2_time: '5 \u092e\u093f\u0928 \u092a\u0939\u0932\u0947',
+            alert_3: '\u091c\u094b\u0928 D \u092e\u0947\u0902 \u0928\u0908 \u091f\u093f\u0915\u093e \u0938\u094d\u091f\u0947\u0936\u0928 \u0938\u0915\u094d\u0930\u093f\u092f', alert_3_time: '8 \u092e\u093f\u0928 \u092a\u0939\u0932\u0947',
+            alert_4: '\u091c\u094b\u0928 A \u092e\u0947\u0902 \u0909\u091a\u094d\u091a \u0936\u094b\u0930 \u0915\u093e \u092a\u0924\u093e', alert_4_time: '12 \u092e\u093f\u0928 \u092a\u0939\u0932\u0947',
+            alert_5: '\u092e\u0947\u0921\u093f\u0915\u0932 \u092a\u094d\u0930\u0924\u093f\u0915\u094d\u0930\u093f\u092f\u093e: \u0914\u0938\u0924 \u0920 2.1', alert_5_time: '15 \u092e\u093f\u0928 \u092a\u0939\u0932\u0947',
+            staff_cleaning: '\u0938\u092b\u093c\u093e\u0908', staff_crowd: '\u092d\u0940\u0921\u093c \u092a\u094d\u0930\u092c\u0902\u0927\u0928', staff_guest: '\u0917\u0948\u0938\u094d\u091f \u0938\u0947\u0935\u093e', staff_medical: '\u092e\u0947\u0921\u093f\u0915\u0932', staff_security: '\u0938\u0941\u0930\u0915\u094d\u0937\u093e',
+            ai_recommendation: 'AI \u0938\u0941\u091a\u0928\u093e',
         },
     };
 
@@ -398,6 +464,11 @@
             loadTransportData();
             loadEcoData();
             loadFacilityMap();
+            if (document.getElementById('view-command').classList.contains('active')) {
+                loadAlerts();
+                loadStaffGrid();
+                loadAIInsights();
+            }
             showToast((I18N[currentLang] || I18N.en).toast_lang + ' ' + this.options[this.selectedIndex].text, 'info');
         });
 
@@ -856,12 +927,15 @@
     }
 
     function loadAlerts() {
+        var t = I18N[currentLang] || I18N.en;
+        var e = I18N.en;
+        function tr(key) { return t[key] || e[key]; }
         var alerts = [
-            { type: 'warning', icon: 'fa-exclamation-triangle', text: 'Zone C approaching 80% capacity', time: '2 min ago' },
-            { type: 'success', icon: 'fa-check-circle', text: 'Halftime rush managed successfully', time: '5 min ago' },
-            { type: 'info', icon: 'fa-info-circle', text: 'New eco station activated in Zone D', time: '8 min ago' },
-            { type: 'danger', icon: 'fa-bell', text: 'High noise levels detected in Zone A', time: '12 min ago' },
-            { type: 'success', icon: 'fa-check-circle', text: 'Medical response time: 2.1 min average', time: '15 min ago' }
+            { type: 'warning', icon: 'fa-exclamation-triangle', text: tr('alert_1'), time: tr('alert_1_time') },
+            { type: 'success', icon: 'fa-check-circle', text: tr('alert_2'), time: tr('alert_2_time') },
+            { type: 'info', icon: 'fa-info-circle', text: tr('alert_3'), time: tr('alert_3_time') },
+            { type: 'danger', icon: 'fa-bell', text: tr('alert_4'), time: tr('alert_4_time') },
+            { type: 'success', icon: 'fa-check-circle', text: tr('alert_5'), time: tr('alert_5_time') }
         ];
         var html = '';
         alerts.forEach(function (a) {
@@ -879,12 +953,16 @@
             .then(function (r) { return r.json(); })
             .then(function (data) {
                 if (data.status !== 'success') return;
+                var t = I18N[currentLang] || I18N.en;
+                var e = I18N.en;
+                function tr(key) { return t[key] || e[key]; }
                 var depts = data.data.departments;
+                var deptMap = { cleaning: tr('staff_cleaning'), crowd_mgmt: tr('staff_crowd'), guest_services: tr('staff_guest'), medical: tr('staff_medical'), security: tr('staff_security') };
                 var html = '';
                 Object.keys(depts).forEach(function (key) {
                     var d = depts[key];
                     var pct = Math.round(d.deployed / d.total * 100);
-                    var label = key.replace(/_/g, ' ').replace(/\b\w/g, function (c) { return c.toUpperCase(); });
+                    var label = deptMap[key] || key.replace(/_/g, ' ').replace(/\b\w/g, function (c) { return c.toUpperCase(); });
                     html +=
                         '<div class="staff-row">' +
                             '<span class="staff-dept">' + label + '</span>' +
@@ -901,12 +979,15 @@
             .then(function (r) { return r.json(); })
             .then(function (data) {
                 if (data.status !== 'success') return;
+                var t = I18N[currentLang] || I18N.en;
+                var e = I18N.en;
+                function tr(key) { return t[key] || e[key]; }
                 var suggestions = data.data.optimization_suggestions || [];
                 var html = '';
                 suggestions.forEach(function (s) {
                     html +=
                         '<div class="ai-item">' +
-                            '<div class="ai-type"><i class="fas fa-brain"></i> AI Recommendation</div>' +
+                            '<div class="ai-type"><i class="fas fa-brain"></i> ' + tr('ai_recommendation') + '</div>' +
                             '<div class="ai-text">' + s + '</div>' +
                         '</div>';
                 });
