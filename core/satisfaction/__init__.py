@@ -1,6 +1,13 @@
 """Fan Satisfaction Scoring System — real-time satisfaction tracking."""
+import logging
 import time
 from typing import Any
+
+logger = logging.getLogger(__name__)
+
+MAX_SCORES = 1000
+MAX_OVERALL_HISTORY = 1000
+MAX_NPS_RESPONSES = 1000
 
 
 class SatisfactionTracker:
@@ -13,10 +20,11 @@ class SatisfactionTracker:
         "accessibility", "wifi_quality", "value_for_money",
     ]
 
-    def __init__(self):
-        self.scores = {tp: [] for tp in self.TOUCHPOINTS}
-        self.overall_history = []
-        self._nps_responses = []
+    def __init__(self) -> None:
+        """Initialize the satisfaction tracker."""
+        self.scores: dict[str, list[dict]] = {tp: [] for tp in self.TOUCHPOINTS}
+        self.overall_history: list[dict] = []
+        self._nps_responses: list[dict] = []
 
     def record_score(self, touchpoint: str, score: int, fan_id: str | None = None) -> dict:
         """Record a satisfaction score for a touchpoint (1-10)."""
@@ -29,9 +37,13 @@ class SatisfactionTracker:
             "time": time.time(),
             "fan_id": fan_id,
         })
+        if len(self.scores[touchpoint]) > MAX_SCORES:
+            self.scores[touchpoint] = self.scores[touchpoint][-MAX_SCORES:]
 
         overall = self.get_overall_score()
         self.overall_history.append({"time": time.time(), "score": overall})
+        if len(self.overall_history) > MAX_OVERALL_HISTORY:
+            self.overall_history = self.overall_history[-MAX_OVERALL_HISTORY:]
 
         return {"touchpoint": touchpoint, "score": score, "overall": overall}
 
@@ -39,11 +51,13 @@ class SatisfactionTracker:
         """Record Net Promoter Score (0-10)."""
         score = max(0, min(10, score))
         self._nps_responses.append({"score": score, "time": time.time(), "fan_id": fan_id})
+        if len(self._nps_responses) > MAX_NPS_RESPONSES:
+            self._nps_responses = self._nps_responses[-MAX_NPS_RESPONSES:]
         return self.get_nps()
 
     def get_overall_score(self) -> float:
         """Calculate overall satisfaction score."""
-        all_scores = []
+        all_scores: list[int] = []
         for tp_scores in self.scores.values():
             all_scores.extend([s["score"] for s in tp_scores[-20:]])
         if not all_scores:

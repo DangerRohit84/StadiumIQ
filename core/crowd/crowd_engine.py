@@ -1,7 +1,17 @@
 """Advanced crowd management engine with flow analysis and prediction."""
+import logging
 import random
 import time
+from collections import deque
 from typing import Any
+
+logger = logging.getLogger(__name__)
+
+LOW_THRESHOLD = 40
+MODERATE_THRESHOLD = 65
+HIGH_THRESHOLD = 80
+CRITICAL_THRESHOLD = 95
+HISTORY_MAX_LEN = 100
 
 
 class CrowdManager:
@@ -14,11 +24,11 @@ class CrowdManager:
         "D": {"name": "West Stand", "capacity": 22500, "sections": ["D1", "D2", "D3", "D4", "D5"]},
     }
 
-    def __init__(self):
-        self._occupancy = {z: random.randint(3000, 15000) for z in self.ZONES}
-        self._flow_rates = {z: {"inflow": 0, "outflow": 0} for z in self.ZONES}
-        self._history = {z: [] for z in self.ZONES}
-        self._update_cycle = 0
+    def __init__(self) -> None:
+        self._occupancy: dict[str, int] = {z: random.randint(3000, 15000) for z in self.ZONES}
+        self._flow_rates: dict[str, dict[str, int]] = {z: {"inflow": 0, "outflow": 0} for z in self.ZONES}
+        self._history: dict[str, deque] = {z: deque(maxlen=HISTORY_MAX_LEN) for z in self.ZONES}
+        self._update_cycle: int = 0
 
     def update(self) -> dict:
         """Simulate crowd movement with realistic patterns."""
@@ -45,8 +55,6 @@ class CrowdManager:
                 "inflow": inflow,
                 "outflow": outflow,
             })
-            if len(self._history[zone_id]) > 100:
-                self._history[zone_id] = self._history[zone_id][-100:]
 
             updates[zone_id] = self.get_zone_status(zone_id)
 
@@ -62,16 +70,16 @@ class CrowdManager:
         capacity = zone["capacity"]
         pct = (occupancy / capacity * 100) if capacity > 0 else 0
 
-        if pct < 40:
+        if pct < LOW_THRESHOLD:
             level = "low"
             risk = "minimal"
-        elif pct < 65:
+        elif pct < MODERATE_THRESHOLD:
             level = "moderate"
             risk = "low"
-        elif pct < 80:
+        elif pct < HIGH_THRESHOLD:
             level = "high"
             risk = "moderate"
-        elif pct < 95:
+        elif pct < CRITICAL_THRESHOLD:
             level = "critical"
             risk = "high"
         else:
@@ -84,8 +92,9 @@ class CrowdManager:
             trend = "stable"
 
         hist = self._history[zone_id]
-        peak_30m = max((h["occupancy"] for h in hist[-30:]), default=occupancy) if hist else occupancy
-        avg_30m = (sum(h["occupancy"] for h in hist[-30:]) / min(30, len(hist))) if hist else occupancy
+        hist_list = list(hist)
+        peak_30m = max((h["occupancy"] for h in hist_list[-30:]), default=occupancy) if hist_list else occupancy
+        avg_30m = (sum(h["occupancy"] for h in hist_list[-30:]) / min(30, len(hist_list))) if hist_list else occupancy
 
         return {
             "zone_id": zone_id,
@@ -131,12 +140,11 @@ class CrowdManager:
             "timestamp": time.time(),
         }
 
-    def get_heatmap_data(self) -> list:
+    def get_heatmap_data(self) -> list[dict]:
         """Generate heatmap data for visualization."""
-        heatmap = []
+        heatmap: list[dict] = []
         for zone_id, zone in self.ZONES.items():
             occ = self._occupancy[zone_id]
-            pct = occ / zone["capacity"]
 
             for i, section in enumerate(zone["sections"]):
                 section_occ = occ / len(zone["sections"])
@@ -156,9 +164,16 @@ class CrowdManager:
 
     def predict_flow(self, minutes_ahead: int = 30) -> dict:
         """Predict crowd flow for the next N minutes."""
-        predictions = {}
+        if minutes_ahead < 1:
+            logger.warning("Invalid minutes_ahead=%d, clamping to 1", minutes_ahead)
+            minutes_ahead = 1
+        elif minutes_ahead > 1440:
+            logger.warning("minutes_ahead=%d exceeds max, clamping to 1440", minutes_ahead)
+            minutes_ahead = 1440
+
+        predictions: dict[str, dict] = {}
         for zone_id in self.ZONES:
-            hist = self._history[zone_id][-10:]
+            hist = list(self._history[zone_id])[-10:]
             if len(hist) < 2:
                 predictions[zone_id] = {"predicted_occupancy": self._occupancy[zone_id], "confidence": 0.5}
                 continue
@@ -179,8 +194,8 @@ class CrowdManager:
 
         return predictions
 
-    def _generate_recommendations(self, zones: dict) -> list:
-        recs = []
+    def _generate_recommendations(self, zones: dict) -> list[dict]:
+        recs: list[dict] = []
         for zid, status in zones.items():
             if status["level"] in ("critical", "overflow"):
                 recs.append({

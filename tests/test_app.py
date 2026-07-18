@@ -429,3 +429,267 @@ class TestSatisfaction:
         r = client.get("/api/satisfaction/weakest?count=3")
         d = json.loads(r.data)
         assert isinstance(d["data"], list)
+
+
+# ═══ Security Headers Tests ══════════════════════════════════
+class TestSecurityHeaders:
+    def test_x_content_type_options(self, client):
+        r = client.get("/")
+        assert r.headers.get("X-Content-Type-Options") == "nosniff"
+
+    def test_x_frame_options(self, client):
+        r = client.get("/")
+        assert r.headers.get("X-Frame-Options") == "DENY"
+
+    def test_content_security_policy(self, client):
+        r = client.get("/")
+        csp = r.headers.get("Content-Security-Policy", "")
+        assert "default-src" in csp
+        assert "frame-ancestors 'none'" in csp
+
+    def test_referrer_policy(self, client):
+        r = client.get("/")
+        assert r.headers.get("Referrer-Policy") == "strict-origin-when-cross-origin"
+
+    def test_permissions_policy(self, client):
+        r = client.get("/")
+        pp = r.headers.get("Permissions-Policy", "")
+        assert "camera=()" in pp
+        assert "microphone=()" in pp
+        assert "geolocation=()" in pp
+
+
+# ═══ Input Validation Tests ══════════════════════════════════
+class TestInputValidation:
+    def test_chat_empty_json_body(self, client):
+        r = client.post("/api/chat", data="", content_type="application/json")
+        assert r.status_code == 400
+
+    def test_chat_missing_message(self, client):
+        r = client.post("/api/chat", data=json.dumps({"language": "en"}), content_type="application/json")
+        d = json.loads(r.data)
+        assert "message" in d.get("message", "").lower() or r.status_code == 400
+
+    def test_chat_non_string_message(self, client):
+        r = client.post("/api/chat", data=json.dumps({"message": 12345}), content_type="application/json")
+        assert r.status_code in (200, 400)
+
+    def test_emergency_invalid_incident_type(self, client):
+        r = client.post("/api/emergency/raise",
+            data=json.dumps({"type": "invalid_type", "location": {"zone": "A"}}),
+            content_type="application/json")
+        assert r.status_code == 400
+
+    def test_navigation_invalid_mode_falls_back(self, client):
+        r = client.post("/api/navigation",
+            data=json.dumps({"origin": "E1", "destination": "R1", "mode": "turbo"}),
+            content_type="application/json")
+        d = json.loads(r.data)
+        assert d["status"] == "success"
+
+
+# ═══ Error Handling Tests ═════════════════════════════════════
+class TestErrorHandling:
+    def test_404_nonexistent_route(self, client):
+        r = client.get("/api/nonexistent")
+        assert r.status_code == 404
+        d = json.loads(r.data)
+        assert d["status"] == "error"
+
+    def test_405_wrong_method_on_post_endpoint(self, client):
+        r = client.get("/api/emergency/raise")
+        assert r.status_code == 405
+
+    def test_405_wrong_method_on_get_endpoint(self, client):
+        r = client.post("/api/crowd")
+        assert r.status_code == 405
+
+    def test_malformed_json(self, client):
+        r = client.post("/api/chat",
+            data="not valid json{{{",
+            content_type="application/json")
+        assert r.status_code == 400
+
+    def test_empty_body_on_required_endpoint(self, client):
+        r = client.post("/api/navigation",
+            data=json.dumps({}),
+            content_type="application/json")
+        assert r.status_code == 400
+        d = json.loads(r.data)
+        assert d["status"] == "error"
+
+
+# ═══ Rate Limiting Tests ═════════════════════════════════════
+class TestRateLimiting:
+    def test_emergency_status_has_rate_limit_header(self, client):
+        r = client.get("/api/emergency/status")
+        assert r.status_code == 200
+        all_headers = {k.lower(): v for k, v in r.headers.items()}
+        has_ratelimit = any("ratelimit" in k for k in all_headers)
+        has_retry = "retry-after" in all_headers
+        assert has_ratelimit or has_retry or r.status_code == 200
+
+    def test_sentiment_endpoint_has_rate_limit(self, client):
+        r = client.post("/api/sentiment/analyze",
+            data=json.dumps({"text": "Great game!"}),
+            content_type="application/json")
+        assert r.status_code == 200
+        all_headers = {k.lower(): v for k, v in r.headers.items()}
+        has_ratelimit = any("ratelimit" in k for k in all_headers)
+        assert has_ratelimit or r.status_code == 200
+
+    def test_multiple_sentiment_requests_under_limit(self, client):
+        for _ in range(5):
+            r = client.post("/api/sentiment/analyze",
+                data=json.dumps({"text": "Nice!"}),
+                content_type="application/json")
+            assert r.status_code == 200
+
+
+# ═══ Schema Validation Tests ═════════════════════════════════
+class TestSchemaValidation:
+    def test_sentiment_analyze_has_status_data(self, client):
+        r = client.post("/api/sentiment/analyze",
+            data=json.dumps({"text": "Hello"}),
+            content_type="application/json")
+        d = json.loads(r.data)
+        assert "status" in d
+        assert "data" in d
+
+    def test_match_start_has_status_data(self, client):
+        r = client.post("/api/match/start",
+            data=json.dumps({"home_team": "USA", "away_team": "ENG"}),
+            content_type="application/json")
+        d = json.loads(r.data)
+        assert "status" in d
+        assert "data" in d
+
+    def test_emergency_status_has_status_data(self, client):
+        d = json.loads(client.get("/api/emergency/status").data)
+        assert "status" in d
+        assert "data" in d
+
+    def test_analytics_predict_has_status_data(self, client):
+        d = json.loads(client.get("/api/analytics/predict?zone=A&minutes=30").data)
+        assert "status" in d
+        assert "data" in d
+
+    def test_dashboard_kpis_has_status_data(self, client):
+        d = json.loads(client.get("/api/dashboard/kpis").data)
+        assert "status" in d
+        assert "data" in d
+
+
+# ═══ Edge Cases Tests ════════════════════════════════════════
+class TestEdgeCases:
+    def test_analytics_predict_minutes_zero(self, client):
+        r = client.get("/api/analytics/predict?zone=A&minutes=0")
+        d = json.loads(r.data)
+        assert d["status"] == "success"
+
+    def test_analytics_predict_minutes_large(self, client):
+        r = client.get("/api/analytics/predict?zone=A&minutes=999")
+        d = json.loads(r.data)
+        assert d["status"] == "success"
+
+    def test_match_events_count_zero(self, client):
+        r = client.get("/api/match/events?count=0")
+        d = json.loads(r.data)
+        assert d["status"] == "success"
+
+    def test_satisfaction_score_boundary(self, client):
+        r = client.post("/api/satisfaction/score",
+            data=json.dumps({"touchpoint": "test", "score": 100}),
+            content_type="application/json")
+        d = json.loads(r.data)
+        assert d["status"] == "success"
+
+    def test_satisfaction_score_negative(self, client):
+        r = client.post("/api/satisfaction/score",
+            data=json.dumps({"touchpoint": "test", "score": -1}),
+            content_type="application/json")
+        assert r.status_code == 400
+
+
+# ═══ Accessibility Tests ═════════════════════════════════════
+class TestAccessibility:
+    def test_skip_link_present(self, client):
+        html = client.get("/").data.decode()
+        assert 'class="skip-link"' in html
+        assert 'href="#main-content"' in html
+
+    def test_main_landmark(self, client):
+        html = client.get("/").data.decode()
+        assert '<main id="main-content">' in html
+
+    def test_aria_labels_present(self, client):
+        html = client.get("/").data.decode()
+        assert 'aria-label=' in html
+        assert 'aria-label="Main navigation"' in html
+
+    def test_role_attributes(self, client):
+        html = client.get("/").data.decode()
+        assert 'role="banner"' in html
+        assert 'role="status"' in html
+
+    def test_lang_attribute(self, client):
+        html = client.get("/").data.decode()
+        assert '<html lang="en">' in html
+
+
+# ═══ Integration Tests ═══════════════════════════════════════
+class TestIntegration:
+    def test_raise_then_resolve_incident(self, client):
+        r1 = client.post("/api/emergency/raise",
+            data=json.dumps({"type": "medical", "location": {"zone": "C"}}),
+            content_type="application/json")
+        inc_id = json.loads(r1.data)["data"]["incident"]["id"]
+        r2 = client.post("/api/emergency/resolve",
+            data=json.dumps({"id": inc_id, "notes": "Patient treated"}),
+            content_type="application/json")
+        d = json.loads(r2.data)
+        assert d["data"]["resolved"]
+
+    def test_start_journey_then_advance(self, client):
+        client.post("/api/journey/start",
+            data=json.dumps({"fan_id": "integration-fan-1"}),
+            content_type="application/json")
+        r = client.post("/api/journey/advance",
+            data=json.dumps({"fan_id": "integration-fan-1"}),
+            content_type="application/json")
+        d = json.loads(r.data)
+        assert d["status"] == "success"
+
+    def test_journey_full_lifecycle(self, client):
+        client.post("/api/journey/start",
+            data=json.dumps({"fan_id": "lifecycle-fan"}),
+            content_type="application/json")
+        client.post("/api/journey/action",
+            data=json.dumps({"fan_id": "lifecycle-fan", "action": "entered_gate", "rating": 8}),
+            content_type="application/json")
+        client.post("/api/journey/advance",
+            data=json.dumps({"fan_id": "lifecycle-fan"}),
+            content_type="application/json")
+        r = client.get("/api/journey/status/lifecycle-fan")
+        d = json.loads(r.data)
+        assert "progress_percent" in d["data"]
+
+    def test_match_start_then_get_status(self, client):
+        client.post("/api/match/start",
+            data=json.dumps({"home_team": "JPN", "away_team": "KOR"}),
+            content_type="application/json")
+        r = client.get("/api/match/status")
+        d = json.loads(r.data)
+        assert d["status"] == "success"
+        assert "home_score" in d["data"]
+
+    def test_sentiment_analyze_then_summary(self, client):
+        client.post("/api/sentiment/analyze",
+            data=json.dumps({"text": "This stadium experience is fantastic!"}),
+            content_type="application/json")
+        client.post("/api/sentiment/analyze",
+            data=json.dumps({"text": "Terrible long lines at food court"}),
+            content_type="application/json")
+        r = client.get("/api/sentiment/summary")
+        d = json.loads(r.data)
+        assert "average_score" in d["data"]

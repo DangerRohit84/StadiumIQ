@@ -1,6 +1,12 @@
 """Sentiment Analysis Engine for fan feedback."""
+import logging
+import re
 import time
 from typing import Any
+
+logger = logging.getLogger(__name__)
+
+MAX_FEEDBACK_LOG = 1000
 
 
 class SentimentAnalyzer:
@@ -34,9 +40,10 @@ class SentimentAnalyzer:
         "facility": ["restroom", "bathroom", "seat", "wifi", "screen", "shop"],
     }
 
-    def __init__(self):
-        self.feedback_log = []
-        self._sentiment_trend = []
+    def __init__(self) -> None:
+        """Initialize the sentiment analyzer."""
+        self.feedback_log: list[dict] = []
+        self._sentiment_trend: list[dict] = []
 
     def analyze(self, text: str, source: str = "chat") -> dict:
         """Analyze sentiment of a single piece of feedback."""
@@ -45,6 +52,9 @@ class SentimentAnalyzer:
         result["timestamp"] = time.time()
 
         self.feedback_log.append(result)
+        if len(self.feedback_log) > MAX_FEEDBACK_LOG:
+            self.feedback_log = self.feedback_log[-MAX_FEEDBACK_LOG:]
+
         self._sentiment_trend.append({
             "time": time.time(),
             "score": result["satisfaction_score"],
@@ -99,7 +109,7 @@ class SentimentAnalyzer:
             "trend": trend,
         }
 
-    def get_sentiment_chart_data(self) -> list:
+    def get_sentiment_chart_data(self) -> list[dict]:
         """Get time-series data for sentiment chart."""
         return [
             {"time": t["time"], "score": t["score"]}
@@ -107,16 +117,17 @@ class SentimentAnalyzer:
         ]
 
     def _rule_based_analysis(self, text: str) -> dict:
+        """Rule-based sentiment analysis with word boundary matching."""
         text_lower = text.lower()
         words = text_lower.split()
 
-        pos_count = sum(1 for w in self.POSITIVE_WORDS if w in text_lower)
-        neg_count = sum(1 for w in self.NEGATIVE_WORDS if w in text_lower)
-        urg_count = sum(1 for w in self.URGENCY_WORDS if w in text_lower)
+        pos_count = sum(1 for w in self.POSITIVE_WORDS if re.search(r'\b' + re.escape(w) + r'\b', text_lower))
+        neg_count = sum(1 for w in self.NEGATIVE_WORDS if re.search(r'\b' + re.escape(w) + r'\b', text_lower))
+        urg_count = sum(1 for w in self.URGENCY_WORDS if re.search(r'\b' + re.escape(w) + r'\b', text_lower))
 
-        topics = []
+        topics: list[str] = []
         for topic, keywords in self.TOPIC_KEYWORDS.items():
-            if any(kw in text_lower for kw in keywords):
+            if any(re.search(r'\b' + re.escape(kw) + r'\b', text_lower) for kw in keywords):
                 topics.append(topic)
 
         if neg_count > pos_count:
@@ -129,7 +140,7 @@ class SentimentAnalyzer:
             sentiment = "neutral"
             score = 5
 
-        emotions = []
+        emotions: list[str] = []
         if pos_count > 0: emotions.append("satisfaction")
         if neg_count > 0: emotions.append("frustration")
         if urg_count > 0: emotions.append("urgency")
@@ -152,9 +163,9 @@ class SentimentAnalyzer:
             "satisfaction_score": score,
             "suggested_action": suggested_action,
             "keywords_found": {
-                "positive": [w for w in self.POSITIVE_WORDS if w in text_lower],
-                "negative": [w for w in self.NEGATIVE_WORDS if w in text_lower],
-                "urgency": [w for w in self.URGENCY_WORDS if w in text_lower],
+                "positive": [w for w in self.POSITIVE_WORDS if re.search(r'\b' + re.escape(w) + r'\b', text_lower)],
+                "negative": [w for w in self.NEGATIVE_WORDS if re.search(r'\b' + re.escape(w) + r'\b', text_lower)],
+                "urgency": [w for w in self.URGENCY_WORDS if re.search(r'\b' + re.escape(w) + r'\b', text_lower)],
             },
         }
 

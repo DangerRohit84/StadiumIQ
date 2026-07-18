@@ -1,6 +1,11 @@
 """Smart Fan Journey Tracker — tracks and personalizes the entire fan experience."""
+import logging
 import time
 from typing import Any
+
+logger = logging.getLogger(__name__)
+
+MAX_FANS = 10000
 
 
 class FanJourney:
@@ -49,9 +54,10 @@ class FanJourney:
         ]},
     ]
 
-    def __init__(self):
-        self.active_fans = {}
-        self.journey_analytics = {
+    def __init__(self) -> None:
+        """Initialize the fan journey tracker."""
+        self.active_fans: dict[str, dict] = {}
+        self.journey_analytics: dict[str, Any] = {
             "total_fans_tracked": 0,
             "avg_satisfaction": 4.3,
             "stage_completion": {s["id"]: 0 for s in self.JOURNEY_STAGES},
@@ -60,6 +66,13 @@ class FanJourney:
     def start_journey(self, fan_id: str, preferences: dict | None = None) -> dict:
         """Start tracking a fan's journey."""
         prefs = preferences or {}
+
+        if len(self.active_fans) >= MAX_FANS:
+            # Evict oldest fan by started_at
+            oldest_id = min(self.active_fans, key=lambda fid: self.active_fans[fid]["started_at"])
+            logger.info("Evicting oldest fan %s to stay under MAX_FANS cap", oldest_id)
+            del self.active_fans[oldest_id]
+
         self.active_fans[fan_id] = {
             "fan_id": fan_id,
             "current_stage": "pre_arrival",

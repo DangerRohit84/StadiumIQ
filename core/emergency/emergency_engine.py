@@ -1,6 +1,9 @@
 """Emergency Response System with real-time incident management."""
+import logging
 import time
 from typing import Any
+
+logger = logging.getLogger(__name__)
 
 
 class EmergencySystem:
@@ -16,14 +19,24 @@ class EmergencySystem:
         "severe_weather": {"severity": "high", "response_time": 0, "evacuation": True},
     }
 
-    def __init__(self):
-        self.active_incidents = []
-        self.incident_history = []
-        self.alert_level = "green"
-        self.evacuation_zones = set()
+    def __init__(self) -> None:
+        """Initialize the emergency response system."""
+        self.active_incidents: list[dict] = []
+        self.incident_history: list[dict] = []
+        self.alert_level: str = "green"
+        self.evacuation_zones: set[str] = set()
 
     def raise_incident(self, incident_type: str, location: dict, details: str = "") -> dict:
-        """Raise a new emergency incident."""
+        """Raise a new emergency incident.
+
+        Args:
+            incident_type: Type of incident (fire, medical, crowd_surge, etc.).
+            location: Dict with at least a 'zone' key.
+            details: Free-form description of the incident.
+
+        Returns:
+            Dict with incident details, protocol, and alert level.
+        """
         config = self.INCIDENT_TYPES.get(incident_type, {
             "severity": "medium", "response_time": 5, "evacuation": False
         })
@@ -44,6 +57,7 @@ class EmergencySystem:
 
         self.active_incidents.append(incident)
         self._update_alert_level()
+        logger.info("Incident %s raised: type=%s severity=%s", incident["id"], incident_type, config["severity"])
 
         if config["evacuation"]:
             zone = location.get("zone", "unknown")
@@ -56,7 +70,15 @@ class EmergencySystem:
         }
 
     def resolve_incident(self, incident_id: str, notes: str = "") -> dict:
-        """Resolve an active incident."""
+        """Resolve an active incident.
+
+        Args:
+            incident_id: The ID of the incident to resolve.
+            notes: Resolution notes.
+
+        Returns:
+            Dict with resolution status and incident details.
+        """
         for inc in self.active_incidents:
             if inc["id"] == incident_id:
                 inc["status"] = "resolved"
@@ -65,6 +87,7 @@ class EmergencySystem:
                 self.active_incidents.remove(inc)
                 self.incident_history.append(inc)
                 self._update_alert_level()
+                logger.info("Incident %s resolved", incident_id)
                 return {"resolved": True, "incident": inc}
 
         return {"resolved": False, "error": "Incident not found"}

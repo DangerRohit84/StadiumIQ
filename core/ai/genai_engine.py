@@ -1,8 +1,18 @@
 """GenAI Engine powered by Google Gemini 2.5 Flash with intelligent fallback."""
 import json
+import logging
 import time
+from collections import OrderedDict
+
 import google.generativeai as genai
 from config.settings import Config
+
+logger = logging.getLogger(__name__)
+
+HISTORY_CAP = 20
+HISTORY_WINDOW = 6
+CONFIDENCE_DEFAULT = 0.95
+MAX_FANS = 10000
 
 
 class GenAIEngine:
@@ -38,12 +48,12 @@ RESPONSE RULES:
 - For sustainability: Mention eco-points earned for green actions
 - Limit responses to 200 words unless detail is requested"""
 
-    def __init__(self):
-        self._model = None
-        self._conversation_history = {}
+    def __init__(self) -> None:
+        self._model: genai.GenerativeModel | None = None
+        self._conversation_history: dict[str, list[dict[str, str]]] = OrderedDict()
         self._configure_gemini()
 
-    def _configure_gemini(self):
+    def _configure_gemini(self) -> None:
         """Configure Google Gemini API."""
         api_key = Config.GOOGLE_API_KEY
         if api_key:
@@ -54,6 +64,7 @@ RESPONSE RULES:
                     system_instruction=self.SYSTEM_PROMPT,
                 )
             except Exception:
+                logger.exception("Failed to configure Gemini API")
                 self._model = None
 
     LANG_NAMES = {
@@ -74,7 +85,7 @@ RESPONSE RULES:
         """Generate AI response using Gemini 2.5 Flash with multi-turn memory."""
         start = time.time()
 
-        prompt_parts = []
+        prompt_parts: list[str] = []
 
         lang_name = self.LANG_NAMES.get(language, "English")
         if language != "en":
@@ -82,7 +93,7 @@ RESPONSE RULES:
 
         # Add conversation history for multi-turn context
         if fan_id and fan_id in self._conversation_history:
-            history = self._conversation_history[fan_id][-6:]
+            history = self._conversation_history[fan_id][-HISTORY_WINDOW:]
             for msg in history:
                 role = "User" if msg["role"] == "user" else "Assistant"
                 prompt_parts.append(f"{role}: {msg['content']}")
@@ -103,13 +114,7 @@ RESPONSE RULES:
                     tokens_used = getattr(response.usage_metadata, 'total_token_count', 0)
 
                 # Save conversation history
-                if fan_id:
-                    if fan_id not in self._conversation_history:
-                        self._conversation_history[fan_id] = []
-                    self._conversation_history[fan_id].append({"role": "user", "content": message})
-                    self._conversation_history[fan_id].append({"role": "assistant", "content": ai_text})
-                    if len(self._conversation_history[fan_id]) > 20:
-                        self._conversation_history[fan_id] = self._conversation_history[fan_id][-20:]
+                self._save_history(fan_id, message, ai_text)
 
                 return {
                     "response": ai_text,
@@ -118,24 +123,32 @@ RESPONSE RULES:
                     "latency_ms": latency,
                     "tokens_used": tokens_used,
                     "language": language,
-                    "confidence": 0.95,
+                    "confidence": CONFIDENCE_DEFAULT,
                 }
             except Exception:
-                pass
+                logger.exception("Gemini API call failed")
 
         result = self._fallback_response(message, context, user_type, language)
         result["latency_ms"] = round((time.time() - start) * 1000)
 
         # Save conversation history even for fallback
-        if fan_id:
-            if fan_id not in self._conversation_history:
-                self._conversation_history[fan_id] = []
-            self._conversation_history[fan_id].append({"role": "user", "content": message})
-            self._conversation_history[fan_id].append({"role": "assistant", "content": result["response"]})
-            if len(self._conversation_history[fan_id]) > 20:
-                self._conversation_history[fan_id] = self._conversation_history[fan_id][-20:]
+        self._save_history(fan_id, message, result["response"])
 
         return result
+
+    def _save_history(self, fan_id: str | None, user_msg: str, ai_msg: str) -> None:
+        """Save conversation history with LRU eviction."""
+        if not fan_id:
+            return
+        if fan_id not in self._conversation_history:
+            self._conversation_history[fan_id] = []
+        self._conversation_history[fan_id].append({"role": "user", "content": user_msg})
+        self._conversation_history[fan_id].append({"role": "assistant", "content": ai_msg})
+        if len(self._conversation_history[fan_id]) > HISTORY_CAP:
+            self._conversation_history[fan_id] = self._conversation_history[fan_id][-HISTORY_CAP:]
+        # LRU eviction: cap total fan_ids
+        while len(self._conversation_history) > MAX_FANS:
+            self._conversation_history.popitem(last=False)
 
     def analyze_sentiment(self, text: str) -> dict:
         """Analyze sentiment using Gemini."""
@@ -154,7 +167,7 @@ RESPONSE RULES:
                     raw = raw.split("\n", 1)[1].rsplit("```", 1)[0].strip()
                 return json.loads(raw)
             except Exception:
-                pass
+                logger.exception("Gemini sentiment analysis failed")
         return self._rule_sentiment(text)
 
     def _rule_sentiment(self, text: str) -> dict:

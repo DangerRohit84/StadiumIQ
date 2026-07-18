@@ -1,7 +1,12 @@
 """AI Match Simulator — live match events, score predictions, and momentum analysis."""
+import logging
 import random
 import time
 from typing import Any
+
+logger = logging.getLogger(__name__)
+
+MAX_EVENTS = 500
 
 
 class MatchSimulator:
@@ -73,10 +78,11 @@ class MatchSimulator:
         ],
     }
 
-    def __init__(self):
-        self.active_match = None
-        self.event_log = []
-        self.momentum = {"home": 50, "away": 50}
+    def __init__(self) -> None:
+        """Initialize the match simulator."""
+        self.active_match: dict | None = None
+        self.event_log: list[dict] = []
+        self.momentum: dict[str, int] = {"home": 50, "away": 50}
 
     def start_match(self, home_team: str, away_team: str) -> dict:
         """Start a new match simulation."""
@@ -217,6 +223,7 @@ class MatchSimulator:
         }
 
     def _generate_event(self) -> dict | None:
+        """Generate a random match event based on event weights."""
         minute = self.active_match["minute"]
         home = self.active_match["home"]
         away = self.active_match["away"]
@@ -244,8 +251,11 @@ class MatchSimulator:
             "excitement": self.MATCH_EVENTS[event_type]["excitement"],
         }
 
-    def _process_event(self, event: dict):
+    def _process_event(self, event: dict) -> None:
+        """Process a match event and update stats."""
         self.event_log.append(event)
+        if len(self.event_log) > MAX_EVENTS:
+            self.event_log = self.event_log[-MAX_EVENTS:]
         team = event["team"]
 
         if event["type"] == "goal":
@@ -273,12 +283,14 @@ class MatchSimulator:
         other = "away" if team == "home" else "home"
         self.momentum[other] = max(20, self.momentum[other] - excitement // 2)
 
-    def _update_momentum(self):
+    def _update_momentum(self) -> None:
+        """Decay momentum towards the mean with random noise."""
         for team in ["home", "away"]:
             decay = random.uniform(-2, 1)
             self.momentum[team] = max(20, min(80, self.momentum[team] + decay))
 
-    def _update_possession(self):
+    def _update_possession(self) -> None:
+        """Update possession stats based on momentum."""
         home_m = self.momentum["home"]
         home_poss = 40 + (home_m - 50) * 0.4 + random.uniform(-3, 3)
         home_poss = max(30, min(70, home_poss))

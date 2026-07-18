@@ -1,7 +1,11 @@
 """IoT Sensor Simulation Engine for smart stadium."""
+import logging
 import random
 import time
+from collections import defaultdict
 from typing import Any
+
+logger = logging.getLogger(__name__)
 
 
 class IoTSensorNetwork:
@@ -12,12 +16,14 @@ class IoTSensorNetwork:
         "air_quality", "co2", "light", "motion", "flow_rate",
     ]
 
-    def __init__(self):
-        self.sensors = self._init_sensors()
-        self._last_update = time.time()
+    def __init__(self) -> None:
+        """Initialize the IoT sensor network."""
+        self.sensors: dict[str, dict] = self._init_sensors()
+        self._last_update: float = time.time()
 
-    def _init_sensors(self) -> dict:
-        sensors = {}
+    def _init_sensors(self) -> dict[str, dict]:
+        """Initialize all sensors across zones."""
+        sensors: dict[str, dict] = {}
         zones = ["A", "B", "C", "D"]
         sensor_id = 1
 
@@ -65,7 +71,7 @@ class IoTSensorNetwork:
         }
         return units.get(stype, "")
 
-    def update_readings(self) -> dict:
+    def update_readings(self) -> dict[str, dict]:
         """Simulate sensor updates with realistic fluctuations."""
         self._last_update = time.time()
         updated = {}
@@ -116,28 +122,35 @@ class IoTSensorNetwork:
         """Get summaries for all zones."""
         return {zone: self.get_zone_summary(zone) for zone in ["A", "B", "C", "D"]}
 
-    def get_anomaly_readings(self, threshold: float = 2.0) -> list:
-        """Identify sensors with anomalous readings."""
-        anomalies = []
-        for sid, sensor in self.sensors.items():
-            zone_sensors = [s for s in self.sensors.values()
-                          if s["zone"] == sensor["zone"] and s["type"] == sensor["type"]]
-            if len(zone_sensors) < 2:
-                continue
+    def get_anomaly_readings(self, threshold: float = 2.0) -> list[dict]:
+        """Identify sensors with anomalous readings.
 
-            values = [s["value"] for s in zone_sensors]
+        Pre-groups sensors by (zone, type) to avoid O(n²) lookups.
+        """
+        groups: dict[tuple[str, str], list[dict]] = defaultdict(list)
+        for sensor in self.sensors.values():
+            groups[(sensor["zone"], sensor["type"])].append(sensor)
+
+        anomalies: list[dict] = []
+        for group_sensors in groups.values():
+            if len(group_sensors) < 2:
+                continue
+            values = [s["value"] for s in group_sensors]
             mean = sum(values) / len(values)
             std = (sum((v - mean) ** 2 for v in values) / len(values)) ** 0.5
 
-            if std > 0 and abs(sensor["value"] - mean) > threshold * std:
-                anomalies.append({
-                    "sensor_id": sid,
-                    "type": sensor["type"],
-                    "zone": sensor["zone"],
-                    "value": sensor["value"],
-                    "expected": round(mean, 2),
-                    "deviation": round(abs(sensor["value"] - mean) / std, 2),
-                })
+            if std > 0:
+                for s in group_sensors:
+                    deviation = abs(s["value"] - mean) / std
+                    if deviation > threshold:
+                        anomalies.append({
+                            "sensor_id": s["sensor_id"],
+                            "type": s["type"],
+                            "zone": s["zone"],
+                            "value": s["value"],
+                            "expected": round(mean, 2),
+                            "deviation": round(deviation, 2),
+                        })
 
         return anomalies
 
