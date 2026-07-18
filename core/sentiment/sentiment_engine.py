@@ -3,6 +3,7 @@ import logging
 import re
 import time
 from typing import Any
+from core.database import db
 
 logger = logging.getLogger(__name__)
 
@@ -54,6 +55,8 @@ class SentimentAnalyzer:
         self.feedback_log.append(result)
         if len(self.feedback_log) > MAX_FEEDBACK_LOG:
             self.feedback_log = self.feedback_log[-MAX_FEEDBACK_LOG:]
+
+        db.save_sentiment(text, result["sentiment"], result["satisfaction_score"])
 
         self._sentiment_trend.append({
             "time": time.time(),

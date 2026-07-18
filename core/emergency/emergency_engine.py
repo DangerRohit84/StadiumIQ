@@ -2,6 +2,7 @@
 import logging
 import time
 from typing import Any
+from core.database import db
 
 logger = logging.getLogger(__name__)
 
@@ -57,6 +58,7 @@ class EmergencySystem:
 
         self.active_incidents.append(incident)
         self._update_alert_level()
+        db.save_incident(incident["id"], incident)
         logger.info("Incident %s raised: type=%s severity=%s", incident["id"], incident_type, config["severity"])
 
         if config["evacuation"]:

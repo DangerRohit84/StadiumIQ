@@ -1,5 +1,6 @@
 """StadiumIQ - GenAI Smart Stadium Assistant for FIFA World Cup 2026."""
 import logging
+import os
 import time
 import uuid
 import hmac
@@ -96,9 +97,10 @@ def create_app(config_name: str = "development") -> Flask:
     app = Flask(__name__, template_folder="web/templates", static_folder="web/static")
     app.config.from_object(config_by_name[config_name])
 
-    CORS(app, origins=["*"], methods=["GET", "POST", "OPTIONS"], allow_headers=["Content-Type", "Authorization", "X-API-Key", "X-CSRF-Token"])
+    allowed_origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:5000,http://127.0.0.1:5000").split(",")
+    CORS(app, origins=allowed_origins, methods=["GET", "POST", "OPTIONS"], allow_headers=["Content-Type", "Authorization", "X-API-Key", "X-CSRF-Token"])
     limiter = Limiter(get_remote_address, app=app, default_limits=["200 per hour"])
-    socketio = SocketIO(app, cors_allowed_origins="*", async_mode="threading")
+    socketio = SocketIO(app, cors_allowed_origins=allowed_origins, async_mode="threading")
 
     # ─── HTTPS Redirect (production) ──────────────────────────
     @app.before_request
@@ -248,13 +250,21 @@ def create_app(config_name: str = "development") -> Flask:
     @app.route("/api/crowd/overview", methods=["GET"])
     def api_crowd_overview():
         """Return a high-level overview of stadium crowd status."""
+        cached = db.cache_get("crowd_overview")
+        if cached:
+            return jsonify({"status": "success", "data": cached, "cached": True})
         data = crowd_manager.get_stadium_overview()
+        db.cache_set("crowd_overview", data, ttl=2.0)
         return jsonify({"status": "success", "data": data})
 
     @app.route("/api/crowd/heatmap", methods=["GET"])
     def api_crowd_heatmap():
         """Return crowd density heatmap data for visualization."""
+        cached = db.cache_get("crowd_heatmap")
+        if cached:
+            return jsonify({"status": "success", "data": cached, "cached": True})
         data = crowd_manager.get_heatmap_data()
+        db.cache_set("crowd_heatmap", data, ttl=3.0)
         return jsonify({"status": "success", "data": data})
 
     @app.route("/api/crowd/predict", methods=["GET"])
@@ -275,13 +285,21 @@ def create_app(config_name: str = "development") -> Flask:
     @app.route("/api/iot/zones", methods=["GET"])
     def api_iot_zones():
         """Return aggregated sensor summaries per zone."""
+        cached = db.cache_get("iot_zones")
+        if cached:
+            return jsonify({"status": "success", "data": cached, "cached": True})
         data = sensor_network.get_all_zone_summaries()
+        db.cache_set("iot_zones", data, ttl=3.0)
         return jsonify({"status": "success", "data": data})
 
     @app.route("/api/iot/anomalies", methods=["GET"])
     def api_iot_anomalies():
         """Return sensor readings flagged as anomalies."""
+        cached = db.cache_get("iot_anomalies")
+        if cached:
+            return jsonify({"status": "success", "data": cached, "cached": True})
         data = sensor_network.get_anomaly_readings()
+        db.cache_set("iot_anomalies", data, ttl=5.0)
         return jsonify({"status": "success", "data": data})
 
     # ─── Emergency ────────────────────────────────────────────
@@ -405,13 +423,21 @@ def create_app(config_name: str = "development") -> Flask:
     @app.route("/api/analytics/waits", methods=["GET"])
     def api_analytics_waits():
         """Predict wait times for concession and restroom facilities."""
+        cached = db.cache_get("analytics_waits")
+        if cached:
+            return jsonify({"status": "success", "data": cached, "cached": True})
         data = predictive_analytics.predict_wait_times()
+        db.cache_set("analytics_waits", data, ttl=5.0)
         return jsonify({"status": "success", "data": data})
 
     @app.route("/api/analytics/insights", methods=["GET"])
     def api_analytics_insights():
         """Generate actionable operational insights from analytics."""
+        cached = db.cache_get("analytics_insights")
+        if cached:
+            return jsonify({"status": "success", "data": cached, "cached": True})
         data = predictive_analytics.generate_operational_insights()
+        db.cache_set("analytics_insights", data, ttl=10.0)
         return jsonify({"status": "success", "data": data})
 
     # ─── Sentiment ────────────────────────────────────────────
@@ -432,32 +458,52 @@ def create_app(config_name: str = "development") -> Flask:
     @app.route("/api/sentiment/summary", methods=["GET"])
     def api_sentiment_summary():
         """Return an aggregated summary of fan sentiment."""
+        cached = db.cache_get("sentiment_summary")
+        if cached:
+            return jsonify({"status": "success", "data": cached, "cached": True})
         data = sentiment_analyzer.get_feedback_summary()
+        db.cache_set("sentiment_summary", data, ttl=5.0)
         return jsonify({"status": "success", "data": data})
 
     @app.route("/api/sentiment/chart", methods=["GET"])
     def api_sentiment_chart():
         """Return sentiment data formatted for chart visualization."""
+        cached = db.cache_get("sentiment_chart")
+        if cached:
+            return jsonify({"status": "success", "data": cached, "cached": True})
         data = sentiment_analyzer.get_sentiment_chart_data()
+        db.cache_set("sentiment_chart", data, ttl=5.0)
         return jsonify({"status": "success", "data": data})
 
     # ─── Dashboard Analytics ──────────────────────────────────
     @app.route("/api/dashboard/kpis", methods=["GET"])
     def api_dashboard_kpis():
         """Return real-time key performance indicators."""
+        cached = db.cache_get("kpis")
+        if cached:
+            return jsonify({"status": "success", "data": cached, "cached": True})
         data = analytics_dashboard.get_realtime_kpis()
+        db.cache_set("kpis", data, ttl=3.0)
         return jsonify({"status": "success", "data": data})
 
     @app.route("/api/dashboard/hourly", methods=["GET"])
     def api_dashboard_hourly():
         """Return hourly analytics trends."""
+        cached = db.cache_get("hourly")
+        if cached:
+            return jsonify({"status": "success", "data": cached, "cached": True})
         data = analytics_dashboard.get_hourly_analytics()
+        db.cache_set("hourly", data, ttl=5.0)
         return jsonify({"status": "success", "data": data})
 
     @app.route("/api/dashboard/revenue", methods=["GET"])
     def api_dashboard_revenue():
         """Return revenue analytics across concession areas."""
+        cached = db.cache_get("revenue")
+        if cached:
+            return jsonify({"status": "success", "data": cached, "cached": True})
         data = analytics_dashboard.get_revenue_analytics()
+        db.cache_set("revenue", data, ttl=10.0)
         return jsonify({"status": "success", "data": data})
 
     # ─── AI Translation ───────────────────────────────────────
@@ -515,7 +561,11 @@ def create_app(config_name: str = "development") -> Flask:
     @app.route("/api/dashboard/staff", methods=["GET"])
     def api_dashboard_staff():
         """Return current staff deployment across zones."""
+        cached = db.cache_get("staff")
+        if cached:
+            return jsonify({"status": "success", "data": cached, "cached": True})
         data = analytics_dashboard.get_staff_deployment()
+        db.cache_set("staff", data, ttl=5.0)
         return jsonify({"status": "success", "data": data})
 
     @app.route("/api/dashboard/command", methods=["GET"])
@@ -614,7 +664,12 @@ def create_app(config_name: str = "development") -> Flask:
     @app.route("/api/match/status", methods=["GET"])
     def api_match_status():
         """Return the current match state and score."""
-        return jsonify({"status": "success", "data": match_simulator.get_match_status()})
+        cached = db.cache_get("match_status")
+        if cached:
+            return jsonify({"status": "success", "data": cached, "cached": True})
+        data = match_simulator.get_match_status()
+        db.cache_set("match_status", data, ttl=2.0)
+        return jsonify({"status": "success", "data": data})
 
     @app.route("/api/match/events", methods=["GET"])
     def api_match_events():
@@ -626,12 +681,22 @@ def create_app(config_name: str = "development") -> Flask:
     @app.route("/api/match/prediction", methods=["GET"])
     def api_match_prediction():
         """Return a win/draw/loss prediction for the current match."""
-        return jsonify({"status": "success", "data": match_simulator.get_prediction()})
+        cached = db.cache_get("match_prediction")
+        if cached:
+            return jsonify({"status": "success", "data": cached, "cached": True})
+        data = match_simulator.get_prediction()
+        db.cache_set("match_prediction", data, ttl=5.0)
+        return jsonify({"status": "success", "data": data})
 
     @app.route("/api/match/energy", methods=["GET"])
     def api_match_energy():
         """Return the current crowd energy level during the match."""
-        return jsonify({"status": "success", "data": match_simulator.get_crowd_energy()})
+        cached = db.cache_get("match_energy")
+        if cached:
+            return jsonify({"status": "success", "data": cached, "cached": True})
+        data = match_simulator.get_crowd_energy()
+        db.cache_set("match_energy", data, ttl=2.0)
+        return jsonify({"status": "success", "data": data})
 
     @app.route("/api/match/teams", methods=["GET"])
     def api_match_teams():

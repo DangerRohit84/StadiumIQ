@@ -3,6 +3,7 @@ import logging
 import random
 import time
 from typing import Any
+from core.database import db
 
 logger = logging.getLogger(__name__)
 
@@ -256,6 +257,7 @@ class MatchSimulator:
         self.event_log.append(event)
         if len(self.event_log) > MAX_EVENTS:
             self.event_log = self.event_log[-MAX_EVENTS:]
+        db.save_match_event(self.active_match["id"], event)
         team = event["team"]
 
         if event["type"] == "goal":

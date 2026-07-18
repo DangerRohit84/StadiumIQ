@@ -2,6 +2,7 @@
 import logging
 import time
 from typing import Any
+from core.database import db
 
 logger = logging.getLogger(__name__)
 
@@ -88,6 +89,7 @@ class FanJourney:
             "started_at": time.time(),
         }
         self.journey_analytics["total_fans_tracked"] += 1
+        db.save_fan_journey(fan_id, self.active_fans[fan_id])
 
         return self.get_journey_status(fan_id)
 
@@ -109,6 +111,7 @@ class FanJourney:
 
         fan["stage_history"].append({"stage": fan["current_stage"], "time": time.time()})
         self.journey_analytics["stage_completion"][fan["current_stage"]] += 1
+        db.save_fan_journey(fan_id, fan)
 
         return self.get_journey_status(fan_id)
 
@@ -116,7 +119,9 @@ class FanJourney:
         """Get current journey status with personalized recommendations."""
         fan = self.active_fans.get(fan_id)
         if not fan:
-            return {"error": "Fan not found"}
+            fan = db.get_fan_journey(fan_id)
+            if not fan:
+                return {"error": "Fan not found"}
 
         current = next(
             (s for s in self.JOURNEY_STAGES if s["id"] == fan["current_stage"]),

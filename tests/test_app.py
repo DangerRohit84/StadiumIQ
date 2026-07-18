@@ -1177,3 +1177,29 @@ class TestDocumentation:
         with open(readme_path, encoding="utf-8") as f:
             content = f.read().lower()
         assert "pytest" in content or "test" in content
+
+
+# ═══ Load & Stress Tests ══════════════════════════════════════
+class TestLoadAndStress:
+    def test_sustained_load_crowd(self, authed):
+        """50 sequential requests to crowd overview."""
+        for _ in range(50):
+            r = authed.get("/api/crowd/overview")
+            assert r.status_code == 200
+            assert r.get_json()["status"] == "success"
+
+    def test_sustained_load_sentiment(self, authed):
+        """30 sequential sentiment analyses."""
+        for i in range(30):
+            r = _post(authed, "/api/sentiment/analyze", {"text": f"Test message {i}", "source": "test"})
+            assert r.status_code == 200
+
+    def test_mixed_endpoint_load(self, authed):
+        """Hit every GET endpoint 10 times."""
+        get_endpoints = ["/api/crowd/overview", "/api/crowd/heatmap", "/api/iot/zones",
+                        "/api/emergency/status", "/api/sentiment/summary", "/api/dashboard/kpis",
+                        "/api/match/status", "/api/analytics/waits"]
+        for ep in get_endpoints:
+            for _ in range(10):
+                r = authed.get(ep)
+                assert r.status_code == 200

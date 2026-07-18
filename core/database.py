@@ -105,6 +105,14 @@ class Database:
             (text, sentiment, score, time.time())
         )
         conn.commit()
+
+    def save_match_event(self, match_id: str, event: dict):
+        conn = self._get_conn()
+        conn.execute(
+            "INSERT INTO match_events (match_id, event, minute, created_at) VALUES (?, ?, ?, ?)",
+            (match_id, json.dumps(event, default=str), event.get("minute", 0), time.time())
+        )
+        conn.commit()
     
     def get_sentiment_count(self, sentiment: str) -> int:
         conn = self._get_conn()
