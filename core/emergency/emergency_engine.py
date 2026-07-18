@@ -133,6 +133,7 @@ class EmergencySystem:
         }
 
     def _update_alert_level(self):
+        """Update the global alert level based on active incident severities."""
         if any(i["severity"] == "critical" for i in self.active_incidents):
             self.alert_level = "red"
         elif any(i["severity"] == "high" for i in self.active_incidents):
@@ -143,6 +144,7 @@ class EmergencySystem:
             self.alert_level = "green"
 
     def _calculate_safety_score(self) -> int:
+        """Calculate overall safety score from active incidents."""
         score = 100
         for inc in self.active_incidents:
             if inc["severity"] == "critical": score -= 30
@@ -152,6 +154,7 @@ class EmergencySystem:
         return max(0, score)
 
     def _safety_recommendations(self) -> list:
+        """Generate safety recommendations based on current alert level."""
         recs = []
         if self.alert_level == "red":
             recs.append("IMMEDIATE: Evacuate affected zones")
@@ -167,6 +170,7 @@ class EmergencySystem:
         return recs
 
     def _get_protocol(self, incident_type: str, location: dict) -> dict:
+        """Return the response protocol for a given incident type."""
         protocols = {
             "fire": {
                 "steps": [
@@ -196,6 +200,7 @@ class EmergencySystem:
         })
 
     def _get_exits_for_zones(self, zones: list) -> list:
+        """Map zones to their primary evacuation exits."""
         exit_map = {
             "A": ["E1 - North Main", "E2 - East Gate"],
             "B": ["E2 - East Gate", "E4 - VIP"],
@@ -208,6 +213,7 @@ class EmergencySystem:
         return list(set(exits))
 
     def _get_secondary_exits(self, zones: list) -> list:
+        """Return secondary evacuation routes for the given zones."""
         return ["Service Tunnel A", "Service Tunnel B", "Emergency Stairs North", "Emergency Stairs South"]
 
 

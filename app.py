@@ -244,7 +244,11 @@ def create_app(config_name: str = "development") -> Flask:
     @app.route("/api/crowd", methods=["GET"])
     def api_crowd():
         """Return updated crowd density readings for all zones."""
+        cached = db.cache_get("crowd_update")
+        if cached:
+            return jsonify({"status": "success", "data": cached, "cached": True})
         data = crowd_manager.update()
+        db.cache_set("crowd_update", data, ttl=2)
         return jsonify({"status": "success", "data": data})
 
     @app.route("/api/crowd/overview", methods=["GET"])
@@ -272,15 +276,25 @@ def create_app(config_name: str = "development") -> Flask:
         """Predict crowd flow for the specified number of minutes ahead."""
         minutes = request.args.get("minutes", 30, type=int)
         minutes = max(1, min(minutes, 180))
+        cache_key = f"crowd_predict_{minutes}"
+        cached = db.cache_get(cache_key)
+        if cached:
+            return jsonify({"status": "success", "data": cached, "cached": True})
         data = crowd_manager.predict_flow(minutes)
+        db.cache_set(cache_key, data, ttl=5)
         return jsonify({"status": "success", "data": data})
 
     # ─── IoT Sensors ──────────────────────────────────────────
     @app.route("/api/iot/sensors", methods=["GET"])
     def api_iot_sensors():
         """Return updated readings from IoT sensors across the stadium."""
+        cached = db.cache_get("iot_sensors")
+        if cached:
+            return jsonify({"status": "success", "data": cached, "cached": True})
         data = sensor_network.update_readings()
-        return jsonify({"status": "success", "data": {k: v for k, v in list(data.items())[:20]}})
+        limited = {k: v for k, v in list(data.items())[:20]}
+        db.cache_set("iot_sensors", limited, ttl=2)
+        return jsonify({"status": "success", "data": limited})
 
     @app.route("/api/iot/zones", methods=["GET"])
     def api_iot_zones():
@@ -335,7 +349,12 @@ def create_app(config_name: str = "development") -> Flask:
     @app.route("/api/emergency/status", methods=["GET"])
     def api_emergency_status():
         """Return current safety and alert level status."""
-        return jsonify({"status": "success", "data": emergency_system.get_safety_status()})
+        cached = db.cache_get("emergency_status")
+        if cached:
+            return jsonify({"status": "success", "data": cached, "cached": True})
+        data = emergency_system.get_safety_status()
+        db.cache_set("emergency_status", data, ttl=5)
+        return jsonify({"status": "success", "data": data})
 
     @app.route("/api/emergency/evacuation", methods=["POST"])
     @limiter.limit("5 per minute")
@@ -398,7 +417,12 @@ def create_app(config_name: str = "development") -> Flask:
     def api_navigation_accessibility(profile):
         """Return accessibility information for a given profile."""
         profile = _sanitize_string(profile, 30)
+        cache_key = f"accessibility_{profile}"
+        cached = db.cache_get(cache_key)
+        if cached:
+            return jsonify({"status": "success", "data": cached, "cached": True})
         data = navigation_engine.get_accessibility_info(profile)
+        db.cache_set(cache_key, data, ttl=60)
         return jsonify({"status": "success", "data": data})
 
     # ─── Predictive Analytics ─────────────────────────────────
@@ -410,14 +434,23 @@ def create_app(config_name: str = "development") -> Flask:
             zone = "A"
         minutes = request.args.get("minutes", 60, type=int)
         minutes = max(1, min(minutes, 180))
+        cache_key = f"analytics_predict_{zone}_{minutes}"
+        cached = db.cache_get(cache_key)
+        if cached:
+            return jsonify({"status": "success", "data": cached, "cached": True})
         data = predictive_analytics.predict_demand(zone, minutes)
+        db.cache_set(cache_key, data, ttl=5)
         return jsonify({"status": "success", "data": data})
 
     @app.route("/api/analytics/risks", methods=["GET"])
     def api_analytics_risks():
         """Assess incident risk levels across all zones."""
+        cached = db.cache_get("analytics_risks")
+        if cached:
+            return jsonify({"status": "success", "data": cached, "cached": True})
         zones = crowd_manager.get_all_zones()
         data = predictive_analytics.predict_incident_risk(zones)
+        db.cache_set("analytics_risks", data, ttl=5)
         return jsonify({"status": "success", "data": data})
 
     @app.route("/api/analytics/waits", methods=["GET"])
@@ -571,7 +604,11 @@ def create_app(config_name: str = "development") -> Flask:
     @app.route("/api/dashboard/command", methods=["GET"])
     def api_dashboard_command():
         """Return a consolidated command center summary."""
+        cached = db.cache_get("command_summary")
+        if cached:
+            return jsonify({"status": "success", "data": cached, "cached": True})
         data = analytics_dashboard.get_command_center_summary()
+        db.cache_set("command_summary", data, ttl=5)
         return jsonify({"status": "success", "data": data})
 
     # ─── Fan Journey ──────────────────────────────────────────
@@ -603,14 +640,24 @@ def create_app(config_name: str = "development") -> Flask:
     def api_journey_status(fan_id):
         """Return the current status of a fan's journey."""
         fan_id = _sanitize_string(fan_id, 50)
+        cache_key = f"journey_status_{fan_id}"
+        cached = db.cache_get(cache_key)
+        if cached:
+            return jsonify({"status": "success", "data": cached, "cached": True})
         result = fan_journey.get_journey_status(fan_id)
+        db.cache_set(cache_key, result, ttl=5)
         return jsonify({"status": "success", "data": result})
 
     @app.route("/api/journey/recommendations/<fan_id>", methods=["GET"])
     def api_journey_recommendations(fan_id):
         """Return personalized recommendations for a fan."""
         fan_id = _sanitize_string(fan_id, 50)
+        cache_key = f"journey_recs_{fan_id}"
+        cached = db.cache_get(cache_key)
+        if cached:
+            return jsonify({"status": "success", "data": cached, "cached": True})
         result = fan_journey.get_personalized_recommendations(fan_id)
+        db.cache_set(cache_key, result, ttl=5)
         return jsonify({"status": "success", "data": result})
 
     @app.route("/api/journey/action", methods=["POST"])
@@ -628,7 +675,12 @@ def create_app(config_name: str = "development") -> Flask:
     @app.route("/api/journey/analytics", methods=["GET"])
     def api_journey_analytics():
         """Return aggregate fan journey analytics."""
-        return jsonify({"status": "success", "data": fan_journey.get_analytics()})
+        cached = db.cache_get("journey_analytics")
+        if cached:
+            return jsonify({"status": "success", "data": cached, "cached": True})
+        data = fan_journey.get_analytics()
+        db.cache_set("journey_analytics", data, ttl=5)
+        return jsonify({"status": "success", "data": data})
 
     # ─── Match Simulator ──────────────────────────────────────
     @app.route("/api/match/start", methods=["POST"])
@@ -676,7 +728,13 @@ def create_app(config_name: str = "development") -> Flask:
         """Return recent match events such as goals and cards."""
         count = request.args.get("count", 5, type=int)
         count = max(1, min(count, MAX_PAGE_SIZE))
-        return jsonify({"status": "success", "data": match_simulator.get_recent_events(count)})
+        cache_key = f"match_events_{count}"
+        cached = db.cache_get(cache_key)
+        if cached:
+            return jsonify({"status": "success", "data": cached, "cached": True})
+        data = match_simulator.get_recent_events(count)
+        db.cache_set(cache_key, data, ttl=5)
+        return jsonify({"status": "success", "data": data})
 
     @app.route("/api/match/prediction", methods=["GET"])
     def api_match_prediction():
@@ -701,7 +759,12 @@ def create_app(config_name: str = "development") -> Flask:
     @app.route("/api/match/teams", methods=["GET"])
     def api_match_teams():
         """Return the list of available teams for match simulation."""
-        return jsonify({"status": "success", "data": match_simulator.TEAMS})
+        cached = db.cache_get("match_teams")
+        if cached:
+            return jsonify({"status": "success", "data": cached, "cached": True})
+        data = match_simulator.TEAMS
+        db.cache_set("match_teams", data, ttl=60)
+        return jsonify({"status": "success", "data": data})
 
     # ─── Satisfaction ─────────────────────────────────────────
     @app.route("/api/satisfaction/score", methods=["POST"])
@@ -734,14 +797,25 @@ def create_app(config_name: str = "development") -> Flask:
     @app.route("/api/satisfaction/dashboard", methods=["GET"])
     def api_satisfaction_dashboard():
         """Return the satisfaction tracker dashboard data."""
-        return jsonify({"status": "success", "data": satisfaction_tracker.get_dashboard_data()})
+        cached = db.cache_get("satisfaction_dashboard")
+        if cached:
+            return jsonify({"status": "success", "data": cached, "cached": True})
+        data = satisfaction_tracker.get_dashboard_data()
+        db.cache_set("satisfaction_dashboard", data, ttl=5)
+        return jsonify({"status": "success", "data": data})
 
     @app.route("/api/satisfaction/weakest", methods=["GET"])
     def api_satisfaction_weakest():
         """Return the weakest satisfaction areas needing improvement."""
         count = request.args.get("count", 3, type=int)
         count = max(1, min(count, 13))
-        return jsonify({"status": "success", "data": satisfaction_tracker.get_weakest_areas(count)})
+        cache_key = f"satisfaction_weakest_{count}"
+        cached = db.cache_get(cache_key)
+        if cached:
+            return jsonify({"status": "success", "data": cached, "cached": True})
+        data = satisfaction_tracker.get_weakest_areas(count)
+        db.cache_set(cache_key, data, ttl=5)
+        return jsonify({"status": "success", "data": data})
 
     # ─── WebSocket Events ─────────────────────────────────────
     @socketio.on("connect")

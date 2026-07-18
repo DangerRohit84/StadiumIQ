@@ -19,6 +19,7 @@ class PredictiveAnalytics:
         self._predictions = {}
 
     def _init_patterns(self) -> dict:
+        """Initialize baseline crowd flow patterns per zone."""
         return {
             "A": {"base_flow": 150, "peak_multiplier": 2.5, "peak_time": "pre_kickoff"},
             "B": {"base_flow": 120, "peak_multiplier": 2.0, "peak_time": "pre_kickoff"},
@@ -141,6 +142,7 @@ class PredictiveAnalytics:
         }
 
     def _time_based_factor(self, minutes_ahead: int) -> float:
+        """Return a demand multiplier based on how far ahead we predict."""
         if minutes_ahead <= 15:
             return 1.0
         elif minutes_ahead <= 30:

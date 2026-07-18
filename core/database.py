@@ -21,6 +21,10 @@ class Database:
     
     def _init_db(self):
         conn = self._get_conn()
+        conn.execute("PRAGMA journal_mode=WAL")
+        conn.execute("PRAGMA synchronous=NORMAL")
+        conn.execute("PRAGMA cache_size=-64000")  # 64MB cache
+        conn.execute("PRAGMA foreign_keys=ON")
         conn.executescript("""
             CREATE TABLE IF NOT EXISTS cache (
                 key TEXT PRIMARY KEY,
@@ -73,8 +77,15 @@ class Database:
         conn.commit()
     
     def cache_clear(self):
+        """Delete expired cache entries."""
         conn = self._get_conn()
         conn.execute("DELETE FROM cache WHERE expires_at <= ?", (time.time(),))
+        conn.commit()
+
+    def cache_flush(self):
+        """Delete ALL cache entries including valid ones (for testing)."""
+        conn = self._get_conn()
+        conn.execute("DELETE FROM cache")
         conn.commit()
     
     def save_fan_journey(self, fan_id: str, data: dict):

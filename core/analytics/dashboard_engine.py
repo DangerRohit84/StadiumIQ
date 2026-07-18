@@ -56,10 +56,12 @@ def _match_day_pattern(hour: int) -> float:
 
 
 def _get_current_hour() -> int:
+    """Return the current hour of the day (0-23)."""
     return time.localtime().tm_hour
 
 
 def _get_minute_of_day() -> int:
+    """Return the current minute of the day (0-1439)."""
     lt = time.localtime()
     return lt.tm_hour * 60 + lt.tm_min
 

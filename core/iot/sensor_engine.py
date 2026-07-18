@@ -44,6 +44,7 @@ class IoTSensorNetwork:
         return sensors
 
     def _get_initial_value(self, stype: str) -> float:
+        """Return a realistic initial value for a sensor type."""
         defaults = {
             "crowd_density": random.uniform(20, 70),
             "temperature": random.uniform(20, 28),
@@ -58,6 +59,7 @@ class IoTSensorNetwork:
         return round(defaults.get(stype, 50), 2)
 
     def _get_unit(self, stype: str) -> str:
+        """Return the unit of measurement for a sensor type."""
         units = {
             "crowd_density": "%",
             "temperature": "°C",

@@ -195,6 +195,7 @@ class CrowdManager:
         return predictions
 
     def _generate_recommendations(self, zones: dict) -> list[dict]:
+        """Generate crowd management recommendations based on zone status."""
         recs: list[dict] = []
         for zid, status in zones.items():
             if status["level"] in ("critical", "overflow"):
@@ -224,11 +225,13 @@ class CrowdManager:
         return recs
 
     def _section_x(self, zone: str, idx: int) -> float:
+        """Return the x-coordinate for a heatmap section."""
         positions = {"A": [30, 40, 50, 60, 70], "B": [80, 80, 80, 80, 80],
                      "C": [30, 40, 50, 60, 70], "D": [20, 20, 20, 20, 20]}
         return positions.get(zone, [50] * 5)[idx]
 
     def _section_y(self, zone: str, idx: int) -> float:
+        """Return the y-coordinate for a heatmap section."""
         positions = {"A": [20, 20, 20, 20, 20], "B": [30, 40, 50, 60, 70],
                      "C": [80, 80, 80, 80, 80], "D": [30, 40, 50, 60, 70]}
         return positions.get(zone, [50] * 5)[idx]

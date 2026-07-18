@@ -154,6 +154,7 @@ class NavigationEngine:
         }
 
     def _find_facility(self, facility_id: str):
+        """Look up a facility by its ID across all facility types."""
         for facilities in self.FACILITIES.values():
             for f in facilities:
                 if f["id"] == facility_id:
@@ -161,6 +162,7 @@ class NavigationEngine:
         return None
 
     def _generate_steps(self, origin: dict, dest: dict, mode: str, dlat: float, dlon: float) -> list:
+        """Generate turn-by-turn directions between two points."""
         steps = []
         step_num = 1
 

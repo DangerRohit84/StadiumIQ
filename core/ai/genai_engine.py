@@ -171,6 +171,7 @@ RESPONSE RULES:
         return self._rule_sentiment(text)
 
     def _rule_sentiment(self, text: str) -> dict:
+        """Perform simple keyword-based sentiment analysis."""
         positive_words = ["great", "amazing", "love", "excellent", "best", "awesome", "fantastic", "happy", "wonderful", "perfect"]
         negative_words = ["bad", "terrible", "hate", "awful", "worst", "horrible", "disappointed", "angry", "poor", "frustrating"]
         text_lower = text.lower()
@@ -199,6 +200,7 @@ RESPONSE RULES:
     }
 
     def _fallback_response(self, message: str, context: dict | None, user_type: str, language: str = "en") -> dict:
+        """Generate a rule-based fallback response when Gemini is unavailable."""
         msg = message.lower()
 
         # If non-English, try to find a translated response
