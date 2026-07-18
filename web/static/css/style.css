@@ -79,7 +79,8 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
 .status-dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:status-pulse 2s ease infinite}
 @keyframes status-pulse{0%,100%{box-shadow:0 0 4px var(--green)}50%{box-shadow:0 0 12px var(--green)}}
 
-.lang-select{background:rgba(255,255,255,.04);color:var(--text);border:1px solid var(--glass-border);padding:.35rem .5rem;border-radius:8px;font-size:.7rem;font-weight:600;cursor:pointer}
+.lang-select{background:var(--bg-2);color:var(--text);border:1px solid var(--glass-border);padding:.35rem .5rem;border-radius:8px;font-size:.7rem;font-weight:600;cursor:pointer;-webkit-appearance:none;-moz-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%2394a3c8'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right .5rem center;padding-right:1.5rem}
+.lang-select option{background:#0a0f1e;color:var(--text);padding:.4rem .5rem;border:none}
 .lang-select:focus{border-color:var(--blue);outline:none}
 
 .a11y-btn{background:rgba(255,255,255,.04);border:1px solid var(--glass-border);color:var(--text-3);width:32px;height:32px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .3s;font-size:.85rem}
