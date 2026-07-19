@@ -14,5 +14,4 @@ tests/
 Dockerfile
 docker-compose.yml
 README.md
-gunicorn.conf.py
 LINKEDIN_POST.md
