@@ -107,6 +107,17 @@ def require_api_key(f: Callable) -> Callable:
     return decorated
 
 
+def require_csrf(f: Callable) -> Callable:
+    """Decorator that requires only a valid CSRF token (for web UI endpoints)."""
+    @wraps(f)
+    def decorated(*args: Any, **kwargs: Any) -> Any:
+        """Check CSRF token before calling function."""
+        if not _validate_csrf_token():
+            return jsonify({"status": "error", "message": "Invalid CSRF token"}), 403
+        return f(*args, **kwargs)
+    return decorated
+
+
 def _generate_csrf_token() -> str:
     """Generate a CSRF token and store it in the session."""
     if "_csrf_token" not in session:
@@ -267,7 +278,7 @@ def create_app(config_name: str = "development") -> Flask:
     # ─── AI Chat ──────────────────────────────────────────────
     @app.route("/api/chat", methods=["POST"])
     @limiter.limit("30 per minute")
-    @require_api_key
+    @require_csrf
     def api_chat() -> tuple:
         """Process a fan chat message and return an AI-generated response."""
         try:
@@ -658,7 +669,7 @@ def create_app(config_name: str = "development") -> Flask:
 
     @app.route("/api/i18n/translate", methods=["POST"])
     @limiter.limit("20 per minute")
-    @require_api_key
+    @require_csrf
     def api_translate() -> tuple:
         """Translate UI strings to the target language via GenAI."""
         try:
@@ -696,7 +707,7 @@ def create_app(config_name: str = "development") -> Flask:
             try:
                 raw = engine.generate_text(full_prompt)
                 if not raw:
-                    return jsonify({"status": "error", "message": "Translation failed"}), 500
+                    return jsonify({"status": "success", "data": texts, "cached": False, "note": "fallback"})
                 raw = raw.strip()
                 if raw.startswith("```"):
                     raw = raw.split("\n", 1)[1].rsplit("```", 1)[0].strip()
@@ -706,7 +717,7 @@ def create_app(config_name: str = "development") -> Flask:
                 return jsonify({"status": "success", "data": translated, "cached": False})
             except Exception as e:
                 logger.error("Translation failed: %s", e)
-                return jsonify({"status": "error", "message": "Translation failed"}), 500
+                return jsonify({"status": "success", "data": texts, "cached": False, "note": "fallback"})
         except Exception as e:
             logger.error("Route api_translate failed: %s", e)
             return jsonify({"status": "error", "message": "Internal error"}), 500

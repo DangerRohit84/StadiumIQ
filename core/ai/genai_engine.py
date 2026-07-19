@@ -140,7 +140,7 @@ RESPONSE RULES:
 
                 return {
                     "response": ai_text,
-                    "source": "gemini-2.5-flash",
+                    "source": "gemini-2.0-flash",
                     "model": Config.GOOGLE_MODEL,
                     "latency_ms": latency,
                     "tokens_used": tokens_used,

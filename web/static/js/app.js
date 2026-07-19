@@ -615,6 +615,7 @@
         loadEcoData();
         loadFacilityMap();
         setupChat();
+        setupEventDelegation();
         setupTabs();
 
         // ─── AI Translation Cache ──────────────────────────────
@@ -861,6 +862,23 @@
         btn.setAttribute('aria-expanded', a11yMode ? 'true' : 'false');
         showToast(a11yMode ? 'Accessibility mode enabled' : 'Accessibility mode disabled', 'info');
     };
+
+    // ─── Event Delegation (CSP-safe, no inline onclick) ──────
+    function setupEventDelegation() {
+        document.addEventListener('click', function (e) {
+            var target = e.target.closest('[data-view], [data-msg], [data-tab], #a11y-btn');
+            if (!target) return;
+            if (target.id === 'a11y-btn') {
+                toggleAccessibility();
+            } else if (target.dataset.view) {
+                switchView(target.dataset.view);
+            } else if (target.dataset.msg) {
+                sendQuick(target.dataset.msg);
+            } else if (target.dataset.tab) {
+                switchInfoTab(target.dataset.tab);
+            }
+        });
+    }
 
     // ─── Chat System ─────────────────────────────────────────
     function setupChat() {
