@@ -7,6 +7,8 @@ from contextlib import contextmanager
 from typing import Any, Optional
 
 MAX_CACHE_ROWS = 10000
+MAX_SENTIMENT_ROWS = 5000
+MAX_MATCH_EVENT_ROWS = 5000
 MAX_RETRIES = 3
 RETRY_DELAY = 0.05
 
@@ -201,6 +203,9 @@ class Database:
                     (text, sentiment, score, time.time())
                 )
                 self._dirty = True
+                row_count = conn.execute("SELECT COUNT(*) as cnt FROM sentiment_log").fetchone()['cnt']
+                if row_count > MAX_SENTIMENT_ROWS:
+                    conn.execute(f"DELETE FROM sentiment_log WHERE id NOT IN (SELECT id FROM sentiment_log ORDER BY created_at DESC LIMIT {MAX_SENTIMENT_ROWS})")
                 return
             except sqlite3.OperationalError:
                 if attempt < MAX_RETRIES - 1:
@@ -218,6 +223,9 @@ class Database:
                     (match_id, json.dumps(event, default=str), event.get("minute", 0), time.time())
                 )
                 self._dirty = True
+                row_count = conn.execute("SELECT COUNT(*) as cnt FROM match_events").fetchone()['cnt']
+                if row_count > MAX_MATCH_EVENT_ROWS:
+                    conn.execute(f"DELETE FROM match_events WHERE id NOT IN (SELECT id FROM match_events ORDER BY created_at DESC LIMIT {MAX_MATCH_EVENT_ROWS})")
                 return
             except sqlite3.OperationalError:
                 if attempt < MAX_RETRIES - 1:
@@ -249,9 +257,11 @@ class Database:
             self._dirty = False
 
     def cleanup(self) -> None:
-        """Remove expired cache entries from the database."""
+        """Remove expired cache entries and prune old logs."""
         conn = self._get_conn()
         conn.execute("DELETE FROM cache WHERE expires_at <= ?", (time.time(),))
+        conn.execute(f"DELETE FROM sentiment_log WHERE id NOT IN (SELECT id FROM sentiment_log ORDER BY created_at DESC LIMIT {MAX_SENTIMENT_ROWS})")
+        conn.execute(f"DELETE FROM match_events WHERE id NOT IN (SELECT id FROM match_events ORDER BY created_at DESC LIMIT {MAX_MATCH_EVENT_ROWS})")
         conn.commit()
 
 db = Database()
