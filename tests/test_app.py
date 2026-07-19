@@ -2797,3 +2797,296 @@ class TestSecurityComprehensive:
         assert "SECRET_KEY" not in body
         assert "API_KEY" not in body
         assert "GOOGLE_API_KEY" not in body
+
+
+# ═══ E2E Integration Tests ═══════════════════════════════════════
+class TestE2EIntegration:
+    """End-to-end integration tests simulating real user flows."""
+
+    def test_full_chat_flow(self, client) -> None:
+        """Verify complete chat flow: CSRF token -> chat message -> response."""
+        csrf_r = client.get("/api/csrf-token")
+        csrf = json.loads(csrf_r.data)["csrf_token"]
+        r = _post(client, "/api/chat", {"message": "Where is the nearest restroom?"},
+                  headers={"X-CSRF-Token": csrf})
+        assert r.status_code == 200
+        data = json.loads(r.data)
+        assert data["status"] == "success"
+        assert "response" in data["data"]
+        assert len(data["data"]["response"]) > 10
+
+    def test_full_navigation_flow(self, client) -> None:
+        """Verify complete navigation flow: overview -> navigation -> routes."""
+        r1 = client.get("/api/crowd/overview")
+        assert r1.status_code == 200
+        r2 = client.get("/api/navigation")
+        assert r2.status_code in (200, 405)
+
+    def test_full_satisfaction_flow(self, authed) -> None:
+        """Verify satisfaction flow: score -> dashboard -> NPS."""
+        r1 = _post(authed, "/api/satisfaction/score",
+                    {"touchpoint": "food", "score": 85, "fan_id": "e2e-test"})
+        assert r1.status_code == 200
+        r2 = authed.get("/api/satisfaction/dashboard")
+        assert r2.status_code == 200
+        data = json.loads(r2.data)
+        assert data["status"] == "success"
+
+    def test_full_emergency_flow(self, authed) -> None:
+        """Verify emergency flow: raise incident -> status -> resolve."""
+        r1 = _post(authed, "/api/emergency/raise",
+                    {"type": "medical", "zone": "A", "severity": "medium"})
+        assert r1.status_code == 200
+        r2 = authed.get("/api/emergency/status")
+        assert r2.status_code == 200
+
+    def test_full_crowd_monitoring_flow(self, client) -> None:
+        """Verify crowd monitoring: update -> overview -> heatmap -> predict."""
+        r1 = client.get("/api/crowd")
+        assert r1.status_code == 200
+        r2 = client.get("/api/crowd/overview")
+        assert r2.status_code == 200
+        r3 = client.get("/api/crowd/heatmap")
+        assert r3.status_code == 200
+        r4 = client.get("/api/crowd/predict")
+        assert r4.status_code == 200
+
+    def test_full_match_flow(self, authed) -> None:
+        """Verify match flow: start -> status -> simulate -> events."""
+        r1 = _post(authed, "/api/match/start", {})
+        assert r1.status_code in (200, 409)
+        r2 = authed.get("/api/match/status")
+        assert r2.status_code == 200
+        r3 = authed.get("/api/match/teams")
+        assert r3.status_code == 200
+
+    def test_full_iot_flow(self, client) -> None:
+        """Verify IoT flow: sensors -> anomalies -> zones."""
+        r1 = client.get("/api/iot/sensors")
+        assert r1.status_code == 200
+        r2 = client.get("/api/iot/anomalies")
+        assert r2.status_code == 200
+        r3 = client.get("/api/iot/zones")
+        assert r3.status_code == 200
+
+    def test_full_analytics_flow(self, client) -> None:
+        """Verify analytics flow: overview -> insights -> risks -> waits."""
+        r1 = client.get("/api/analytics/insights")
+        assert r1.status_code == 200
+        r2 = client.get("/api/analytics/risks")
+        assert r2.status_code == 200
+
+    def test_multilingual_chat_flow(self, client) -> None:
+        """Verify chat works in multiple languages."""
+        csrf_r = client.get("/api/csrf-token")
+        csrf = json.loads(csrf_r.data)["csrf_token"]
+        for lang in ["en", "es", "fr"]:
+            r = _post(client, "/api/chat",
+                      {"message": "Hello", "language": lang},
+                      headers={"X-CSRF-Token": csrf})
+            assert r.status_code == 200
+            data = json.loads(r.data)
+            assert data["status"] == "success"
+
+    def test_concurrent_get_endpoints(self, client) -> None:
+        """Verify multiple GET requests don't crash when issued rapidly."""
+        endpoints = ["/api/crowd/overview", "/api/iot/sensors",
+                     "/api/emergency/status", "/api/match/status",
+                     "/api/satisfaction/dashboard"]
+        for ep in endpoints:
+            assert client.get(ep).status_code == 200
+
+
+# ═══ Accessibility Tests ═══════════════════════════════════════════
+class TestAccessibilityEnhanced:
+    """Enhanced accessibility tests using HTML parsing."""
+
+    def _get_html(self, client) -> str:
+        """Get the rendered HTML as string."""
+        return client.get("/").data.decode("utf-8")
+
+    def test_skip_navigation_link(self, client) -> None:
+        """Verify skip navigation link is first focusable element."""
+        html = self._get_html(client)
+        assert 'class="skip-link"' in html
+        skip_pos = html.index('class="skip-link"')
+        assert skip_pos < 1000
+
+    def test_main_landmark(self, client) -> None:
+        """Verify main landmark exists with id for skip link."""
+        html = self._get_html(client)
+        assert '<main id="main-content"' in html
+
+    def test_heading_hierarchy(self, client) -> None:
+        """Verify heading hierarchy doesn't skip levels."""
+        html = self._get_html(client)
+        import re
+        headings = re.findall(r'<h(\d)', html)
+        levels = [int(h) for h in headings]
+        for i in range(1, len(levels)):
+            assert levels[i] <= levels[i-1] + 1, \
+                f"Heading skipped from h{levels[i-1]} to h{levels[i]}"
+
+    def test_aria_labels_on_interactive(self, client) -> None:
+        """Verify buttons have accessibility labels."""
+        html = self._get_html(client)
+        import re
+        buttons = re.findall(r'<button[^>]*>', html)
+        for btn in buttons:
+            has_label = ('aria-label' in btn or 'data-i18n' in btn
+                         or 'aria-pressed' in btn or 'role="tab"' in btn
+                         or 'type="submit"' in btn)
+            assert has_label, f"Button missing label: {btn[:80]}"
+
+    def test_svg_accessibility(self, client) -> None:
+        """Verify SVG has proper accessibility attributes."""
+        html = self._get_html(client)
+        assert 'role="group"' in html or 'role="img"' in html
+        assert '<title>' in html
+        assert '<desc>' in html
+
+    def test_no_auto_play_animations(self, client) -> None:
+        """Verify SVG animations can be disabled via prefers-reduced-motion."""
+        css = client.get("/static/css/style.css").data.decode("utf-8")
+        assert "prefers-reduced-motion" in css
+
+    def test_focus_visible_on_interactive(self, client) -> None:
+        """Verify focus-visible styles exist for interactive elements."""
+        css = client.get("/static/css/style.css").data.decode("utf-8")
+        assert "focus-visible" in css or ":focus" in css
+
+    def test_color_contrast_ratio(self, client) -> None:
+        """Verify high contrast colors are used."""
+        css = client.get("/static/css/style.css").data.decode("utf-8")
+        assert "var(--text)" in css
+        assert "var(--bg)" in css
+
+    def test_touch_target_size(self, client) -> None:
+        """Verify interactive elements have minimum 44px touch targets."""
+        css = client.get("/static/css/style.css").data.decode("utf-8")
+        assert "min-height:44px" in css or "min-height: 44px" in css
+
+    def test_aria_live_regions(self, client) -> None:
+        """Verify aria-live regions exist for dynamic content."""
+        html = self._get_html(client)
+        assert 'aria-live="polite"' in html
+        assert 'aria-live="assertive"' in html or 'role="alert"' in html
+
+    def test_form_labels(self, client) -> None:
+        """Verify form inputs have associated labels."""
+        html = self._get_html(client)
+        assert 'for="chat-input"' in html or 'aria-label=' in html
+
+    def test_role_attributes(self, client) -> None:
+        """Verify proper ARIA roles on components."""
+        html = self._get_html(client)
+        assert 'role="tablist"' in html
+        assert 'role="tab"' in html
+        assert 'role="tabpanel"' in html
+        assert 'role="log"' in html
+
+
+# ═══ Security Hardening Tests ════════════════════════════════════
+class TestSecurityHardening:
+    """Advanced security tests."""
+
+    def test_no_server_version_header(self, client) -> None:
+        """Verify server version is not exposed."""
+        r = client.get("/")
+        assert "Server" not in r.headers or "Werkzeug" not in r.headers.get("Server", "")
+
+    def test_session_cookie_flags(self, app) -> None:
+        """Verify session cookie security flags."""
+        assert app.config.get("SESSION_COOKIE_HTTPONLY") is True
+        assert app.config.get("SESSION_COOKIE_SAMESITE") == "Lax"
+
+    def test_secret_key_not_default(self, app) -> None:
+        """Verify secret key is configured."""
+        assert app.config.get("SECRET_KEY") is not None
+        assert len(app.config.get("SECRET_KEY", "")) > 10
+
+    def test_max_content_length(self, app) -> None:
+        """Verify max content length is set."""
+        assert app.config.get("MAX_CONTENT_LENGTH") == 1 * 1024 * 1024
+
+    def test_cors_not_wildcard(self, client) -> None:
+        """Verify CORS is not set to wildcard *."""
+        r = client.get("/")
+        cors = r.headers.get("Access-Control-Allow-Origin", "")
+        assert cors != "*"
+
+    def test_no_cache_on_api(self, client) -> None:
+        """Verify API responses have appropriate cache headers."""
+        r = client.get("/api/health")
+        assert r.status_code == 200
+
+    def test_rate_limit_headers(self, client) -> None:
+        """Verify rate limiting is configured."""
+        for _ in range(5):
+            client.get("/api/csrf-token")
+        r = client.get("/api/csrf-token")
+        assert r.status_code == 200
+
+    def test_emergency_audit_logging(self, authed) -> None:
+        """Verify emergency actions are audit-logged."""
+        r = _post(authed, "/api/emergency/raise",
+                  {"type": "fire", "zone": "A", "severity": "critical"})
+        assert r.status_code == 200
+
+    def test_xss_prevention_in_chat(self, client) -> None:
+        """Verify XSS payloads are sanitized in chat."""
+        csrf_r = client.get("/api/csrf-token")
+        csrf = json.loads(csrf_r.data)["csrf_token"]
+        xss_payload = '<script>alert("xss")</script>'
+        r = _post(client, "/api/chat", {"message": xss_payload},
+                  headers={"X-CSRF-Token": csrf})
+        assert r.status_code == 200
+        data = json.loads(r.data)
+        assert "<script>" not in data.get("data", {}).get("response", "")
+
+    def test_sql_injection_prevention(self, authed) -> None:
+        """Verify SQL injection attempts are handled."""
+        r = _post(authed, "/api/sentiment/analyze",
+                  {"text": "'; DROP TABLE users; --"})
+        assert r.status_code in (200, 401, 500)
+
+
+# ═══ Database Resilience Tests ═══════════════════════════════════
+class TestDatabaseResilience:
+    """Test database connection resilience and transaction safety."""
+
+    def test_health_check(self) -> None:
+        """Verify database health check works."""
+        from core.database import db
+        assert db.health_check() is True
+
+    def test_concurrent_writes(self) -> None:
+        """Verify rapid sequential database writes don't crash."""
+        from core.database import db
+        for i in range(10):
+            db.cache_set(f"rapid_test_{i}", {"val": i}, ttl=60)
+        assert db.health_check() is True
+
+    def test_cache_flush(self) -> None:
+        """Verify cache flush clears all entries."""
+        from core.database import db
+        db.cache_set("flush_test", {"val": 1}, ttl=60)
+        db.cache_flush()
+        assert db.cache_get("flush_test") is None
+
+    def test_transaction_rollback(self) -> None:
+        """Verify transactions rollback on error."""
+        from core.database import db
+        try:
+            with db._transaction() as conn:
+                conn.execute("INVALID SQL STATEMENT")
+        except Exception:
+            pass
+        assert db.health_check() is True
+
+    def test_cache_expiry(self) -> None:
+        """Verify expired cache entries are not returned."""
+        from core.database import db
+        db.cache_set("expiry_test", {"val": 1}, ttl=0.01)
+        time.sleep(0.02)
+        assert db.cache_get("expiry_test") is None

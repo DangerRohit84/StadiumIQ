@@ -83,7 +83,7 @@ RESPONSE RULES:
         try:
             if not self._model:
                 return None
-            response = self._model.generate_content(prompt)
+            response = self._model.generate_content(prompt, request_options={"timeout": 10})
             return response.text if response else None
         except Exception as e:
             logger.error("Gemini generation failed: %s", e)
@@ -128,7 +128,7 @@ RESPONSE RULES:
 
         if self._model:
             try:
-                response = self._model.generate_content(full_prompt)
+                response = self._model.generate_content(full_prompt, request_options={"timeout": 10})
                 ai_text = response.text
                 latency = round((time.time() - start) * 1000)
                 tokens_used = 0
@@ -140,7 +140,7 @@ RESPONSE RULES:
 
                 return {
                     "response": ai_text,
-                    "source": "gemini-2.0-flash",
+                    "source": "gemini-2.5-flash",
                     "model": Config.GOOGLE_MODEL,
                     "latency_ms": latency,
                     "tokens_used": tokens_used,
@@ -182,7 +182,8 @@ RESPONSE RULES:
                     f'{{"sentiment": "positive|negative|neutral", "confidence": 0-1, '
                     f'"emotions": ["list"], "topics": ["list"], '
                     f'"satisfaction_score": 1-10, "suggested_action": "string"}}\n\n'
-                    f"Feedback: {text}"
+                    f"Feedback: {text}",
+                    request_options={"timeout": 10}
                 )
                 raw = response.text.strip()
                 if raw.startswith("```"):

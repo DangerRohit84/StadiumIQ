@@ -3,9 +3,12 @@ import sqlite3
 import json
 import time
 import threading
+from contextlib import contextmanager
 from typing import Any, Optional
 
 MAX_CACHE_ROWS = 10000
+MAX_RETRIES = 3
+RETRY_DELAY = 0.05
 
 
 class Database:
@@ -27,8 +30,20 @@ class Database:
             self._local.conn.execute("PRAGMA synchronous=NORMAL")
             self._local.conn.execute("PRAGMA cache_size=-64000")
             self._local.conn.execute("PRAGMA busy_timeout=30000")
+            self._local.conn.execute("PRAGMA foreign_keys=ON")
         self._query_count += 1
         return self._local.conn
+
+    @contextmanager
+    def _transaction(self):
+        """Context manager for atomic database transactions."""
+        conn = self._get_conn()
+        try:
+            yield conn
+            conn.commit()
+        except Exception:
+            conn.rollback()
+            raise
 
     @property
     def _dirty(self) -> bool:
@@ -103,7 +118,7 @@ class Database:
 
     def cache_set(self, key: str, value: Any, ttl: float = 5.0) -> None:
         """Store a value in cache with a time-to-live."""
-        for attempt in range(5):
+        for attempt in range(MAX_RETRIES):
             try:
                 conn = self._get_conn()
                 conn.execute(
@@ -111,16 +126,15 @@ class Database:
                     (key, json.dumps(value, default=str), time.time() + ttl)
                 )
                 self._dirty = True
+                row_count = conn.execute("SELECT COUNT(*) as cnt FROM cache").fetchone()['cnt']
+                if row_count > MAX_CACHE_ROWS:
+                    conn.execute("DELETE FROM cache WHERE expires_at <= ?", (time.time(),))
                 return
             except sqlite3.OperationalError:
-                if attempt < 4:
-                    time.sleep(0.05 * (attempt + 1))
+                if attempt < MAX_RETRIES - 1:
+                    time.sleep(RETRY_DELAY * (attempt + 1))
                 else:
                     raise
-        row_count = conn.execute("SELECT COUNT(*) as cnt FROM cache").fetchone()['cnt']
-        if row_count > MAX_CACHE_ROWS:
-            conn.execute("DELETE FROM cache WHERE expires_at <= ?", (time.time(),))
-            self._dirty = True
     
     def cache_clear(self) -> None:
         """Delete expired cache entries."""
@@ -138,7 +152,7 @@ class Database:
     
     def save_fan_journey(self, fan_id: str, data: dict) -> None:
         """Save fan journey data to the database."""
-        for attempt in range(5):
+        for attempt in range(MAX_RETRIES):
             try:
                 conn = self._get_conn()
                 conn.execute(
@@ -148,8 +162,8 @@ class Database:
                 self._dirty = True
                 return
             except sqlite3.OperationalError:
-                if attempt < 4:
-                    time.sleep(0.05 * (attempt + 1))
+                if attempt < MAX_RETRIES - 1:
+                    time.sleep(RETRY_DELAY * (attempt + 1))
                 else:
                     raise
     
@@ -162,7 +176,7 @@ class Database:
     
     def save_incident(self, incident_id: str, data: dict) -> None:
         """Save emergency incident data to the database."""
-        for attempt in range(5):
+        for attempt in range(MAX_RETRIES):
             try:
                 conn = self._get_conn()
                 conn.execute(
@@ -172,14 +186,14 @@ class Database:
                 self._dirty = True
                 return
             except sqlite3.OperationalError:
-                if attempt < 4:
-                    time.sleep(0.05 * (attempt + 1))
+                if attempt < MAX_RETRIES - 1:
+                    time.sleep(RETRY_DELAY * (attempt + 1))
                 else:
                     raise
-    
+
     def save_sentiment(self, text: str, sentiment: str, score: float) -> None:
         """Save sentiment analysis result to the database."""
-        for attempt in range(5):
+        for attempt in range(MAX_RETRIES):
             try:
                 conn = self._get_conn()
                 conn.execute(
@@ -189,14 +203,14 @@ class Database:
                 self._dirty = True
                 return
             except sqlite3.OperationalError:
-                if attempt < 4:
-                    time.sleep(0.05 * (attempt + 1))
+                if attempt < MAX_RETRIES - 1:
+                    time.sleep(RETRY_DELAY * (attempt + 1))
                 else:
                     raise
 
     def save_match_event(self, match_id: str, event: dict) -> None:
         """Save a match event to the database."""
-        for attempt in range(5):
+        for attempt in range(MAX_RETRIES):
             try:
                 conn = self._get_conn()
                 conn.execute(
@@ -206,8 +220,8 @@ class Database:
                 self._dirty = True
                 return
             except sqlite3.OperationalError:
-                if attempt < 4:
-                    time.sleep(0.05 * (attempt + 1))
+                if attempt < MAX_RETRIES - 1:
+                    time.sleep(RETRY_DELAY * (attempt + 1))
                 else:
                     raise
     

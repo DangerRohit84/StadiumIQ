@@ -8,7 +8,7 @@ load_dotenv()
 
 class Config:
     """Base configuration."""
-    SECRET_KEY = os.getenv("SECRET_KEY") or secrets.token_hex(32)
+    SECRET_KEY = os.getenv("SECRET_KEY") or "stadiumiq-dev-key-change-in-production-2026"
     API_KEY = os.getenv("API_KEY", secrets.token_hex(16))
     GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY", "")
     GOOGLE_MODEL = os.getenv("GOOGLE_MODEL", "gemini-2.5-flash")

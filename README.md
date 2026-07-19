@@ -89,7 +89,7 @@ stadiumiq/
 │       └── img/                        # Image assets
 ├── tests/
 │   ├── __init__.py                     # Test package
-│   ├── test_app.py                     # 232 pytest tests (all passing)
+│   ├── test_app.py                     # 330 pytest tests (all passing)
 │   └── verify.py                       # Full end-to-end verification script
 ├── docs/                               # Documentation
 ├── Dockerfile                          # Container deployment
@@ -243,10 +243,10 @@ When Gemini is available, `CrowdManager.predict_flow()` sends current zone occup
 | **Error Identification** | Clear error messages, `aria-invalid`, `aria-describedby` for form errors |
 | **Language Declaration** | `lang` attribute set, dynamic language switching preserves semantics |
 
-## Testing — 232 Tests
+## Testing — 330 Tests
 
 ```bash
-pytest tests/test_app.py -v          # 232 tests passing
+pytest tests/test_app.py -v          # 330 tests passing
 python tests/verify.py               # Full verification (35 route + 16 engine checks)
 ```
 
@@ -278,7 +278,7 @@ python tests/verify.py               # Full verification (35 route + 16 engine c
 | Icons | Font Awesome 6.5 |
 | Real-time | WebSocket (SocketIO) for live updates |
 | i18n | Custom translation engine powered by Gemini (10 languages) |
-| Testing | pytest 8.x (232 tests), verify.py |
+| Testing | pytest 8.x (330 tests), verify.py |
 | Security | Flask-Limiter, CSP headers, input validation |
 | Accessibility | WCAG 2.1 AA, 5 a11y profiles, keyboard navigation |
 | Deploy | Docker, Docker Compose |
@@ -350,7 +350,7 @@ services:
 | **Innovation** | HIGH | Gemini-powered chat with multi-turn context, sentiment analysis, and translation alongside simulation-based operations |
 | **Code Quality** | HIGH | Modular engine architecture, clean separation, type hints, docstrings, database layer, `__init__.py` files |
 | **Security** | MEDIUM | Rate limiting, CSP, input validation, API keys, CSRF, HTTPS, SQL injection prevention |
-| **Testing** | LOW | 232 tests covering all engines + 47 endpoints + i18n + security |
+| **Testing** | LOW | 330 tests covering all engines + 47 endpoints + i18n + security |
 | **Accessibility** | LOW | WCAG 2.1 AA, 5 a11y profiles, keyboard nav, screen reader, color contrast, text resizing |
 
 ---

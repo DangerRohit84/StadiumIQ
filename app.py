@@ -187,7 +187,7 @@ def create_app(config_name: str = "development") -> Flask:
         nonce = g.nonce
         response.headers["Content-Security-Policy"] = (
             "default-src 'self'; "
-            f"script-src 'self' 'nonce-{nonce}' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; "
+            f"script-src 'self' 'nonce-{nonce}' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://cdn.socket.io; "
             "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; "
             "font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com; "
             "img-src 'self' data:; "

@@ -617,6 +617,7 @@
         setupChat();
         setupEventDelegation();
         setupTabs();
+        setupSocketIO();
 
         // ─── AI Translation Cache ──────────────────────────────
         var aiTranslationCache = {};
@@ -862,6 +863,34 @@
         btn.setAttribute('aria-expanded', a11yMode ? 'true' : 'false');
         showToast(a11yMode ? 'Accessibility mode enabled' : 'Accessibility mode disabled', 'info');
     };
+
+    // ─── Socket.IO Real-Time Updates ─────────────────────────
+    function setupSocketIO() {
+        if (typeof io === 'undefined') return;
+        try {
+            var socket = io({ transports: ['websocket', 'polling'], reconnection: true });
+            socket.on('connect', function () {
+                console.log('[StadiumIQ] WebSocket connected');
+            });
+            socket.on('new_message', function (data) {
+                if (data.ai_response) {
+                    removeTyping();
+                    appendMsg('bot', data.ai_response, null, 'gemini-realtime');
+                }
+            });
+            socket.on('crowd_update', function (data) {
+                if (data && data.zones) renderCrowd(data);
+            });
+            socket.on('incident_alert', function (data) {
+                if (data && data.message) showToast(data.message, 'warning');
+            });
+            socket.on('disconnect', function () {
+                console.log('[StadiumIQ] WebSocket disconnected');
+            });
+        } catch (e) {
+            console.warn('[StadiumIQ] Socket.IO not available:', e);
+        }
+    }
 
     // ─── Event Delegation (CSP-safe, no inline onclick) ──────
     function setupEventDelegation() {
