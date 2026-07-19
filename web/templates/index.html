@@ -43,10 +43,10 @@
             </div>
             <nav class="nav-pills" aria-label="Main navigation">
                 <button class="nav-pill active" data-view="fan" aria-pressed="true" onclick="switchView('fan')">
-                    <i class="fas fa-user-astronaut" aria-hidden="true"></i><span data-i18n="nav_fan">Fan Experience</span>
+                    <i class="fas fa-user-astronaut" aria-hidden="true"></i><span data-i18n="fan_experience">Fan Experience</span>
                 </button>
                 <button class="nav-pill" data-view="command" aria-pressed="false" onclick="switchView('command')">
-                    <i class="fas fa-terminal" aria-hidden="true"></i><span data-i18n="nav_cmd">Command Center</span>
+                    <i class="fas fa-terminal" aria-hidden="true"></i><span data-i18n="command_center">Command Center</span>
                 </button>
             </nav>
         </div>
@@ -82,7 +82,7 @@
                 <div class="hero-content">
                     <div class="hero-badge"><i class="fas fa-trophy" aria-hidden="true"></i> <span data-i18n="hero_badge">FIFA World Cup 2026</span></div>
                     <div class="ai-badge" aria-label="Powered by Google Gemini AI">AI Powered</div>
-                    <h1 class="hero-title"><span data-i18n="hero_title_1">Your Personal</span> <span class="gradient-text" data-i18n="hero_title_2">AI Stadium</span> <span data-i18n="hero_title_3">Assistant</span></h1>
+                    <h1 class="hero-title" data-i18n="hero_title">Your Personal AI Stadium Assistant</h1>
                     <p class="hero-sub" data-i18n="hero_sub">Navigate smarter. Experience better. powered by Google Gemini 2.5 Flash.</p>
                     <div class="hero-stats" role="list" aria-label="Key statistics" aria-live="polite" aria-atomic="true">
                         <div class="hero-stat" role="listitem">
@@ -153,17 +153,17 @@
 
                     <div class="quick-bar" role="group" aria-label="Quick actions">
                         <div class="quick-scroll">
-                            <button class="quick-chip" aria-label="Find nearest restroom" onclick="sendQuick('Where is the nearest restroom?')"><i class="fas fa-restroom" aria-hidden="true"></i> <span data-i18n="q_restroom">Restrooms</span></button>
-                            <button class="quick-chip" aria-label="View food options" onclick="sendQuick('What food options are available?')"><i class="fas fa-utensils" aria-hidden="true"></i> <span data-i18n="q_food">Food</span></button>
-                            <button class="quick-chip" aria-label="Check crowd levels" onclick="sendQuick('How busy is the stadium?')"><i class="fas fa-chart-bar" aria-hidden="true"></i> <span data-i18n="q_crowds">Crowds</span></button>
-                            <button class="quick-chip" aria-label="Find parking" onclick="sendQuick('Where can I park?')"><i class="fas fa-parking" aria-hidden="true"></i> <span data-i18n="q_parking">Parking</span></button>
-                            <button class="quick-chip" aria-label="Accessibility information" onclick="sendQuick('I need wheelchair accessibility')"><i class="fas fa-wheelchair" aria-hidden="true"></i> <span data-i18n="q_accessible">Accessible</span></button>
-                            <button class="quick-chip" aria-label="Find recycling stations" onclick="sendQuick('Where are recycling stations?')"><i class="fas fa-recycle" aria-hidden="true"></i> <span data-i18n="q_eco">Eco</span></button>
-                            <button class="quick-chip" aria-label="View match schedule" onclick="sendQuick('What matches are today?')"><i class="fas fa-calendar-alt" aria-hidden="true"></i> <span data-i18n="q_schedule">Schedule</span></button>
-                            <button class="quick-chip" aria-label="Find first aid location" onclick="sendQuick('Where is the first aid?')"><i class="fas fa-medkit" aria-hidden="true"></i> <span data-i18n="q_medical">Medical</span></button>
-                            <button class="quick-chip" aria-label="Find merchandise shop" onclick="sendQuick('Where can I buy merchandise?')"><i class="fas fa-shopping-bag" aria-hidden="true"></i> <span data-i18n="q_merch">Merchandise</span></button>
-                            <button class="quick-chip" aria-label="Lost and found assistance" onclick="sendQuick('I lost my phone, can you help?')"><i class="fas fa-search" aria-hidden="true"></i> <span data-i18n="q_lost">Lost & Found</span></button>
-                            <button class="quick-chip" aria-label="Customer service assistance" onclick="sendQuick('I need customer service assistance')"><i class="fas fa-headset" aria-hidden="true"></i> <span data-i18n="q_service">Service</span></button>
+                            <button class="quick-chip" aria-label="Find nearest restroom" onclick="sendQuick('Where is the nearest restroom?')">                    <i class="fas fa-restroom" aria-hidden="true"></i> <span data-i18n="restrooms">Restrooms</span></button>
+                            <button class="quick-chip" aria-label="View food options" onclick="sendQuick('What food options are available?')">                    <i class="fas fa-utensils" aria-hidden="true"></i> <span data-i18n="food">Food</span></button>
+                            <button class="quick-chip" aria-label="Check crowd levels" onclick="sendQuick('How busy is the stadium?')">                    <i class="fas fa-chart-bar" aria-hidden="true"></i> <span data-i18n="crowds">Crowds</span></button>
+                            <button class="quick-chip" aria-label="Find parking" onclick="sendQuick('Where can I park?')">                    <i class="fas fa-parking" aria-hidden="true"></i> <span data-i18n="parking">Parking</span></button>
+                            <button class="quick-chip" aria-label="Accessibility information" onclick="sendQuick('I need wheelchair accessibility')">                    <i class="fas fa-wheelchair" aria-hidden="true"></i> <span data-i18n="accessible">Accessible</span></button>
+                            <button class="quick-chip" aria-label="Find recycling stations" onclick="sendQuick('Where are recycling stations?')">                    <i class="fas fa-recycle" aria-hidden="true"></i> <span data-i18n="eco">Eco</span></button>
+                            <button class="quick-chip" aria-label="View match schedule" onclick="sendQuick('What matches are today?')">                    <i class="fas fa-calendar-alt" aria-hidden="true"></i> <span data-i18n="schedule">Schedule</span></button>
+                            <button class="quick-chip" aria-label="Find first aid location" onclick="sendQuick('Where is the first aid?')">                    <i class="fas fa-medkit" aria-hidden="true"></i> <span data-i18n="medical">Medical</span></button>
+                            <button class="quick-chip" aria-label="Find merchandise shop" onclick="sendQuick('Where can I buy merchandise?')">                    <i class="fas fa-shopping-bag" aria-hidden="true"></i> <span data-i18n="merchandise">Merchandise</span></button>
+                            <button class="quick-chip" aria-label="Lost and found assistance" onclick="sendQuick('I lost my phone, can you help?')">                    <i class="fas fa-search" aria-hidden="true"></i> <span data-i18n="lost_found">Lost & Found</span></button>
+                            <button class="quick-chip" aria-label="Customer service assistance" onclick="sendQuick('I need customer service assistance')">                    <i class="fas fa-headset" aria-hidden="true"></i> <span data-i18n="service">Service</span></button>
                         </div>
                     </div>
 
@@ -184,13 +184,13 @@
                 <div class="panel info-panel">
                     <div class="panel-tabs" role="tablist" aria-label="Stadium information tabs">
                         <button class="panel-tab active" role="tab" aria-selected="true" aria-controls="tab-crowd" id="tab-btn-crowd" data-tab="crowd" onclick="switchInfoTab('crowd')">
-                            <i class="fas fa-users" aria-hidden="true"></i><span data-i18n="tab_crowd">Crowd</span>
+                            <i class="fas fa-users" aria-hidden="true"></i><span data-i18n="crowd_map">Crowd</span>
                         </button>
                         <button class="panel-tab" role="tab" aria-selected="false" aria-controls="tab-map" id="tab-btn-map" data-tab="map" onclick="switchInfoTab('map')">
-                            <i class="fas fa-map-marked-alt" aria-hidden="true"></i><span data-i18n="tab_map">Map</span>
+                            <i class="fas fa-map-marked-alt" aria-hidden="true"></i><span data-i18n="map">Map</span>
                         </button>
                         <button class="panel-tab" role="tab" aria-selected="false" aria-controls="tab-transport" id="tab-btn-transport" data-tab="transport" onclick="switchInfoTab('transport')">
-                            <i class="fas fa-shuttle-van" aria-hidden="true"></i><span data-i18n="tab_transport">Transport</span>
+                            <i class="fas fa-shuttle-van" aria-hidden="true"></i><span data-i18n="transport">Transport</span>
                         </button>
                         <button class="panel-tab" role="tab" aria-selected="false" aria-controls="tab-eco" id="tab-btn-eco" data-tab="eco" onclick="switchInfoTab('eco')">
                             <i class="fas fa-leaf" aria-hidden="true"></i><span data-i18n="tab_eco">Eco</span>
@@ -267,7 +267,7 @@
         <!-- ═══ COMMAND CENTER VIEW ═══ -->
         <div id="view-command" class="view" role="region" aria-label="Command Center View" aria-hidden="true">
             <div class="command-hero">
-                <h2><i class="fas fa-terminal" aria-hidden="true"></i> <span data-i18n="cmd_title">Operations Command Center</span></h2>
+                <h2><i class="fas fa-terminal" aria-hidden="true"></i> <span data-i18n="command_center_title">Operations Command Center</span></h2>
                 <p data-i18n="cmd_sub">Real-time stadium intelligence and operational analytics</p>
             </div>
             <div class="command-layout">
