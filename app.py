@@ -182,7 +182,7 @@ def create_app(config_name: str = "development") -> Flask:
         response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()"
         response.headers["Cross-Origin-Opener-Policy"] = "same-origin"
         response.headers["Cross-Origin-Resource-Policy"] = "same-origin"
-        response.headers["Cross-Origin-Embedder-Policy"] = "require-corp"
+        response.headers["Cross-Origin-Embedder-Policy"] = "credentialless"
         response.headers["X-Permitted-Cross-Domain-Policies"] = "none"
         nonce = g.nonce
         response.headers["Content-Security-Policy"] = (

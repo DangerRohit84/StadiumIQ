@@ -673,7 +673,7 @@ class TestSecurityHeaders:
     def test_cross_origin_embedder_policy(self, client) -> None:
         """Verify Cross-Origin-Embedder-Policy header is set."""
         r = client.get("/")
-        assert r.headers.get("Cross-Origin-Embedder-Policy") == "require-corp"
+        assert r.headers.get("Cross-Origin-Embedder-Policy") == "credentialless"
 
     def test_x_permitted_cross_domain_policies(self, client) -> None:
         """Verify X-Permitted-Cross-Domain-Policies is none."""
@@ -2783,7 +2783,7 @@ class TestSecurityComprehensive:
         r = client.get("/")
         assert r.headers.get("Cross-Origin-Opener-Policy") == "same-origin"
         assert r.headers.get("Cross-Origin-Resource-Policy") == "same-origin"
-        assert r.headers.get("Cross-Origin-Embedder-Policy") == "require-corp"
+        assert r.headers.get("Cross-Origin-Embedder-Policy") == "credentialless"
 
     def test_permitted_cross_domain_policies(self, client) -> None:
         """Verify X-Permitted-Cross-Domain-Policies is none."""
