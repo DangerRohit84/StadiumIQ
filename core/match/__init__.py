@@ -4,6 +4,7 @@ import random
 import time
 from typing import Any
 from core.database import db
+from core.types import MatchEvent
 
 logger = logging.getLogger(__name__)
 
@@ -104,7 +105,7 @@ class MatchSimulator:
         self.momentum = {"home": 50, "away": 50}
         return self.get_match_status()
 
-    def simulate_minute(self) -> dict:
+    def simulate_minute(self) -> dict[str, Any]:
         """Simulate one minute of match action."""
         if not self.active_match or self.active_match["status"] != "live":
             return {"error": "No active match"}
@@ -300,6 +301,7 @@ class MatchSimulator:
         self.active_match["away_stats"]["possession"] = round(100 - home_poss)
 
     def _predict_next_event(self) -> dict:
+        """Predict the next likely match event."""
         events = list(self.MATCH_EVENTS.keys())
         weights = [e["weight"] for e in self.MATCH_EVENTS.values()]
         predicted = random.choices(events, weights=weights)[0]
@@ -307,6 +309,7 @@ class MatchSimulator:
         return {"type": predicted, "expected_minute_range": minute_range, "probability": round(random.uniform(20, 60), 1)}
 
     def _energy_description(self, level: str) -> str:
+        """Return a descriptive string for the given energy level."""
         descriptions = {
             "electric": "MetLife Stadium is ROARING! The crowd is on their feet!",
             "excited": "Great atmosphere! Fans are engaged and vocal!",

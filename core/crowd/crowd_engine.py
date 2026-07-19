@@ -5,6 +5,8 @@ import time
 from collections import deque
 from typing import Any
 
+from core.types import ZoneData
+
 logger = logging.getLogger(__name__)
 
 LOW_THRESHOLD = 40
@@ -25,6 +27,7 @@ class CrowdManager:
     }
 
     def __init__(self) -> None:
+        """Initialize crowd manager with zone occupancy and flow tracking."""
         self._occupancy: dict[str, int] = {z: random.randint(3000, 15000) for z in self.ZONES}
         self._flow_rates: dict[str, dict[str, int]] = {z: {"inflow": 0, "outflow": 0} for z in self.ZONES}
         self._history: dict[str, deque] = {z: deque(maxlen=HISTORY_MAX_LEN) for z in self.ZONES}
@@ -60,7 +63,7 @@ class CrowdManager:
 
         return updates
 
-    def get_zone_status(self, zone_id: str) -> dict:
+    def get_zone_status(self, zone_id: str) -> ZoneData:
         """Get detailed status for a zone."""
         zone = self.ZONES.get(zone_id)
         if not zone:
@@ -112,11 +115,11 @@ class CrowdManager:
             "sections": zone["sections"],
         }
 
-    def get_all_zones(self) -> dict:
+    def get_all_zones(self) -> dict[str, ZoneData]:
         """Get status of all zones."""
         return {z: self.get_zone_status(z) for z in self.ZONES}
 
-    def get_stadium_overview(self) -> dict:
+    def get_stadium_overview(self) -> dict[str, Any]:
         """Get overall stadium metrics."""
         total_occ = sum(self._occupancy.values())
         total_cap = sum(z["capacity"] for z in self.ZONES.values())
@@ -163,7 +166,11 @@ class CrowdManager:
         return heatmap
 
     def predict_flow(self, minutes_ahead: int = 30) -> dict:
-        """Predict crowd flow for the next N minutes."""
+        """Predict crowd flow for the next N minutes.
+
+        Uses Gemini for smarter predictions when available, falls back to
+        rule-based trend extrapolation.
+        """
         if minutes_ahead < 1:
             logger.warning("Invalid minutes_ahead=%d, clamping to 1", minutes_ahead)
             minutes_ahead = 1
@@ -171,6 +178,53 @@ class CrowdManager:
             logger.warning("minutes_ahead=%d exceeds max, clamping to 1440", minutes_ahead)
             minutes_ahead = 1440
 
+        # Try Gemini-assisted prediction
+        try:
+            from core.ai.genai_engine import engine
+            if engine.is_available():
+                zone_summaries = []
+                for zid in self.ZONES:
+                    occ = self._occupancy[zid]
+                    cap = self.ZONES[zid]["capacity"]
+                    flow = self._flow_rates[zid]
+                    zone_summaries.append(
+                        f"Zone {zid} ({self.ZONES[zid]['name']}): "
+                        f"{occ}/{cap} ({occ/cap*100:.0f}%), "
+                        f"inflow={flow['inflow']}, outflow={flow['outflow']}"
+                    )
+                prompt = (
+                    f"Predict crowd occupancy for each stadium zone in {minutes_ahead} minutes.\n"
+                    f"Current state:\n" + "\n".join(zone_summaries) + "\n"
+                    f"Return ONLY valid JSON (no markdown): "
+                    f'{{"A": {{"predicted_occupancy": int, "predicted_percentage": float, "trend": "string"}}, '
+                    f'"B": {{...}}, "C": {{...}}, "D": {{...}}}}'
+                )
+                raw = engine.generate_text(prompt)
+                if raw:
+                    import json
+                    raw = raw.strip()
+                    if raw.startswith("```"):
+                        raw = raw.split("\n", 1)[1].rsplit("```", 1)[0].strip()
+                    parsed = json.loads(raw)
+                    predictions = {}
+                    for zone_id in self.ZONES:
+                        if zone_id in parsed:
+                            zd = parsed[zone_id]
+                            capacity = self.ZONES[zone_id]["capacity"]
+                            predictions[zone_id] = {
+                                "predicted_occupancy": max(0, min(capacity, zd.get("predicted_occupancy", self._occupancy[zone_id]))),
+                                "predicted_percentage": zd.get("predicted_percentage", round(self._occupancy[zone_id] / capacity * 100, 1)),
+                                "confidence": 0.85,
+                                "trend": zd.get("trend", "stable"),
+                                "source": "gemini",
+                            }
+                        else:
+                            predictions[zone_id] = {"predicted_occupancy": self._occupancy[zone_id], "confidence": 0.5}
+                    return predictions
+        except Exception:
+            logger.debug("Gemini prediction failed, falling back to rule-based")
+
+        # Fallback: rule-based trend extrapolation
         predictions: dict[str, dict] = {}
         for zone_id in self.ZONES:
             hist = list(self._history[zone_id])[-10:]
@@ -190,6 +244,7 @@ class CrowdManager:
                 "predicted_percentage": round(predicted / self.ZONES[zone_id]["capacity"] * 100, 1),
                 "confidence": round(confidence, 2),
                 "trend": "increasing" if per_step > 5 else "decreasing" if per_step < -5 else "stable",
+                "source": "rule-based",
             }
 
         return predictions

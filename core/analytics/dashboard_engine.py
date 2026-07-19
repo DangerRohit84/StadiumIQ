@@ -1,11 +1,10 @@
 """Analytics Dashboard Engine for operational intelligence."""
 import hashlib
-import math
 import time
-from typing import Any
 
 from core.crowd.crowd_engine import crowd_manager
 from core.emergency.emergency_engine import emergency_system
+from core.types import KPIData
 
 
 STADIUM_CAPACITY = sum(z["capacity"] for z in crowd_manager.ZONES.values())
@@ -74,7 +73,8 @@ class AnalyticsDashboard:
     specified bucket interval) to keep the dashboard coherent across polls.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
+        """Initialize analytics dashboard with empty history and alerts."""
         self._kpi_history: list[dict] = []
         self._alerts: list[dict] = []
 
@@ -82,7 +82,7 @@ class AnalyticsDashboard:
     # Public API
     # ------------------------------------------------------------------
 
-    def get_realtime_kpis(self) -> dict:
+    def get_realtime_kpis(self) -> KPIData:
         """Get current key performance indicators.
 
         Uses real occupancy from crowd_manager, real safety score from
@@ -122,6 +122,7 @@ class AnalyticsDashboard:
 
         # Trend classification
         def _trend(metric: str, value: float) -> str:
+            """Classify the trend direction for a metric."""
             prev_bucket = bucket - 1
             prev_val = _seeded_float(prev_bucket, hash(metric) % 1000, 0, 1)
             cur_val = _seeded_float(bucket, hash(metric) % 1000, 0, 1)

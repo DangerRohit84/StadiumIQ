@@ -4,7 +4,8 @@ import os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 import json
 
-def test_imports():
+def test_imports() -> bool:
+    """Verify all module imports work correctly."""
     print("1. Testing imports...")
     try:
         from config.settings import Config
@@ -72,7 +73,8 @@ def test_imports():
     return True
 
 
-def test_app_creation():
+def test_app_creation() -> object:
+    """Verify Flask app can be created successfully."""
     print("\n2. Testing app creation...")
     try:
         from app import create_app
@@ -84,7 +86,8 @@ def test_app_creation():
         return None
 
 
-def test_routes(app):
+def test_routes(app) -> bool:
+    """Verify all API routes respond correctly."""
     print("\n3. Testing all API routes with test client...")
     app.config["TESTING"] = True
     errors = []
@@ -173,7 +176,8 @@ def test_routes(app):
     return errors
 
 
-def test_core_engines():
+def test_core_engines() -> bool:
+    """Verify core engine logic works correctly."""
     print("\n4. Testing core engine logic...")
     try:
         from core.crowd.crowd_engine import crowd_manager

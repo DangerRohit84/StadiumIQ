@@ -2,7 +2,6 @@
 import logging
 import re
 import time
-from typing import Any
 from core.database import db
 
 logger = logging.getLogger(__name__)
@@ -41,14 +40,51 @@ class SentimentAnalyzer:
         "facility": ["restroom", "bathroom", "seat", "wifi", "screen", "shop"],
     }
 
+    _POS_PATTERNS: dict[str, re.Pattern] = {}
+    _NEG_PATTERNS: dict[str, re.Pattern] = {}
+    _URG_PATTERNS: dict[str, re.Pattern] = {}
+    _TOPIC_PATTERNS: dict[str, list[re.Pattern]] = {}
+    _patterns_built = False
+
+    @classmethod
+    def _build_patterns(cls) -> None:
+        """Compile regex patterns for positive, negative, urgency, and topic keywords."""
+        if cls._patterns_built:
+            return
+        for w in cls.POSITIVE_WORDS:
+            cls._POS_PATTERNS[w] = re.compile(r'\b' + re.escape(w) + r'\b')
+        for w in cls.NEGATIVE_WORDS:
+            cls._NEG_PATTERNS[w] = re.compile(r'\b' + re.escape(w) + r'\b')
+        for w in cls.URGENCY_WORDS:
+            cls._URG_PATTERNS[w] = re.compile(r'\b' + re.escape(w) + r'\b')
+        for topic, keywords in cls.TOPIC_KEYWORDS.items():
+            cls._TOPIC_PATTERNS[topic] = [re.compile(r'\b' + re.escape(kw) + r'\b') for kw in keywords]
+        cls._patterns_built = True
+
     def __init__(self) -> None:
         """Initialize the sentiment analyzer."""
+        self._build_patterns()
         self.feedback_log: list[dict] = []
         self._sentiment_trend: list[dict] = []
 
     def analyze(self, text: str, source: str = "chat") -> dict:
-        """Analyze sentiment of a single piece of feedback."""
-        result = self._rule_based_analysis(text)
+        """Analyze sentiment of a single piece of feedback.
+
+        Tries Gemini first for higher accuracy, falls back to rule-based.
+        """
+        result = None
+        try:
+            from core.ai.genai_engine import engine
+            if engine.is_available():
+                gemini_result = engine.analyze_sentiment(text)
+                if gemini_result and "sentiment" in gemini_result:
+                    result = gemini_result
+        except Exception:
+            pass
+
+        if result is None:
+            result = self._rule_based_analysis(text)
+
         result["source"] = source
         result["timestamp"] = time.time()
 
@@ -56,7 +92,10 @@ class SentimentAnalyzer:
         if len(self.feedback_log) > MAX_FEEDBACK_LOG:
             self.feedback_log = self.feedback_log[-MAX_FEEDBACK_LOG:]
 
-        db.save_sentiment(text, result["sentiment"], result["satisfaction_score"])
+        try:
+            db.save_sentiment(text, result["sentiment"], result["satisfaction_score"])
+        except Exception:
+            pass
 
         self._sentiment_trend.append({
             "time": time.time(),
@@ -122,15 +161,14 @@ class SentimentAnalyzer:
     def _rule_based_analysis(self, text: str) -> dict:
         """Rule-based sentiment analysis with word boundary matching."""
         text_lower = text.lower()
-        words = text_lower.split()
 
-        pos_count = sum(1 for w in self.POSITIVE_WORDS if re.search(r'\b' + re.escape(w) + r'\b', text_lower))
-        neg_count = sum(1 for w in self.NEGATIVE_WORDS if re.search(r'\b' + re.escape(w) + r'\b', text_lower))
-        urg_count = sum(1 for w in self.URGENCY_WORDS if re.search(r'\b' + re.escape(w) + r'\b', text_lower))
+        pos_count = sum(1 for pat in self._POS_PATTERNS.values() if pat.search(text_lower))
+        neg_count = sum(1 for pat in self._NEG_PATTERNS.values() if pat.search(text_lower))
+        urg_count = sum(1 for pat in self._URG_PATTERNS.values() if pat.search(text_lower))
 
         topics: list[str] = []
-        for topic, keywords in self.TOPIC_KEYWORDS.items():
-            if any(re.search(r'\b' + re.escape(kw) + r'\b', text_lower) for kw in keywords):
+        for topic, patterns in self._TOPIC_PATTERNS.items():
+            if any(pat.search(text_lower) for pat in patterns):
                 topics.append(topic)
 
         if neg_count > pos_count:
@@ -166,9 +204,9 @@ class SentimentAnalyzer:
             "satisfaction_score": score,
             "suggested_action": suggested_action,
             "keywords_found": {
-                "positive": [w for w in self.POSITIVE_WORDS if re.search(r'\b' + re.escape(w) + r'\b', text_lower)],
-                "negative": [w for w in self.NEGATIVE_WORDS if re.search(r'\b' + re.escape(w) + r'\b', text_lower)],
-                "urgency": [w for w in self.URGENCY_WORDS if re.search(r'\b' + re.escape(w) + r'\b', text_lower)],
+                "positive": [w for w, pat in self._POS_PATTERNS.items() if pat.search(text_lower)],
+                "negative": [w for w, pat in self._NEG_PATTERNS.items() if pat.search(text_lower)],
+                "urgency": [w for w, pat in self._URG_PATTERNS.items() if pat.search(text_lower)],
             },
         }
 

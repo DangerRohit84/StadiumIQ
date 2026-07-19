@@ -1,6 +1,7 @@
 """Emergency Response System with real-time incident management."""
 import logging
 import time
+from collections import deque
 from typing import Any
 from core.database import db
 
@@ -23,11 +24,11 @@ class EmergencySystem:
     def __init__(self) -> None:
         """Initialize the emergency response system."""
         self.active_incidents: list[dict] = []
-        self.incident_history: list[dict] = []
+        self.incident_history: deque = deque(maxlen=500)
         self.alert_level: str = "green"
         self.evacuation_zones: set[str] = set()
 
-    def raise_incident(self, incident_type: str, location: dict, details: str = "") -> dict:
+    def raise_incident(self, incident_type: str, location: dict, details: str = "") -> dict[str, Any]:
         """Raise a new emergency incident.
 
         Args:
@@ -132,7 +133,7 @@ class EmergencySystem:
             ),
         }
 
-    def _update_alert_level(self):
+    def _update_alert_level(self) -> None:
         """Update the global alert level based on active incident severities."""
         if any(i["severity"] == "critical" for i in self.active_incidents):
             self.alert_level = "red"

@@ -1,5 +1,5 @@
 """Advanced Navigation Engine with pathfinding and accessibility routing."""
-from typing import Any
+from core.types import NavigationRoute
 
 
 class NavigationEngine:
@@ -65,7 +65,7 @@ class NavigationEngine:
 
         return best
 
-    def get_directions(self, origin_id: str, dest_id: str, mode: str = "standard") -> dict:
+    def get_directions(self, origin_id: str, dest_id: str, mode: str = "standard") -> NavigationRoute:
         """Get detailed directions between two points."""
         origin = self._find_facility(origin_id)
         dest = self._find_facility(dest_id)
@@ -91,8 +91,52 @@ class NavigationEngine:
         }
 
     def get_crowd_aware_route(self, origin_id: str, dest_id: str, zone_densities: dict) -> dict:
-        """Get route that avoids high-density zones."""
+        """Get route that avoids high-density zones.
+
+        Uses Gemini for AI-powered route optimization when available.
+        """
         route = self.get_directions(origin_id, dest_id)
+
+        # Try Gemini-assisted route optimization
+        try:
+            from core.ai.genai_engine import engine
+            if engine.is_available():
+                density_text = ", ".join(
+                    f"Zone {z}: {s.get('percentage', 0)}% ({s.get('level', 'unknown')})"
+                    for z, s in zone_densities.items()
+                ) if zone_densities else "No density data"
+                origin = self._find_facility(origin_id)
+                dest = self._find_facility(dest_id)
+                origin_name = origin["name"] if origin else origin_id
+                dest_name = dest["name"] if dest else dest_id
+                prompt = (
+                    f"Optimize a walking route from {origin_name} to {dest_name} at a stadium.\n"
+                    f"Zone densities: {density_text}\n"
+                    f"Return ONLY valid JSON (no markdown): "
+                    f'{{"route_summary": "string", "avoid_zones": ["list"], '
+                    f'"estimated_time_min": int, "distance_km": float, '
+                    f'"steps": [{{"step": int, "instruction": "string", "distance": "string"}}]}}'
+                )
+                raw = engine.generate_text(prompt)
+                if raw:
+                    import json
+                    raw = raw.strip()
+                    if raw.startswith("```"):
+                        raw = raw.split("\n", 1)[1].rsplit("```", 1)[0].strip()
+                    parsed = json.loads(raw)
+                    if "steps" in parsed:
+                        route["steps"] = parsed["steps"]
+                    if "estimated_time_min" in parsed:
+                        route["estimated_time_min"] = parsed["estimated_time_min"]
+                    if "distance_km" in parsed:
+                        route["distance_km"] = parsed["distance_km"]
+                    if "route_summary" in parsed:
+                        route["route_summary"] = parsed["route_summary"]
+                    if "avoid_zones" in parsed and parsed["avoid_zones"]:
+                        route["warning"] = f"Avoid zones: {', '.join(parsed['avoid_zones'])}"
+                    route["source"] = "gemini"
+        except Exception:
+            pass
 
         crowdest = max(
             zone_densities.items(),
@@ -103,9 +147,9 @@ class NavigationEngine:
         if crowdest[0] and crowdest[1].get("percentage", 0) > 75:
             zone_name = crowdest[1].get("name", crowdest[0])
             pct = crowdest[1]["percentage"]
-            route["warning"] = f"Avoid {zone_name} — at {pct}% capacity"
+            if "warning" not in route:
+                route["warning"] = f"Avoid {zone_name} — at {pct}% capacity"
             route["alternative_route"] = "Use outer concourse to bypass congested area"
-            route["estimated_time_min"] += 3
 
         return route
 
@@ -153,7 +197,7 @@ class NavigationEngine:
             ],
         }
 
-    def _find_facility(self, facility_id: str):
+    def _find_facility(self, facility_id: str) -> dict | None:
         """Look up a facility by its ID across all facility types."""
         for facilities in self.FACILITIES.values():
             for f in facilities:

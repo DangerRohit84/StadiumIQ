@@ -1,7 +1,10 @@
 """Predictive Analytics Engine for crowd behavior and operations."""
+import logging
 import random
 import time
 from typing import Any
+
+logger = logging.getLogger(__name__)
 
 
 class PredictiveAnalytics:
@@ -14,7 +17,8 @@ class PredictiveAnalytics:
         "extra_time": {"pattern": "tension_buildup"},
     }
 
-    def __init__(self):
+    def __init__(self) -> None:
+        """Initialize predictive analytics with baseline patterns."""
         self._baseline_patterns = self._init_patterns()
         self._predictions = {}
 
@@ -29,6 +33,7 @@ class PredictiveAnalytics:
 
     def predict_demand(self, zone: str, minutes_ahead: int = 60) -> dict:
         """Predict demand for services in a zone."""
+        logger.info("Predicting demand for zone=%s minutes_ahead=%d", zone, minutes_ahead)
         pattern = self._baseline_patterns.get(zone, self._baseline_patterns["A"])
 
         time_factor = self._time_based_factor(minutes_ahead)
@@ -61,6 +66,7 @@ class PredictiveAnalytics:
 
     def predict_incident_risk(self, zone_data: dict) -> dict:
         """Predict likelihood of incidents based on current conditions."""
+        logger.info("Predicting incident risk for %d zones", len(zone_data))
         risks = {}
         for zone_id, data in zone_data.items():
             density = data.get("percentage", 0) / 100
@@ -122,6 +128,7 @@ class PredictiveAnalytics:
 
     def generate_operational_insights(self) -> dict:
         """Generate comprehensive operational insights."""
+        logger.info("Generating operational insights")
         return {
             "timestamp": time.time(),
             "crowd_prediction": self.predict_demand("A"),

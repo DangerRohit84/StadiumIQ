@@ -3,6 +3,8 @@ import logging
 import time
 from typing import Any
 
+from core.types import SatisfactionScore
+
 logger = logging.getLogger(__name__)
 
 MAX_SCORES = 1000
@@ -26,7 +28,7 @@ class SatisfactionTracker:
         self.overall_history: list[dict] = []
         self._nps_responses: list[dict] = []
 
-    def record_score(self, touchpoint: str, score: int, fan_id: str | None = None) -> dict:
+    def record_score(self, touchpoint: str, score: int, fan_id: str | None = None) -> SatisfactionScore | dict[str, Any]:
         """Record a satisfaction score for a touchpoint (1-10)."""
         if touchpoint not in self.TOUCHPOINTS:
             return {"error": f"Unknown touchpoint: {touchpoint}"}

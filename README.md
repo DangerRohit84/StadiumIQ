@@ -16,33 +16,35 @@ FIFA World Cup 2026 presents unprecedented challenges for stadium operations:
 
 ## Solution Overview
 
-StadiumIQ is a GenAI-powered command center and fan assistant that addresses every FIFA 2026 challenge through 11 specialized AI engines:
+StadiumIQ is a GenAI-powered command center and fan assistant that addresses FIFA 2026 challenges through a combination of 1 GenAI engine (Google Gemini) and 8 specialized simulation engines:
 
-| Challenge | StadiumIQ Solution | GenAI Engine |
-|-----------|-------------------|--------------|
-| Crowd congestion | Real-time density mapping, flow prediction, bottleneck alerts | Crowd Intelligence |
-| Emergency response | AI-generated evacuation plans, incident tracking, safety scoring | Emergency Response |
-| Multilingual fans | Real-time UI translation, AI chat in 10 languages | AI i18n Engine |
-| Poor navigation | Accessibility-first wayfinding, nearest-facility lookup | Navigation |
-| Long wait times | Predictive wait modeling, demand forecasting | Predictive Analytics |
-| Fan dissatisfaction | Sentiment analysis, NPS scoring, touchpoint tracking | Satisfaction Scoring |
-| Live match experience | AI match simulation, momentum tracking, score prediction | Match Simulator |
-| Personalization | Fan journey tracking, contextual recommendations | Smart Fan Journey |
-| Staff deployment | KPI dashboards, hourly analytics, staff optimization | Command Center |
-| Data silos | Unified sensor network, anomaly detection, zone aggregation | IoT Sensors |
-| Operational blind spots | Real-time analytics, risk scoring, AI insights | Dashboard Analytics |
+| Challenge | StadiumIQ Solution | Engine Type |
+|-----------|-------------------|-------------|
+| Crowd congestion | Real-time density mapping, flow prediction, bottleneck alerts | Simulation + Gemini-assisted |
+| Emergency response | AI-generated evacuation plans, incident tracking, safety scoring | Simulation engine |
+| Multilingual fans | Real-time UI translation, AI chat in 10 languages | Gemini |
+| Poor navigation | Accessibility-first wayfinding, nearest-facility lookup | Simulation + Gemini-assisted |
+| Long wait times | Predictive wait modeling, demand forecasting | Simulation engine |
+| Fan dissatisfaction | Sentiment analysis, NPS scoring, touchpoint tracking | Gemini |
+| Live match experience | Match simulation, momentum tracking, score prediction | Simulation engine |
+| Personalization | Fan journey tracking, contextual recommendations | Simulation engine |
+| Staff deployment | KPI dashboards, hourly analytics, staff optimization | Simulation engine |
+| Data silos | Unified sensor network, anomaly detection, zone aggregation | Simulation engine |
+| Operational blind spots | Real-time analytics, risk scoring, AI insights | Simulation engine |
 
 ## Architecture
 
 ```
 stadiumiq/
-├── app.py                              # Flask + SocketIO main application (46+ endpoints)
+├── app.py                              # Flask + SocketIO main application (47 endpoints)
 ├── run.py                              # Entry point
 ├── config/
 │   ├── __init__.py                     # Config package
 │   └── settings.py                     # Environment configuration
 ├── core/
 │   ├── __init__.py                     # Core package
+│   ├── database.py                     # SQLite connection, schema, seed data
+│   ├── types.py                        # Shared type definitions
 │   ├── ai/
 │   │   ├── __init__.py                 # AI package
 │   │   └── genai_engine.py             # Google Gemini GenAI with multi-turn context + fallback
@@ -73,21 +75,23 @@ stadiumiq/
 │   │   └── __init__.py                 # AI Match Simulator
 │   └── satisfaction/
 │       └── __init__.py                 # Fan Satisfaction scoring
-├── database/
-│   ├── __init__.py                     # Database package
-│   └── database.py                     # SQLite connection, schema, seed data
+├── data/
+│   └── stadiums/                       # Stadium data files
 ├── web/
 │   ├── templates/
 │   │   └── index.html                  # Single-page app (Fan + Command Center)
 │   └── static/
 │       ├── css/
 │       │   └── style.css               # Dark theme, responsive, accessible
-│       └── js/
-│           └── app.js                  # Real-time updates, Chart.js visualizations
+│       ├── js/
+│       │   └── app.js                  # Real-time updates, Chart.js visualizations
+│       ├── data/                       # Static data files
+│       └── img/                        # Image assets
 ├── tests/
 │   ├── __init__.py                     # Test package
-│   ├── test_app.py                     # 99 pytest tests (all passing)
+│   ├── test_app.py                     # 232 pytest tests (all passing)
 │   └── verify.py                       # Full end-to-end verification script
+├── docs/                               # Documentation
 ├── Dockerfile                          # Container deployment
 ├── docker-compose.yml                  # Docker Compose setup
 ├── requirements.txt                    # Python dependencies
@@ -97,111 +101,100 @@ stadiumiq/
 
 ## Features
 
-| # | Feature | Description | GenAI? | Engine |
-|---|---------|-------------|--------|--------|
-| 1 | **Multi-Turn AI Chat** | Context-aware conversations with stadium memory, fan profile, and multi-turn history | Yes | Gemini |
-| 2 | **Smart Fan Journey** | Tracks fan from arrival to departure with personalized tips, checkpoints, and recommendations | Yes | Gemini |
-| 3 | **AI Match Simulator** | Live match events, score predictions, momentum tracking, team comparisons | Yes | Gemini |
-| 4 | **Crowd Intelligence** | Real-time density mapping, flow tracking, heatmap generation, bottleneck prediction | Yes | Crowd Engine |
-| 5 | **Emergency Response** | Incident management, AI-generated evacuation plans, safety scoring, real-time alerts | Yes | Gemini + Emergency |
-| 6 | **IoT Sensors** | 36 sensors across 9 types, anomaly detection, zone aggregation, real-time monitoring | Yes | Sensor Engine |
-| 7 | **Predictive Analytics** | Demand forecasting, risk assessment, wait time prediction, crowd surge alerts | Yes | Gemini + Predictive |
-| 8 | **Sentiment Analysis** | Emotion detection, topic extraction, NPS calculation, trend monitoring | Yes | Gemini |
-| 9 | **Satisfaction Scoring** | 13 touchpoints, NPS calculation, weakest area identification, improvement recommendations | Yes | Gemini + Satisfaction |
-| 10 | **Command Center** | Operational KPIs, charts, alerts, staff deployment, AI-generated insights | Yes | Dashboard |
-| 11 | **AI i18n Engine** | Real-time translation of UI strings, dynamic language switching, RTL support | Yes | Gemini |
-| 12 | **Accessibility** | WCAG 2.1 AA compliance, keyboard navigation, screen reader, 5 a11y profiles | No | Navigation |
-| 13 | **Multilingual Support** | 10 languages including Arabic, Chinese, Japanese, Korean, Spanish | Yes | Gemini |
-| 14 | **Security** | Rate limiting, CSP, input validation, API key management, CSRF protection | No | All |
-| 15 | **Real-time Updates** | WebSocket push for live match, crowd, and emergency data | No | SocketIO |
-| 16 | **Data Persistence** | SQLite database with full schema, seeding, and query optimization | No | Database |
+| # | Feature | Description | Engine |
+|---|---------|-------------|--------|
+| 1 | **Multi-Turn AI Chat** | Context-aware conversations with stadium memory, fan profile, and multi-turn history | Gemini |
+| 2 | **Smart Fan Journey** | Tracks fan from arrival to departure with personalized tips, checkpoints, and recommendations | Simulation engine |
+| 3 | **AI Match Simulator** | Live match events, score predictions, momentum tracking, team comparisons | Simulation engine |
+| 4 | **Crowd Intelligence** | Real-time density mapping, flow tracking, heatmap generation, bottleneck prediction | Simulation + Gemini-assisted |
+| 5 | **Emergency Response** | Incident management, evacuation plans, safety scoring, real-time alerts | Simulation engine |
+| 6 | **IoT Sensors** | 36 sensors across 9 types, anomaly detection, zone aggregation, real-time monitoring | Simulation engine |
+| 7 | **Predictive Analytics** | Demand forecasting, risk assessment, wait time prediction, crowd surge alerts | Simulation engine |
+| 8 | **Sentiment Analysis** | Emotion detection, topic extraction, NPS calculation, trend monitoring | Gemini |
+| 9 | **Satisfaction Scoring** | 13 touchpoints, NPS calculation, weakest area identification, improvement recommendations | Simulation engine |
+| 10 | **Command Center** | Operational KPIs, charts, alerts, staff deployment, AI-generated insights | Simulation engine |
+| 11 | **AI i18n Engine** | Real-time translation of UI strings, dynamic language switching, RTL support | Gemini |
+| 12 | **Accessibility** | WCAG 2.1 AA compliance, keyboard navigation, screen reader, 5 a11y profiles | Simulation engine |
+| 13 | **Multilingual Support** | 10 languages including Arabic, Chinese, Japanese, Korean, Spanish | Gemini |
+| 14 | **Security** | Rate limiting, CSP, input validation, API key management, CSRF protection | N/A |
+| 15 | **Real-time Updates** | WebSocket push for live match, crowd, and emergency data | N/A |
+| 16 | **Data Persistence** | SQLite database with full schema, seeding, and query optimization | N/A |
+
+## GenAI Features — What Uses Google Gemini
+
+This section documents exactly which features use Google Gemini and which use rule-based simulations.
+
+### Features Powered by Gemini
+
+| Feature | How Gemini Is Used |
+|---------|-------------------|
+| **AI Chat** | Multi-turn conversations with full stadium context (zone, weather, incidents) injected per prompt. Maintains per-fan conversation history. |
+| **Sentiment Analysis** | Analyzes fan feedback for emotions, topics, and satisfaction scores via structured JSON prompts. Falls back to keyword matching if Gemini unavailable. |
+| **AI Translation** | Translates UI strings on-demand to 10 languages (including RTL for Arabic). Used for dynamic language switching. |
+| **Crowd Prediction** | Gemini-assisted zone-by-zone occupancy predictions using current density data as context. Falls back to trend extrapolation. |
+| **Route Optimization** | Gemini-assisted crowd-aware navigation that factors in real-time zone densities to suggest optimal paths. |
+
+### Features Using Rule-Based Simulation
+
+| Feature | How It Works |
+|---------|-------------|
+| **Crowd Intelligence** | Simulates crowd movement using randomized inflow/outflow with zone capacity constraints and threshold-based alerts. |
+| **Emergency Response** | Pre-defined protocols and evacuation routes based on incident type and affected zones. |
+| **IoT Sensors** | Simulated sensor data generation across 36 sensors with 9 types, anomaly detection via threshold rules. |
+| **Predictive Analytics** | Statistical trend extrapolation from historical patterns. |
+| **Match Simulator** | Rule-based match event generation with random goals, cards, and momentum shifts. |
+| **Fan Journey** | Pre-defined journey stages with deterministic progression and tip matching. |
+| **Satisfaction Scoring** | Aggregation of touchpoint scores with NPS calculation. |
+| **Command Center** | Dashboard aggregation of KPIs from other simulation engines. |
 
 ## GenAI Usage — Google Gemini Integration
 
-### Multi-Turn Chat with Stadium Context
+### Architecture
 
-Every fan query is processed through Google Gemini (gemini-2.0-flash) with full stadium context injected into each prompt:
+The `GenAIEngine` class in `core/ai/genai_engine.py` wraps the Google Gemini 2.5 Flash API with:
 
-```python
-system_prompt = f"""
-You are StadiumIQ, the AI assistant for FIFA World Cup 2026 at MetLife Stadium.
-Current time: {datetime.now().strftime('%H:%M')} | Zone: {current_zone}
-Weather: {weather} | Temperature: {temp}°F | Active incidents: {incidents}
-You can help with navigation, crowd info, emergency guidance, match updates, and fan recommendations.
-Respond concisely (3-4 sentences max) with specific directions when possible.
-"""
-# Conversation history maintained per fan for multi-turn context awareness
-```
-
-### Real-Time Translation of UI Strings
-
-The AI i18n engine translates all UI strings on-demand via Gemini:
+- **System prompt** defining StadiumIQ's persona and capabilities
+- **Multi-turn conversation history** per fan (capped at 20 messages)
+- **Real-time context injection** (zone, weather, incidents) into each prompt
+- **Automatic fallback** to rule-based responses when Gemini is unavailable
 
 ```python
-def translate_text(text: str, target_lang: str) -> dict:
-    prompt = f"""Translate the following UI text to {target_lang}.
-    Keep it concise for buttons/labels. Return JSON: {{"translated": "...", "confidence": 0.95}}"""
-    response = genai.generate_content(prompt)
-    return {"original": text, "translated": result, "target_lang": target_lang}
+# core/ai/genai_engine.py
+class GenAIEngine:
+    def generate(self, message, context=None, language="en", ...):
+        if self._model:  # Gemini available
+            response = self._model.generate_content(full_prompt)
+            return {"response": response.text, "source": "gemini-2.5-flash", ...}
+        return self._fallback_response(message, context, ...)  # Rule-based
 ```
 
-**Supported languages:** English, Spanish, French, German, Japanese, Chinese, Korean, Arabic (RTL), Portuguese, Italian
+### Sentiment Analysis with Gemini
 
-### Sentiment Analysis of Fan Feedback
-
-Fan feedback is analyzed for emotions, topics, and satisfaction scores:
+Fan feedback is analyzed via structured JSON prompts. The engine asks Gemini to return sentiment, emotions, topics, and satisfaction scores:
 
 ```python
-prompt = f"""Analyze fan sentiment for this feedback: "{text}"
-Return JSON with:
-- sentiment: positive/negative/neutral
-- confidence: 0.0-1.0
-- emotions: [joy, frustration, anger, excitement, etc.]
-- topics: [crowd, food, seating, navigation, etc.]
-- nps_score: 0-10
-"""
+# Prompt sent to Gemini:
+"Analyze sentiment of this stadium fan feedback. Return ONLY valid JSON:
+{'sentiment': 'positive|negative|neutral', 'confidence': 0-1,
+ 'emotions': ['list'], 'topics': ['list'],
+ 'satisfaction_score': 1-10, 'suggested_action': 'string'}"
 ```
 
-### Emergency Response Plan Generation
+If Gemini is unavailable, `SentimentAnalyzer._rule_based_analysis()` provides keyword-matching fallback.
 
-AI generates custom evacuation plans based on incident type and stadium context:
+### Translation Engine
 
-```python
-prompt = f"""Generate an emergency response plan for:
-- Incident: {incident_type} in {location}
-- Severity: {severity} | Affected: {affected_count} fans
-- Available exits: {exits}
-Return JSON with: immediate_actions, evacuation_routes, communication, ETA
-"""
-```
+Translates UI strings on-demand to 10 languages via structured prompts. Supports Arabic RTL, CJK character sets, and context-aware translations for stadium-specific terminology.
 
-### Match Prediction and Momentum Analysis
+### Crowd Prediction with Gemini
 
-AI predicts match outcomes and tracks momentum in real-time:
+When Gemini is available, `CrowdManager.predict_flow()` sends current zone occupancy and flow rates to Gemini for prediction. Falls back to trend extrapolation when unavailable.
 
-```python
-prompt = f"""Predict the next 5 minutes of this match:
-- Score: {home_goals}-{away_goals} | Minute: {minute}
-- Momentum: {momentum} | Energy: {energy}/100
-- Recent events: {recent_events}
-Return JSON with: prediction, win_probability, next_event, momentum_shift
-"""
-```
+### Route Optimization with Gemini
 
-### Personalized Fan Journey Recommendations
+`NavigationEngine.get_crowd_aware_route()` uses Gemini to generate optimized routes factoring in real-time zone densities, avoiding congested areas with step-by-step directions.
 
-AI tailors recommendations based on fan position, preferences, and journey stage:
-
-```python
-prompt = f"""Recommend activities for fan:
-- Zone: {current_zone} | Stage: {stage}
-- Preferences: {preferences} | Completed: {completed_actions}
-- Crowd level: {crowd_level} | Wait times: {wait_times}
-Return JSON with: recommendations[], reasons[], estimated_times[]
-"""
-```
-
-## API Endpoints (46+)
+## API Endpoints (47)
 
 | Category | Count | Endpoints |
 |----------|-------|-----------|
@@ -250,10 +243,10 @@ Return JSON with: recommendations[], reasons[], estimated_times[]
 | **Error Identification** | Clear error messages, `aria-invalid`, `aria-describedby` for form errors |
 | **Language Declaration** | `lang` attribute set, dynamic language switching preserves semantics |
 
-## Testing — 99 Tests
+## Testing — 232 Tests
 
 ```bash
-pytest tests/test_app.py -v          # 99 tests passing
+pytest tests/test_app.py -v          # 232 tests passing
 python tests/verify.py               # Full verification (35 route + 16 engine checks)
 ```
 
@@ -279,13 +272,13 @@ python tests/verify.py               # Full verification (35 route + 16 engine c
 | Component | Technology |
 |-----------|------------|
 | Backend | Python 3.10+, Flask 3.0, Flask-SocketIO 5.3 |
-| AI Engine | Google Gemini 2.0 Flash + rule-based fallback |
+| AI Engine | Google Gemini 2.5 Flash with rule-based fallback |
 | Database | SQLite 3 with full schema, seeding, and connection pooling |
 | Frontend | HTML5, CSS3, JavaScript ES6+, Chart.js 4.4 |
 | Icons | Font Awesome 6.5 |
 | Real-time | WebSocket (SocketIO) for live updates |
-| i18n | Custom AI-powered translation engine (10 languages) |
-| Testing | pytest 8.x (99 tests), verify.py |
+| i18n | Custom translation engine powered by Gemini (10 languages) |
+| Testing | pytest 8.x (232 tests), verify.py |
 | Security | Flask-Limiter, CSP headers, input validation |
 | Accessibility | WCAG 2.1 AA, 5 a11y profiles, keyboard navigation |
 | Deploy | Docker, Docker Compose |
@@ -351,24 +344,14 @@ services:
 
 ## Evaluation Alignment
 
-| Criteria | Weight | StadiumIQ Implementation | Score |
-|----------|--------|--------------------------|-------|
-| **Problem Alignment** | HIGH | 11 AI engines solving FIFA 2026 challenges: crowd, emergency, navigation, multilingual, accessibility | 25/25 |
-| **Innovation** | HIGH | Smart Fan Journey, AI Match Simulator, Satisfaction Scoring, AI i18n — unique differentiators | 25/25 |
-| **Code Quality** | HIGH | 11 modular engines, clean separation, type hints, docstrings, database layer, `__init__.py` files | 20/20 |
-| **Security** | MEDIUM | Rate limiting, CSP, input validation, API keys, CSRF, HTTPS, SQL injection prevention | 15/15 |
-| **Testing** | LOW | 99 tests covering all 11 engines + 47 endpoints + i18n + security | 10/10 |
-| **Accessibility** | LOW | WCAG 2.1 AA, 5 a11y profiles, keyboard nav, screen reader, color contrast, text resizing | 5/5 |
-| **Total** | | | **100/100** |
-
-### How We Score 100/100
-
-1. **Problem Alignment (25/25)**: Every FIFA 2026 stadium challenge is mapped to a specific AI engine with real implementations
-2. **Innovation (25/25)**: Smart Fan Journey tracking, AI Match Simulator with momentum, Satisfaction Scoring with 13 touchpoints, AI-powered i18n — not just wrappers
-3. **Code Quality (20/20)**: 11 engines in `core/`, database layer with schema, `__init__.py` for every package, type hints, docstrings
-4. **Security (15/15)**: Flask-Limiter rate limiting, CSP headers, input validation, environment variables, CSRF tokens
-5. **Testing (10/10)**: 99 pytest tests covering all endpoints, engines, i18n translations, and security measures
-6. **Accessibility (5/5)**: WCAG 2.1 AA compliant with 5 accessibility profiles, keyboard navigation, screen reader support
+| Criteria | Weight | StadiumIQ Implementation |
+|----------|--------|--------------------------|
+| **Problem Alignment** | HIGH | Simulation engines addressing crowd, emergency, navigation, multilingual, accessibility challenges |
+| **Innovation** | HIGH | Gemini-powered chat with multi-turn context, sentiment analysis, and translation alongside simulation-based operations |
+| **Code Quality** | HIGH | Modular engine architecture, clean separation, type hints, docstrings, database layer, `__init__.py` files |
+| **Security** | MEDIUM | Rate limiting, CSP, input validation, API keys, CSRF, HTTPS, SQL injection prevention |
+| **Testing** | LOW | 232 tests covering all engines + 47 endpoints + i18n + security |
+| **Accessibility** | LOW | WCAG 2.1 AA, 5 a11y profiles, keyboard nav, screen reader, color contrast, text resizing |
 
 ---
 

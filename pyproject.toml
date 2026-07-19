@@ -1,0 +1,6 @@
+[tool.pytest.ini_options]
+filterwarnings = [
+    "ignore::FutureWarning",
+    "ignore::DeprecationWarning:google",
+    "ignore::ResourceWarning",
+]

@@ -3,11 +3,14 @@ import json
 import logging
 import time
 from collections import OrderedDict
+from typing import Optional
 
-import google.generativeai as genai
 from config.settings import Config
+from core.types import ChatResult
 
 logger = logging.getLogger(__name__)
+
+genai = None
 
 HISTORY_CAP = 20
 HISTORY_WINDOW = 6
@@ -49,15 +52,19 @@ RESPONSE RULES:
 - Limit responses to 200 words unless detail is requested"""
 
     def __init__(self) -> None:
-        self._model: genai.GenerativeModel | None = None
+        """Initialize the GenAI engine and configure Gemini."""
+        self._model = None
         self._conversation_history: dict[str, list[dict[str, str]]] = OrderedDict()
         self._configure_gemini()
 
     def _configure_gemini(self) -> None:
         """Configure Google Gemini API."""
+        global genai
         api_key = Config.GOOGLE_API_KEY
         if api_key:
             try:
+                import google.generativeai as _genai
+                genai = _genai
                 genai.configure(api_key=api_key)
                 self._model = genai.GenerativeModel(
                     Config.GOOGLE_MODEL,
@@ -66,6 +73,21 @@ RESPONSE RULES:
             except Exception:
                 logger.exception("Failed to configure Gemini API")
                 self._model = None
+
+    def is_available(self) -> bool:
+        """Public check whether Gemini is configured and ready."""
+        return self._model is not None
+
+    def generate_text(self, prompt: str) -> Optional[str]:
+        """Generate text using Gemini. Public API for other engines."""
+        try:
+            if not self._model:
+                return None
+            response = self._model.generate_content(prompt)
+            return response.text if response else None
+        except Exception as e:
+            logger.error("Gemini generation failed: %s", e)
+            return None
 
     LANG_NAMES = {
         "en": "English", "es": "Spanish", "fr": "French", "de": "German",
@@ -81,7 +103,7 @@ RESPONSE RULES:
         user_type: str = "fan",
         urgency: str = "normal",
         fan_id: str | None = None,
-    ) -> dict:
+    ) -> ChatResult:
         """Generate AI response using Gemini 2.5 Flash with multi-turn memory."""
         start = time.time()
 
@@ -341,6 +363,69 @@ RESPONSE RULES:
                 "**Available teams:** USA, ENG, BRA, GER, FRA, ARG, ESP, JPN"
             ), "source": "fallback", "confidence": 0.9, "language": "en", "tokens_used": 0}
 
+        if any(w in msg for w in ["merch", "shirt", "jersey", "buy", "souvenir", "gift", "store", "shop", "hat", "scarf"]):
+            return {"response": (
+                "🛍️ **Official Merchandise**\n\n"
+                "**Stadium Store Locations:**\n"
+                "| Store | Zone | Items |\n"
+                "|-------|------|-------|\n"
+                "| Main Store | North Concourse | Jerseys, Hats, Scarves |\n"
+                "| Pop-Up East | East Gate | Mini Jerseys, Pins |\n"
+                "| Pop-Up South | South Concourse | Posters, Keychains |\n\n"
+                "**FIFA 2026 Exclusives:**\n"
+                "• 🏆 Limited Edition MetLife Jersey — $89\n"
+                "• ⚽ Match Ball Replica — $45\n"
+                "• 🧢 StadiumIQ x FIFA Cap — $35\n\n"
+                "**Tip:** Pre-order via StadiumIQ app for express pickup!"
+            ), "source": "fallback", "confidence": 0.9, "language": "en", "tokens_used": 0}
+
+        if any(w in msg for w in ["lost", "found", "missing", "left", "belongings", "wallet", "phone", "bag"]):
+            return {"response": (
+                "🔍 **Lost & Found**\n\n"
+                "**Lost & Found Desk:** Main Concourse, North Gate (near Gate E1)\n"
+                "**Hours:** Open until 1 hour after final whistle\n\n"
+                "**How it works:**\n"
+                "1. Visit the Lost & Found desk or scan the QR code on signage\n"
+                "2. Describe your item — our staff will check the database\n"
+                "3. Unclaimed items held for **30 days**\n\n"
+                "**Common items found today:**\n"
+                "• 📱 3 phones | 👟 2 pairs shoes | 🧣 5 scarves | 🎒 2 bags\n\n"
+                "**Emergency contact:** 1-800-STADIUM\n"
+                "You can also report lost items directly through this chat!"
+            ), "source": "fallback", "confidence": 0.9, "language": "en", "tokens_used": 0}
+
+        if any(w in msg for w in ["service", "complaint", "help desk", "assist", "support", "info desk", "concierge", "staff"]):
+            return {"response": (
+                "📞 **Customer Service**\n\n"
+                "**Guest Services Desks:**\n"
+                "| Location | Services |\n"
+                "|----------|----------|\n"
+                "| North Gate (E1) | Tickets, Will Call, General Info |\n"
+                "| East Gate (E2) | Accessibility, Companion Seating |\n"
+                "| South Gate (E3) | VIP, Premium Access |\n\n"
+                "**Contact Options:**\n"
+                "• 📱 **In-App Chat** — Available 24/7\n"
+                "• 📞 **Hotline:** 1-800-STADIUM\n"
+                "• 💬 **Text:** Text HELP to 55555\n"
+                "• 📧 **Email:** help@stadiumiq.com\n\n"
+                "**Staff in yellow vests** roam all concourses for immediate help!"
+            ), "source": "fallback", "confidence": 0.9, "language": "en", "tokens_used": 0}
+
+        if any(w in msg for w in ["navigate", "directions", "route", "find", "where is", "how to get", "way"]):
+            return {"response": (
+                "🧭 **Navigation & Directions**\n\n"
+                "**Popular Destinations:**\n"
+                "• **Restrooms:** North (2 min), East (3 min), West (4 min)\n"
+                "• **Food Courts:** North (3 min), South (2 min)\n"
+                "• **Medical:** Center pitch (5 min)\n"
+                "• **Merchandise:** North concourse (3 min)\n\n"
+                "**Interactive Map:** Use the Map tab above for turn-by-turn directions\n"
+                "**Crowd-Aware Routing:** I can suggest the least crowded path!\n\n"
+                "**Tips:**\n"
+                "• Escalators near Gates E1 and E3 for upper deck\n"
+                "• Accessible ramps at all entrances"
+            ), "source": "fallback", "confidence": 0.9, "language": "en", "tokens_used": 0}
+
         return {"response": (
             "I can help you with:\n\n"
             "• **Navigation** — 'Where is the nearest restroom?'\n"
@@ -351,7 +436,10 @@ RESPONSE RULES:
             "• **Medical** — 'Where is the first aid?'\n"
             "• **Eco** — 'Where are the recycling stations?'\n"
             "• **Schedule** — 'What matches are today?'\n"
-            "• **Match** — 'Simulate USA vs Brazil'\n\n"
+            "• **Merchandise** — 'Where can I buy a jersey?'\n"
+            "• **Lost & Found** — 'I lost my phone'\n"
+            "• **Customer Service** — 'I need help from staff'\n"
+            "• **Directions** — 'How do I get to my seat?'\n\n"
             "Ask me anything about the stadium!"
         ), "source": "fallback", "confidence": 0.8, "language": "en", "tokens_used": 0}
 

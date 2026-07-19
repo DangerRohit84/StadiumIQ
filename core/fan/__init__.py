@@ -261,6 +261,7 @@ class FanJourney:
         return self.journey_analytics
 
     def _personalize_tips(self, tips: list, prefs: dict) -> list:
+        """Personalize tips based on fan preferences."""
         personalized = list(tips)
         if prefs.get("accessibility"):
             personalized.insert(0, "Accessibility: All routes have ramp/elevator access")
