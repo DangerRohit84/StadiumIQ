@@ -9,4 +9,4 @@ COPY . .
 
 EXPOSE 5000
 
-CMD ["gunicorn", "-c", "gunicorn.conf.py", "run:app"]
+CMD ["gunicorn", "-c", "gunicorn.conf.py", "--worker-class", "gthread", "--threads", "4", "run:app"]
